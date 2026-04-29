@@ -1225,6 +1225,31 @@
     grid-template-columns: 70px 1fr 38px;
   }
 
+  /* Custom hover tooltip for undersea cables */
+  .sm-cable-tip {
+    background: rgba(8, 12, 18, 0.92);
+    border: 1px solid var(--line-2);
+    border-radius: 4px;
+    padding: 5px 9px;
+    color: var(--ink-1);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    white-space: nowrap;
+    user-select: none;
+  }
+  .sm-cable-tip-name {
+    font-size: 12px;
+    color: var(--ink-1);
+    font-weight: 500;
+  }
+  .sm-cable-tip-id {
+    font-size: 10.5px;
+    color: var(--ink-3);
+    letter-spacing: 0.02em;
+  }
+
   .sm-insp-sources {
     margin-top: 8px;
     font-size: 12px;

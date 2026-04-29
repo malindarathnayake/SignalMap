@@ -58,6 +58,7 @@ export function WorldMap() {
   const [topo, setTopo] = useState<Topology | null>(null);
   const [error, setError] = useState(false);
   const [zoomTransform, setZoomTransform] = useState('');
+  const [hoverCable, setHoverCable] = useState<{ id: string; name: string; x: number; y: number } | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
@@ -131,7 +132,8 @@ export function WorldMap() {
   }, [topo]);
 
   return (
-    <svg
+    <>
+      <svg
       ref={svgRef}
       viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
       preserveAspectRatio="xMidYMid meet"
@@ -214,20 +216,44 @@ export function WorldMap() {
                 const densePoints = densifyCablePoints(cable.id, cable.points);
                 const d = pathGen({ type: 'LineString', coordinates: densePoints } as never);
                 if (!d) return null;
+                const isHovered = hoverCable?.id === cable.id;
                 return (
-                  <path
-                    key={cable.id}
-                    d={d}
-                    data-testid={`signalmap-worldmap-cable-${cable.id}`}
-                    style={{
-                      fill: 'none',
-                      stroke: '#5fa6c0',
-                      strokeWidth: thickness * (cable.major ? 1 : 0.7),
-                      strokeOpacity: 0.5,
-                    }}
-                  >
-                    <title>{cable.name} — {cable.id}</title>
-                  </path>
+                  <g key={cable.id}>
+                    {/* Visible path */}
+                    <path
+                      d={d}
+                      data-testid={`signalmap-worldmap-cable-${cable.id}`}
+                      style={{
+                        fill: 'none',
+                        stroke: isHovered ? '#a8e3f5' : '#5fa6c0',
+                        strokeWidth: (thickness * (cable.major ? 1 : 0.7)) * (isHovered ? 2.5 : 1),
+                        strokeOpacity: isHovered ? 0.95 : 0.5,
+                        pointerEvents: 'none',
+                        transition: 'stroke 80ms, stroke-width 80ms, stroke-opacity 80ms',
+                      }}
+                    >
+                      <title>{cable.name} — {cable.id}</title>
+                    </path>
+                    {/* Wide invisible hit zone for hover */}
+                    <path
+                      d={d}
+                      data-testid={`signalmap-worldmap-cable-hit-${cable.id}`}
+                      style={{
+                        fill: 'none',
+                        stroke: 'transparent',
+                        strokeWidth: 4,
+                        pointerEvents: 'stroke',
+                        cursor: 'pointer',
+                      }}
+                      onMouseEnter={(e: MouseEvent) =>
+                        setHoverCable({ id: cable.id, name: cable.name, x: e.clientX, y: e.clientY })
+                      }
+                      onMouseMove={(e: MouseEvent) =>
+                        setHoverCable({ id: cable.id, name: cable.name, x: e.clientX, y: e.clientY })
+                      }
+                      onMouseLeave={() => setHoverCable(null)}
+                    />
+                  </g>
                 );
               });
             })()}
@@ -277,6 +303,23 @@ export function WorldMap() {
           </g>
         </g>
       )}
-    </svg>
+      </svg>
+      {hoverCable && (
+        <div
+          className="sm-cable-tip"
+          data-testid="signalmap-cable-tip"
+          style={{
+            position: 'fixed',
+            left: hoverCable.x + 14,
+            top: hoverCable.y + 14,
+            pointerEvents: 'none',
+            zIndex: 50,
+          }}
+        >
+          <span className="sm-cable-tip-name">{hoverCable.name}</span>
+          <span className="sm-cable-tip-id mono">{hoverCable.id}</span>
+        </div>
+      )}
+    </>
   );
 }
