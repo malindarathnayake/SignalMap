@@ -184,9 +184,9 @@ export function WorldMap() {
                     key={cable.id}
                     d={d}
                     fill="none"
-                    stroke="#7ad6ee"
-                    strokeWidth={cable.major ? 0.4 : 0.25}
-                    strokeOpacity={0.45}
+                    stroke="#5fa6c0"
+                    strokeWidth={cable.major ? 0.18 : 0.1}
+                    strokeOpacity={0.35}
                     vectorEffect="non-scaling-stroke"
                     data-testid={`signalmap-worldmap-cable-${cable.id}`}
                   >
