@@ -11,11 +11,32 @@ export const regions = persist(
   'signalmap-watchlist-regions',
 );
 
+export type MapOverlayLevel = 'off' | 'incident' | 'main' | 'all';
+export const OVERLAY_LEVELS: readonly MapOverlayLevel[] = ['off', 'incident', 'main', 'all'] as const;
+export const OVERLAY_LEVEL_LABELS: Record<MapOverlayLevel, string> = {
+  off: 'Off',
+  incident: 'On incident',
+  main: 'Main',
+  all: 'All',
+};
+
+// Tolerant reader: persisted state may carry a legacy boolean from an
+// earlier version of MapControlsState — coerce true → 'incident',
+// false → 'off', and any malformed value back to the default.
+export function readOverlayLevel(v: unknown): MapOverlayLevel {
+  if (v === true) return 'incident';
+  if (v === false) return 'off';
+  if (typeof v === 'string' && (OVERLAY_LEVELS as readonly string[]).includes(v)) {
+    return v as MapOverlayLevel;
+  }
+  return 'incident';
+}
+
 export type MapControlsState = {
   cluster: boolean;
   minConfidence: number;     // 0..1
-  showCables: boolean;
-  showDatacenters: boolean;
+  showCables: MapOverlayLevel;
+  showDatacenters: MapOverlayLevel;
   brightness: number;        // 0.5..2.0, 1 = neutral
 };
 
@@ -23,8 +44,8 @@ export const mapControls = persist(
   signal<MapControlsState>({
     cluster: true,
     minConfidence: 0.5,
-    showCables: false,
-    showDatacenters: false,
+    showCables: 'incident',
+    showDatacenters: 'incident',
     brightness: 1,
   }),
   'signalmap-watchlist-map-controls',

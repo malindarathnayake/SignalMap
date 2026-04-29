@@ -142,7 +142,7 @@ export function buildEventBrief(event: SignalEvent | undefined, eventId: string)
       `Brief unavailable for ${eventId} — event not found in current fixture set.`,
     ],
     sources: [{ label: 'Reuters', url: 'https://www.reuters.com/' }],
-    generatedAt: new Date().toISOString(),
+    generatedAt: '2026-04-28T12:05:00Z',
     model: 'anthropic/claude-sonnet-4.6 (fixture)',
     warnings: ['event-not-found'],
     degraded: true,
@@ -197,7 +197,10 @@ export function buildEventBrief(event: SignalEvent | undefined, eventId: string)
   return {
     bullets,
     sources,
-    generatedAt: new Date().toISOString(),
+    // Stable timestamp so concurrent calls can be deduplicated and tests
+    // can assert response stability. Real backend should set this to the
+    // moment the brief was generated.
+    generatedAt: '2026-04-28T12:05:00Z',
     model: 'anthropic/claude-sonnet-4.6 (fixture)',
     warnings: [],
     degraded: false,

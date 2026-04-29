@@ -1,5 +1,11 @@
-import { mapControls } from '../../state/watchlist.ts';
-import type { MapControlsState } from '../../state/watchlist.ts';
+import {
+  mapControls,
+  readOverlayLevel,
+  OVERLAY_LEVELS,
+  OVERLAY_LEVEL_LABELS,
+  type MapControlsState,
+  type MapOverlayLevel,
+} from '../../state/watchlist.ts';
 
 function set<K extends keyof MapControlsState>(
   key: K,
@@ -8,8 +14,37 @@ function set<K extends keyof MapControlsState>(
   mapControls.value = { ...mapControls.value, [key]: value };
 }
 
+function OverlayLevelControl({
+  testIdPrefix,
+  value,
+  onChange,
+}: {
+  testIdPrefix: string;
+  value: MapOverlayLevel;
+  onChange: (next: MapOverlayLevel) => void;
+}) {
+  return (
+    <div className="sm-segment" role="group" data-testid={`${testIdPrefix}-segment`}>
+      {OVERLAY_LEVELS.map(lvl => (
+        <button
+          key={lvl}
+          type="button"
+          className={`sm-segment-btn${value === lvl ? ' active' : ''}`}
+          data-testid={`${testIdPrefix}-${lvl}`}
+          aria-pressed={value === lvl}
+          onClick={() => onChange(lvl)}
+        >
+          {OVERLAY_LEVEL_LABELS[lvl]}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export function MapControls() {
   const mc = mapControls.value;
+  const cablesLevel = readOverlayLevel(mc.showCables);
+  const dcLevel = readOverlayLevel(mc.showDatacenters);
 
   return (
     <div className="sm-rail-section" data-testid="signalmap-rail-map-controls">
@@ -49,27 +84,23 @@ export function MapControls() {
           </span>
         </label>
 
-        <label className="sm-control-toggle">
-          <input
-            type="checkbox"
-            checked={mc.showCables}
-            data-testid="signalmap-rail-cables"
-            onChange={e => set('showCables', (e.currentTarget as HTMLInputElement).checked)}
+        <div className="sm-control-block" data-testid="signalmap-rail-cables-block">
+          <span className="sm-control-block-label">Subsea cables</span>
+          <OverlayLevelControl
+            testIdPrefix="signalmap-rail-cables"
+            value={cablesLevel}
+            onChange={(next) => set('showCables', next)}
           />
-          <span>Subsea cables</span>
-          <span className="sm-control-hint">on incident</span>
-        </label>
+        </div>
 
-        <label className="sm-control-toggle">
-          <input
-            type="checkbox"
-            checked={mc.showDatacenters}
-            data-testid="signalmap-rail-datacenters"
-            onChange={e => set('showDatacenters', (e.currentTarget as HTMLInputElement).checked)}
+        <div className="sm-control-block" data-testid="signalmap-rail-datacenters-block">
+          <span className="sm-control-block-label">Datacenters</span>
+          <OverlayLevelControl
+            testIdPrefix="signalmap-rail-datacenters"
+            value={dcLevel}
+            onChange={(next) => set('showDatacenters', next)}
           />
-          <span>Datacenters</span>
-          <span className="sm-control-hint">on incident</span>
-        </label>
+        </div>
 
         <label className="sm-control-toggle">
           <input

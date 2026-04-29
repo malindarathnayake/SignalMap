@@ -78,14 +78,14 @@ test.describe('SignalMap LeftRail (unit 4c)', () => {
     expect(stored.minConfidence).toBeCloseTo(0.8, 5);
   });
 
-  test('MapControls cables/datacenters/cluster toggles persist', async ({ page }) => {
+  test('MapControls cables/datacenters segments + cluster toggle persist', async ({ page }) => {
     await page.goto('/');
-    await page.getByTestId('signalmap-rail-cables').check();
-    await page.getByTestId('signalmap-rail-datacenters').check();
+    await page.getByTestId('signalmap-rail-cables-all').click();
+    await page.getByTestId('signalmap-rail-datacenters-main').click();
     await page.getByTestId('signalmap-rail-cluster').uncheck();
     const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('signalmap-watchlist-map-controls')!));
-    expect(stored.showCables).toBe(true);
-    expect(stored.showDatacenters).toBe(true);
+    expect(stored.showCables).toBe('all');
+    expect(stored.showDatacenters).toBe('main');
     expect(stored.cluster).toBe(false);
   });
 });

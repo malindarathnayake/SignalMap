@@ -6,7 +6,12 @@ import { select } from 'd3-selection';
 import type { Topology } from 'topojson-specification';
 import type { FeatureCollection, Geometry } from 'geojson';
 import { mappableEvents } from '../../state/signals.ts';
-import { regions as watchedRegions, mapControls } from '../../state/watchlist.ts';
+import {
+  regions as watchedRegions,
+  mapControls,
+  readOverlayLevel,
+} from '../../state/watchlist.ts';
+import { UNDERSEA_CABLES } from '../../data/undersea-cables.ts';
 import { MapMarker } from './MapMarker.tsx';
 
 const WIDTH = 960;
@@ -76,8 +81,8 @@ export function WorldMap() {
     };
   }, []);
 
-  const { paths, projection } = useMemo(() => {
-    if (!topo) return { paths: [] as { d: string; key: string | number }[], projection: null };
+  const { paths, projection, pathGen } = useMemo(() => {
+    if (!topo) return { paths: [] as { d: string; key: string | number }[], projection: null, pathGen: null };
 
     const collection = feature(
       topo,
@@ -96,7 +101,7 @@ export function WorldMap() {
       key: (f.id as string | number | undefined) ?? i,
     }));
 
-    return { paths: out, projection: proj };
+    return { paths: out, projection: proj, pathGen };
   }, [topo]);
 
   return (
@@ -136,6 +141,42 @@ export function WorldMap() {
                 vectorEffect="non-scaling-stroke"
               />
             ))}
+          </g>
+          {/* Undersea cables — filtered by mapControls.showCables level */}
+          <g data-testid="signalmap-worldmap-cables">
+            {(() => {
+              if (!projection || !pathGen) return null;
+              const level = readOverlayLevel(mapControls.value.showCables);
+              if (level === 'off') return null;
+              const cables = level === 'main'
+                ? UNDERSEA_CABLES.filter(c => c.major)
+                : level === 'all'
+                  ? UNDERSEA_CABLES
+                  // 'incident' — no live fault data wired yet; render the
+                  // major set so the layer isn't invisible while the level
+                  // sits at the default. This becomes "cables that have
+                  // active outage signals" once the collector publishes
+                  // cable-fault events.
+                  : UNDERSEA_CABLES.filter(c => c.major);
+              return cables.map((cable) => {
+                const d = pathGen({ type: 'LineString', coordinates: cable.points } as never);
+                if (!d) return null;
+                return (
+                  <path
+                    key={cable.id}
+                    d={d}
+                    fill="none"
+                    stroke="#7ad6ee"
+                    strokeWidth={cable.major ? 1 : 0.6}
+                    strokeOpacity={0.55}
+                    vectorEffect="non-scaling-stroke"
+                    data-testid={`signalmap-worldmap-cable-${cable.id}`}
+                  >
+                    <title>{cable.name}</title>
+                  </path>
+                );
+              });
+            })()}
           </g>
           {/* Watchlist region halos */}
           <g data-testid="signalmap-worldmap-halos">

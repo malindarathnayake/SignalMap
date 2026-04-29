@@ -1183,6 +1183,44 @@
     50%      { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 0 8px transparent; }
   }
 
+  /* Segmented control used by Map controls (Subsea cables / Datacenters) */
+  .sm-control-block {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 4px 0;
+  }
+  .sm-control-block-label {
+    color: var(--ink-2);
+    font-size: 12px;
+  }
+  .sm-segment {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    background: var(--bg-2);
+    border: 1px solid var(--line-1);
+    border-radius: 4px;
+    padding: 2px;
+  }
+  .sm-segment-btn {
+    background: transparent;
+    border: none;
+    color: var(--ink-3);
+    font-size: 10.5px;
+    padding: 4px 4px;
+    border-radius: 2px;
+    cursor: pointer;
+    text-align: center;
+    transition: background 100ms, color 100ms;
+  }
+  .sm-segment-btn:hover { color: var(--ink-2); }
+  .sm-segment-btn.active {
+    background: var(--accent);
+    color: var(--bg-1);
+    font-weight: 500;
+  }
+
   .sm-insp-sources {
     margin-top: 8px;
     font-size: 12px;

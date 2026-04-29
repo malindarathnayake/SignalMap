@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { GLOBAL_BRIEF_FIXTURE, EVENT_BRIEF_FIXTURE } from '../src/fixtures/signalmap.ts';
+import { GLOBAL_BRIEF_FIXTURE, EVENT_BRIEF_FIXTURE, LIST_EVENTS_FIXTURE, buildEventBrief } from '../src/fixtures/signalmap.ts';
 
 test.describe('BriefStrip + WhyItMattersTab (unit 6e gate)', () => {
   test.beforeEach(async ({ page, request }) => {
@@ -90,10 +90,16 @@ test.describe('BriefStrip + WhyItMattersTab (unit 6e gate)', () => {
     await expect(btn).toBeVisible();
     await btn.click();
 
-    // Text should appear with the fixture's first bullet
+    // Text should appear with the per-event brief's first bullet —
+    // buildEventBrief generates content from the event's own fields,
+    // so we recompute the expected text here for the same eventId.
+    const expectedEvent = LIST_EVENTS_FIXTURE.events.find(e => e.id === 'rdr-iq-01');
+    const expectedBrief = buildEventBrief(expectedEvent, 'rdr-iq-01');
     const whyText = page.getByTestId('signalmap-inspector-why-text');
     await expect(whyText).toBeVisible({ timeout: 5000 });
-    await expect(whyText).toContainText(EVENT_BRIEF_FIXTURE.bullets[0].slice(0, 30));
+    await expect(whyText).toContainText(expectedBrief.bullets[0].slice(0, 30));
+    // Reference to EVENT_BRIEF_FIXTURE preserved for the fallback path test elsewhere.
+    void EVENT_BRIEF_FIXTURE;
 
     // Button hides after success
     await expect(page.getByTestId('signalmap-inspector-why-button')).toHaveCount(0);
