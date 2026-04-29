@@ -9,6 +9,8 @@ import { bottomPanelTab } from '../../state/cameras.ts';
 import { FeedResizer } from './FeedResizer.tsx';
 import { LiveFeed } from './LiveFeed.tsx';
 import { LiveCameras } from './LiveCameras.tsx';
+import { NewsChannels } from './NewsChannels.tsx';
+import { newsChannels } from '../../state/news-channels.ts';
 
 export function BottomPanel() {
   const tab = bottomPanelTab.value;
@@ -50,9 +52,22 @@ export function BottomPanel() {
         >
           <span className="eyebrow">Live cameras</span>
         </button>
+        <button
+          type="button"
+          role="tab"
+          className={`sm-bottom-tab${tab === 'news' ? ' active' : ''}`}
+          data-testid="signalmap-bottom-tab-news"
+          aria-selected={tab === 'news'}
+          onClick={() => { bottomPanelTab.value = 'news'; }}
+        >
+          <span className="eyebrow">News</span>
+          <span className="sm-feed-count mono tnum">{newsChannels.value.length}</span>
+        </button>
       </div>
       <div className="sm-bottom-body">
-        {tab === 'feed' ? <LiveFeed embedded /> : <LiveCameras />}
+        {tab === 'feed' && <LiveFeed embedded />}
+        {tab === 'cameras' && <LiveCameras />}
+        {tab === 'news' && <NewsChannels />}
       </div>
     </section>
   );

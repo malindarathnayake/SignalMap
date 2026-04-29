@@ -72,7 +72,7 @@ export const cameraPrefs = persist(
   'signalmap-camera-prefs',
 );
 
-export type BottomPanelTab = 'feed' | 'cameras';
+export type BottomPanelTab = 'feed' | 'cameras' | 'news';
 export const bottomPanelTab = persist(
   signal<BottomPanelTab>('feed'),
   'signalmap-bottom-panel-tab',
