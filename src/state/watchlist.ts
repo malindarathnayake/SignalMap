@@ -45,7 +45,7 @@ export const mapControls = persist(
   signal<MapControlsState>({
     cluster: true,
     minConfidence: 0.5,
-    showCables: 'incident',
+    showCables: 'off',
     showDatacenters: 'incident',
     brightness: 1,
     cableThickness: 0.1,
