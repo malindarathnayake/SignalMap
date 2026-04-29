@@ -135,10 +135,12 @@ export function WorldMap() {
               <path
                 key={key}
                 d={d}
-                fill="var(--land)"
-                stroke="var(--land-stroke)"
-                strokeWidth={0.5}
-                vectorEffect="non-scaling-stroke"
+                style={{
+                  fill: 'var(--land)',
+                  stroke: 'var(--land-stroke)',
+                  strokeWidth: 0.5,
+                  vectorEffect: 'non-scaling-stroke',
+                }}
               />
             ))}
           </g>
@@ -148,6 +150,11 @@ export function WorldMap() {
               if (!projection || !pathGen) return null;
               const level = readOverlayLevel(mapControls.value.showCables);
               if (level === 'off') return null;
+
+              // Hoist signal reads to the IIFE top so Preact subscribes to
+              // them on this component's render even though the actual use
+              // is inside the cables.map() callback below.
+              const thickness = mapControls.value.cableThickness ?? 0.1;
 
               let cables: typeof UNDERSEA_CABLES;
               if (level === 'main') {
@@ -170,9 +177,10 @@ export function WorldMap() {
                   }
                 }
                 cables = UNDERSEA_CABLES.filter(c =>
-                  c.landingPoints?.some(lp =>
+                  FLAGSHIP_CABLE_IDS.has(c.id) &&
+                  (c.landingPoints?.some(lp =>
                     incidentCountries.has(lp.countryName.toLowerCase()),
-                  ) ?? false,
+                  ) ?? false),
                 );
               }
 
@@ -183,12 +191,13 @@ export function WorldMap() {
                   <path
                     key={cable.id}
                     d={d}
-                    fill="none"
-                    stroke="#5fa6c0"
-                    strokeWidth={cable.major ? 0.18 : 0.1}
-                    strokeOpacity={0.35}
-                    vectorEffect="non-scaling-stroke"
                     data-testid={`signalmap-worldmap-cable-${cable.id}`}
+                    style={{
+                      fill: 'none',
+                      stroke: '#5fa6c0',
+                      strokeWidth: thickness * (cable.major ? 1 : 0.7),
+                      strokeOpacity: 0.5,
+                    }}
                   >
                     <title>{cable.name}</title>
                   </path>

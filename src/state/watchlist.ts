@@ -37,7 +37,8 @@ export type MapControlsState = {
   minConfidence: number;     // 0..1
   showCables: MapOverlayLevel;
   showDatacenters: MapOverlayLevel;
-  brightness: number;        // 0.5..2.0, 1 = neutral
+  brightness: number;        // 0.5..4.0, 1 = neutral
+  cableThickness: number;    // 0.05..1.5 stroke-width multiplier (major); minor = 0.7x
 };
 
 export const mapControls = persist(
@@ -47,6 +48,7 @@ export const mapControls = persist(
     showCables: 'incident',
     showDatacenters: 'incident',
     brightness: 1,
+    cableThickness: 0.1,
   }),
   'signalmap-watchlist-map-controls',
 );

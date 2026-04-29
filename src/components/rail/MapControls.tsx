@@ -91,6 +91,23 @@ export function MapControls() {
             value={cablesLevel}
             onChange={(next) => set('showCables', next)}
           />
+          {cablesLevel !== 'off' && (
+            <label className="sm-control-row sm-control-row-inline">
+              <span>Thickness</span>
+              <input
+                type="range"
+                min={0.05}
+                max={1.5}
+                step={0.05}
+                value={mc.cableThickness ?? 0.1}
+                data-testid="signalmap-rail-cable-thickness"
+                onInput={e => set('cableThickness', Number((e.currentTarget as HTMLInputElement).value))}
+              />
+              <span className="mono tnum" data-testid="signalmap-rail-cable-thickness-value">
+                {((mc.cableThickness ?? 0.1).toFixed(2))}
+              </span>
+            </label>
+          )}
         </div>
 
         <div className="sm-control-block" data-testid="signalmap-rail-datacenters-block">

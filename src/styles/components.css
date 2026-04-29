@@ -1220,6 +1220,10 @@
     color: var(--bg-1);
     font-weight: 500;
   }
+  .sm-control-row-inline {
+    margin-top: 4px;
+    grid-template-columns: 70px 1fr 38px;
+  }
 
   .sm-insp-sources {
     margin-top: 8px;
