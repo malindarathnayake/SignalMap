@@ -15,3 +15,9 @@ export const categories = persist(
   signal<string[]>(DEFAULT_CATEGORIES),
   'signalmap-filters-categories',
 );
+
+export type FeedSeverityFilter = 'all' | 'main';
+export const feedSeverityFilter = persist(
+  signal<FeedSeverityFilter>('all'),
+  'signalmap-filters-feed-severity',
+);
