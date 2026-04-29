@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, useRef } from 'preact/hooks';
 import { feature } from 'topojson-client';
-import { geoEquirectangular, geoPath } from 'd3-geo';
+import { geoEquirectangular, geoPath, geoInterpolate } from 'd3-geo';
 import { zoom, type D3ZoomEvent } from 'd3-zoom';
 import { select } from 'd3-selection';
 import type { Topology } from 'topojson-specification';
@@ -16,6 +16,32 @@ import { MapMarker } from './MapMarker.tsx';
 
 const WIDTH = 960;
 const HEIGHT = 480;
+
+// Cables are stored as a small set of waypoints; rendered straight on an
+// equirectangular projection that's a polygonal path, not the smooth arc
+// the cable actually follows on the globe. Densify each segment with
+// intermediate points along the great-circle arc (d3-geo geoInterpolate),
+// then let pathGen project each point. The projection's natural curvature
+// + many short segments produces the smooth arc shape.
+const DENSIFY_SAMPLES = 32;
+const densifyCache = new Map<string, [number, number][]>();
+function densifyCablePoints(id: string, pts: [number, number][]): [number, number][] {
+  const cached = densifyCache.get(id);
+  if (cached) return cached;
+  if (pts.length < 2) {
+    densifyCache.set(id, pts);
+    return pts;
+  }
+  const out: [number, number][] = [pts[0]!];
+  for (let i = 0; i < pts.length - 1; i++) {
+    const interp = geoInterpolate(pts[i]!, pts[i + 1]!);
+    for (let s = 1; s <= DENSIFY_SAMPLES; s++) {
+      out.push(interp(s / DENSIFY_SAMPLES) as [number, number]);
+    }
+  }
+  densifyCache.set(id, out);
+  return out;
+}
 
 const REGION_BBOX: Record<string, [number, number, number, number]> = {
   na:    [-170, 5,  -50, 75],
@@ -185,7 +211,8 @@ export function WorldMap() {
               }
 
               return cables.map((cable) => {
-                const d = pathGen({ type: 'LineString', coordinates: cable.points } as never);
+                const densePoints = densifyCablePoints(cable.id, cable.points);
+                const d = pathGen({ type: 'LineString', coordinates: densePoints } as never);
                 if (!d) return null;
                 return (
                   <path
@@ -199,7 +226,7 @@ export function WorldMap() {
                       strokeOpacity: 0.5,
                     }}
                   >
-                    <title>{cable.name}</title>
+                    <title>{cable.name} — {cable.id}</title>
                   </path>
                 );
               });
