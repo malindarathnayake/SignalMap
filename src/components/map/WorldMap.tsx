@@ -148,16 +148,34 @@ export function WorldMap() {
               if (!projection || !pathGen) return null;
               const level = readOverlayLevel(mapControls.value.showCables);
               if (level === 'off') return null;
-              const cables = level === 'main'
-                ? UNDERSEA_CABLES.filter(c => c.major)
-                : level === 'all'
-                  ? UNDERSEA_CABLES
-                  // 'incident' — no live fault data wired yet; render the
-                  // major set so the layer isn't invisible while the level
-                  // sits at the default. This becomes "cables that have
-                  // active outage signals" once the collector publishes
-                  // cable-fault events.
-                  : UNDERSEA_CABLES.filter(c => c.major);
+
+              let cables: typeof UNDERSEA_CABLES;
+              if (level === 'main') {
+                cables = UNDERSEA_CABLES.filter(c => c.major);
+              } else if (level === 'all') {
+                cables = UNDERSEA_CABLES;
+              } else {
+                // 'incident' — match cables whose landing-point country
+                // appears in any active event's location. e.g. a UK
+                // routing anomaly highlights every transatlantic cable
+                // that lands in Great Britain (Grace Hopper, etc).
+                const incidentCountries = new Set<string>();
+                for (const ev of mappableEvents.value) {
+                  for (const loc of ev.locations) {
+                    const name = loc.name.toLowerCase();
+                    incidentCountries.add(name);
+                    // "Basra, Iraq" → also add "iraq"
+                    const parts = name.split(',').map(p => p.trim());
+                    if (parts.length > 1) incidentCountries.add(parts[parts.length - 1]!);
+                  }
+                }
+                cables = UNDERSEA_CABLES.filter(c =>
+                  c.landingPoints?.some(lp =>
+                    incidentCountries.has(lp.countryName.toLowerCase()),
+                  ) ?? false,
+                );
+              }
+
               return cables.map((cable) => {
                 const d = pathGen({ type: 'LineString', coordinates: cable.points } as never);
                 if (!d) return null;
@@ -167,8 +185,8 @@ export function WorldMap() {
                     d={d}
                     fill="none"
                     stroke="#7ad6ee"
-                    strokeWidth={cable.major ? 1 : 0.6}
-                    strokeOpacity={0.55}
+                    strokeWidth={cable.major ? 0.4 : 0.25}
+                    strokeOpacity={0.45}
                     vectorEffect="non-scaling-stroke"
                     data-testid={`signalmap-worldmap-cable-${cable.id}`}
                   >
