@@ -49,6 +49,13 @@ test.describe('SignalMap Inspector + BriefStrip placeholders (unit 4d)', () => {
   });
 
   test('BriefStrip shows Loading placeholder', async ({ page }) => {
+    // Phase 6e wired BriefStrip to actually fetch the brief on mount; the
+    // loading state is only visible during the request. Intercept and delay
+    // the response so the assertion has time to observe it.
+    await page.route('**/api/signalmap/brief/global', async (route) => {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      await route.continue();
+    });
     await page.goto('/');
     await expect(page.getByTestId('signalmap-brief-strip')).toBeVisible();
     await expect(page.getByTestId('signalmap-brief-strip-loading')).toContainText('Loading');

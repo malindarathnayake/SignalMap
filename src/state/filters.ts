@@ -21,3 +21,10 @@ export const feedSeverityFilter = persist(
   signal<FeedSeverityFilter>('all'),
   'signalmap-filters-feed-severity',
 );
+
+export const ALL_SEVERITIES = ['critical', 'major', 'minor', 'info'] as const;
+export type FeedSeverity = (typeof ALL_SEVERITIES)[number];
+export const mainSeverities = persist(
+  signal<FeedSeverity[]>(['critical', 'major']),
+  'signalmap-filters-main-severities',
+);
