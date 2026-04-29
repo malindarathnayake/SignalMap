@@ -11,7 +11,7 @@ import {
   mapControls,
   readOverlayLevel,
 } from '../../state/watchlist.ts';
-import { UNDERSEA_CABLES } from '../../data/undersea-cables.ts';
+import { UNDERSEA_CABLES, FLAGSHIP_CABLE_IDS } from '../../data/undersea-cables.ts';
 import { MapMarker } from './MapMarker.tsx';
 
 const WIDTH = 960;
@@ -151,7 +151,7 @@ export function WorldMap() {
 
               let cables: typeof UNDERSEA_CABLES;
               if (level === 'main') {
-                cables = UNDERSEA_CABLES.filter(c => c.major);
+                cables = UNDERSEA_CABLES.filter(c => FLAGSHIP_CABLE_IDS.has(c.id));
               } else if (level === 'all') {
                 cables = UNDERSEA_CABLES;
               } else {

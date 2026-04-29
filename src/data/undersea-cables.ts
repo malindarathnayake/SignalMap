@@ -12,6 +12,35 @@ export type UnderseaCable = {
   countriesServed?: { country: string; capacityShare: number; isRedundant: boolean }[];
 };
 
+// Curated flagship set — the cables a global SignalMap should always
+// show at the "Main" filter level. Picked for recognisability and
+// regional coverage (transatlantic, transpacific, intra-Asia, Africa,
+// South Atlantic). Smaller than the `major: true` subset (~25) which
+// the legacy code used; the user wants only the truly headline cables.
+export const FLAGSHIP_CABLE_IDS = new Set<string>([
+  // Transatlantic — Europe ↔ North America
+  'marea',
+  'grace_hopper',
+  'dunant',
+  'amitie',
+  // Transpacific — Asia ↔ NA West Coast
+  'jupiter',
+  'faster',
+  'topaz',
+  'echo',
+  // Africa & Europe-Asia trunk
+  '2africa',
+  'equiano',
+  'africa_coast_to_europe_ace',
+  'seamewe_6',
+  // South Atlantic — Brazil ↔ Europe / NA
+  'ellalink',
+  'monet',
+  // Asia regional
+  'bifrost',
+  'apricot',
+]);
+
 export const UNDERSEA_CABLES: UnderseaCable[] = [
   // === TRANS-ATLANTIC ===
   {
