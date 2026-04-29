@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Wasabi Technologies Status - Incident History</title>
+    <link>https://status.wasabi.com</link>
+    <description>Wasabi Technologies status history.</description>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 25 Apr 2026 02:44:00 Z</lastBuildDate>
+    <item>
+      <title>Maintenance Activity Advisory for 30 April 2026 in US-WEST-1</title>
+      <link>https://status.wasabi.com/example/us-west-1-maintenance-2026-04-30</link>
+      <pubDate>Fri, 24 Apr 2026 16:00:00 Z</pubDate>
+      <guid isPermaLink="false">wasabi-us-west-1-maintenance-2026-04-30</guid>
+      <description>Wasabi Technologies scheduled maintenance activity in US-WEST-1. No customer action is required.</description>
+    </item>
+  </channel>
+</rss>

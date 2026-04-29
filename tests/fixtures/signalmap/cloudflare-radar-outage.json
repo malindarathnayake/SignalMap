@@ -1,0 +1,37 @@
+{
+  "_fixtureNote": "UNVERIFIED: unauthenticated Cloudflare Radar outage probes returned 400 and no token was available. This fixture uses a minimal documented response envelope with representative annotation fields.",
+  "success": true,
+  "errors": [],
+  "messages": [],
+  "result": {
+    "annotations": [
+      {
+        "id": "radar-outage-fr-power-2026-04-25",
+        "locations": [
+          "FR"
+        ],
+        "locationsDetails": [
+          {
+            "code": "FR",
+            "name": "France"
+          }
+        ],
+        "scope": "REGIONAL",
+        "linkedUrl": "https://radar.cloudflare.com/outage/example-fr-power-2026-04-25",
+        "description": "Regional Internet disruption observed in France following a power outage.",
+        "startDate": "2026-04-25T01:20:00Z",
+        "endDate": null,
+        "outage": {
+          "outageCause": "POWER_OUTAGE",
+          "outageType": "REGIONAL"
+        },
+        "asnsDetails": [
+          {
+            "asn": 3215,
+            "name": "Orange S.A."
+          }
+        ]
+      }
+    ]
+  }
+}

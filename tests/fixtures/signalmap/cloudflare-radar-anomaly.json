@@ -1,0 +1,25 @@
+{
+  "_fixtureNote": "UNVERIFIED: unauthenticated Cloudflare Radar traffic anomaly probes returned 400 and no token was available. This fixture uses a minimal documented response envelope with representative anomaly fields.",
+  "success": true,
+  "errors": [],
+  "messages": [],
+  "result": {
+    "trafficAnomalies": [
+      {
+        "uuid": "2f5b4b47-5dc5-47be-8e7f-4d9a53b5f9f1",
+        "type": "TRAFFIC_DROP",
+        "status": "ACTIVE",
+        "startDate": "2026-04-25T02:05:00Z",
+        "endDate": null,
+        "asnDetails": {
+          "asn": 3215,
+          "name": "Orange S.A."
+        },
+        "locationDetails": {
+          "code": "FR",
+          "name": "France"
+        }
+      }
+    ]
+  }
+}

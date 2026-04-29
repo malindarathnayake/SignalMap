@@ -1,0 +1,55 @@
+name: signalmap
+
+services:
+  signalmap:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        VITE_VARIANT: signalmap
+        VITE_WS_API_URL: /api/ws
+    image: signalmap:latest
+    container_name: signalmap
+    ports:
+      - "${SIGNALMAP_PORT:-3000}:8080"
+    environment:
+      LOCAL_API_PORT: "46123"
+      LOCAL_API_MODE: "docker"
+      LOCAL_API_CLOUD_FALLBACK: "false"
+      REDIS_PASSWORD: "${REDIS_PASSWORD:-}"
+      REDIS_URL: "redis://signalmap-redis:6379"
+      SIGNALMAP_DATA_DIR: "/data/signalmap"
+      SIGNALMAP_LANCEDB_URI: "/data/signalmap/lancedb"
+      TRANSFORMERS_CACHE: "/data/signalmap/models"
+      HF_HOME: "/data/signalmap/models"
+      SIGNALMAP_DISTILL_ROOT: "/opt/distill"
+      SIGNALMAP_RSS_POLL_MINUTES: "${SIGNALMAP_RSS_POLL_MINUTES:-15}"
+      SIGNALMAP_VECTOR_ENABLED: "${SIGNALMAP_VECTOR_ENABLED:-true}"
+      SIGNALMAP_LLM_MODELS: "${SIGNALMAP_LLM_MODELS:-}"
+      OPENROUTER_BASE_URL: "${OPENROUTER_BASE_URL:-}"
+      OPENROUTER_API_KEY: "${OPENROUTER_API_KEY:-}"
+      CLOUDFLARE_API_TOKEN: "${CLOUDFLARE_API_TOKEN:-}"
+    volumes:
+      - signalmap-lancedb:/data/signalmap/lancedb
+      - signalmap-models:/data/signalmap/models
+      - type: bind
+        source: ${SIGNALMAP_DISTILL_HOST_ROOT:-../distill}
+        target: /opt/distill
+        read_only: true
+    depends_on:
+      redis:
+        condition: service_started
+    restart: unless-stopped
+
+  redis:
+    image: docker.io/redis:7-alpine
+    container_name: signalmap-redis
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - signalmap-redis-data:/data
+    restart: unless-stopped
+
+volumes:
+  signalmap-lancedb:
+  signalmap-models:
+  signalmap-redis-data:

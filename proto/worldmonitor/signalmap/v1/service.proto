@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+package worldmonitor.signalmap.v1;
+
+import "sebuf/http/annotations.proto";
+
+service SignalMapService {
+  option (sebuf.http.service_config) = {base_path: "/api/signalmap/v1"};
+
+  rpc ListSignalMapEvents(ListSignalMapEventsRequest) returns (ListSignalMapEventsResponse) {
+    option (sebuf.http.config) = {path: "/list-signal-map-events", method: HTTP_METHOD_GET};
+  }
+}
+
+message ListSignalMapEventsRequest {
+  int64 start_ms = 1 [
+    (sebuf.http.int64_encoding) = INT64_ENCODING_NUMBER,
+    (sebuf.http.query) = {name: "start_ms"}
+  ];
+  int64 end_ms = 2 [
+    (sebuf.http.int64_encoding) = INT64_ENCODING_NUMBER,
+    (sebuf.http.query) = {name: "end_ms"}
+  ];
+  repeated string categories = 3 [(sebuf.http.query) = {name: "categories"}];
+  repeated string watch_regions = 4 [(sebuf.http.query) = {name: "watch_regions"}];
+  repeated string watch_providers = 5 [(sebuf.http.query) = {name: "watch_providers"}];
+  bool watchlist_only = 6 [(sebuf.http.query) = {name: "watchlist_only"}];
+}
+
+message ListSignalMapEventsResponse {
+  repeated SignalMapEvent events = 1;
+  repeated SignalMapSourceHealth source_health = 2;
+  int64 fetched_at = 3 [(sebuf.http.int64_encoding) = INT64_ENCODING_NUMBER];
+  bool upstream_unavailable = 4;
+}
+
+message SignalMapEvent {
+  string id = 1;
+  string category = 2;
+  string severity = 3;
+  string title = 4;
+  string summary = 5;
+  repeated string tags = 6;
+  optional string started_at = 7;
+  optional string ended_at = 8;
+  string last_observed_at = 9;
+  repeated SignalMapLocation locations = 10;
+  repeated SignalMapSource sources = 11;
+  double confidence = 12;
+  optional string provider = 13;
+  string kind = 14;
+  bool watchlist_match = 15;
+  bool marker_eligible = 16;
+}
+
+message SignalMapLocation {
+  string name = 1;
+  optional string country_iso2 = 2;
+  optional double lat = 3;
+  optional double lon = 4;
+  string scope = 5;
+  double confidence = 6;
+  optional string evidence = 7;
+}
+
+message SignalMapSource {
+  string id = 1;
+  string label = 2;
+  optional string url = 3;
+  optional int32 tier = 4;
+  optional bool verified = 5;
+  optional string fetched_at = 6;
+}
+
+message SignalMapSourceHealth {
+  string id = 1;
+  string label = 2;
+  string status = 3;
+  int64 fetched_at = 4 [(sebuf.http.int64_encoding) = INT64_ENCODING_NUMBER];
+  int32 event_count = 5;
+  string detail = 6;
+}

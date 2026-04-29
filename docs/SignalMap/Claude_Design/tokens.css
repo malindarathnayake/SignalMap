@@ -1,0 +1,136 @@
+/* SignalMap design tokens */
+
+:root {
+  /* Type */
+  --sm-font-sans: 'Inter Tight', 'Inter', system-ui, -apple-system, sans-serif;
+  --sm-font-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace;
+
+  /* Spacing scale */
+  --sm-1: 4px;
+  --sm-2: 8px;
+  --sm-3: 12px;
+  --sm-4: 16px;
+  --sm-5: 20px;
+  --sm-6: 24px;
+  --sm-7: 32px;
+  --sm-8: 48px;
+
+  /* Radii */
+  --sm-r-sm: 3px;
+  --sm-r: 6px;
+  --sm-r-lg: 8px;
+
+  /* Category accents (theme-independent hues) */
+  --cat-internet: #ff6b35;       /* orange — Cloudflare-ish urgency */
+  --cat-provider: #ffb020;       /* amber — service health */
+  --cat-geopolitics: #c084fc;    /* violet */
+  --cat-conflict: #f43f5e;       /* rose */
+  --cat-finance: #34d399;        /* emerald */
+  --cat-technology: #38bdf8;     /* sky */
+  --cat-cyber: #ef4444;          /* red */
+  --cat-climate: #14b8a6;        /* teal */
+  --cat-health: #f472b6;         /* pink */
+  --cat-energy: #facc15;         /* yellow */
+  --cat-supply: #a3a3a3;         /* gray */
+  --cat-infra: #818cf8;          /* indigo */
+
+  /* Severity */
+  --sev-critical: #ef4444;
+  --sev-major: #ff6b35;
+  --sev-minor: #facc15;
+  --sev-info: #38bdf8;
+  --sev-resolved: #34d399;
+}
+
+/* DARK theme — default */
+:root, [data-theme="dark"] {
+  --bg-0: #07090d;        /* page */
+  --bg-1: #0c1016;        /* panel */
+  --bg-2: #11161e;        /* panel raised */
+  --bg-3: #161c26;        /* panel hover */
+  --bg-map: #050709;      /* map base */
+  --land: #0f141c;        /* country fill */
+  --land-active: #1a2230; /* hovered country */
+  --land-stroke: #1e2735; /* country borders */
+  --grid: #0e131a;        /* graticule */
+
+  --ink-1: #e8eef7;       /* primary text */
+  --ink-2: #aab4c5;       /* secondary text */
+  --ink-3: #6f7a8d;       /* tertiary / labels */
+  --ink-4: #4a5260;       /* muted */
+
+  --line-1: #1a212c;      /* hairlines */
+  --line-2: #232c39;      /* stronger borders */
+  --line-3: #2f3a4a;      /* hover borders */
+
+  --accent: #4cc9f0;      /* SignalMap cyan */
+  --accent-dim: #1e6680;
+  --accent-soft: rgba(76, 201, 240, 0.12);
+
+  --watchlist: #ffd166;   /* gold for watchlist matches */
+  --watchlist-soft: rgba(255, 209, 102, 0.14);
+
+  --shadow-1: 0 1px 0 rgba(255,255,255,0.03), 0 8px 24px rgba(0,0,0,0.4);
+  --shadow-pop: 0 12px 40px rgba(0,0,0,0.6), 0 0 0 1px var(--line-2);
+}
+
+[data-theme="light"] {
+  --bg-0: #f4f6fa;
+  --bg-1: #ffffff;
+  --bg-2: #f9fafc;
+  --bg-3: #f0f3f8;
+  --bg-map: #eef2f7;
+  --land: #dde3ec;
+  --land-active: #cdd5e1;
+  --land-stroke: #c5cdd9;
+  --grid: #e3e8f0;
+
+  --ink-1: #0b1220;
+  --ink-2: #3b4658;
+  --ink-3: #6a7589;
+  --ink-4: #98a1b3;
+
+  --line-1: #e3e7ee;
+  --line-2: #d3d9e3;
+  --line-3: #b8c0cd;
+
+  --accent: #0a8ec6;
+  --accent-dim: #cee9f4;
+  --accent-soft: rgba(10, 142, 198, 0.10);
+
+  --watchlist: #b97a00;
+  --watchlist-soft: rgba(255, 184, 0, 0.16);
+
+  --shadow-1: 0 1px 2px rgba(15, 25, 50, 0.06), 0 4px 16px rgba(15, 25, 50, 0.06);
+  --shadow-pop: 0 12px 32px rgba(15, 25, 50, 0.16), 0 0 0 1px var(--line-2);
+}
+
+/* Base */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; }
+body {
+  background: var(--bg-0);
+  color: var(--ink-1);
+  font-family: var(--sm-font-sans);
+  font-size: 13px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'cv11', 'ss01', 'ss03';
+}
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+input, select, textarea { font: inherit; color: inherit; }
+
+.mono { font-family: var(--sm-font-mono); font-feature-settings: 'tnum', 'zero'; }
+.tnum { font-variant-numeric: tabular-nums; }
+.eyebrow {
+  font-family: var(--sm-font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 10px; border: 2px solid var(--bg-1); }
+::-webkit-scrollbar-thumb:hover { background: var(--line-3); }

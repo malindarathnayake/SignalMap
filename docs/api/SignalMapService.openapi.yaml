@@ -1,0 +1,246 @@
+openapi: 3.1.0
+info:
+    title: SignalMapService API
+    version: 1.0.0
+paths:
+    /api/signalmap/v1/list-signal-map-events:
+        get:
+            tags:
+                - SignalMapService
+            summary: ListSignalMapEvents
+            operationId: ListSignalMapEvents
+            parameters:
+                - name: start_ms
+                  in: query
+                  required: false
+                  schema:
+                    type: string
+                    format: int64
+                - name: end_ms
+                  in: query
+                  required: false
+                  schema:
+                    type: string
+                    format: int64
+                - name: categories
+                  in: query
+                  required: false
+                  style: form
+                  explode: true
+                  schema:
+                    type: array
+                    items:
+                        type: string
+                - name: watch_regions
+                  in: query
+                  required: false
+                  style: form
+                  explode: true
+                  schema:
+                    type: array
+                    items:
+                        type: string
+                - name: watch_providers
+                  in: query
+                  required: false
+                  style: form
+                  explode: true
+                  schema:
+                    type: array
+                    items:
+                        type: string
+                - name: watchlist_only
+                  in: query
+                  required: false
+                  schema:
+                    type: boolean
+            responses:
+                "200":
+                    description: Successful response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListSignalMapEventsResponse'
+                "400":
+                    description: Validation error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ValidationError'
+                default:
+                    description: Error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+components:
+    schemas:
+        Error:
+            type: object
+            properties:
+                message:
+                    type: string
+                    description: Error message (e.g., 'user not found', 'database connection failed')
+            description: Error is returned when a handler encounters an error. It contains a simple error message that the developer can customize.
+        FieldViolation:
+            type: object
+            properties:
+                field:
+                    type: string
+                    description: The field path that failed validation (e.g., 'user.email' for nested fields). For header validation, this will be the header name (e.g., 'X-API-Key')
+                description:
+                    type: string
+                    description: Human-readable description of the validation violation (e.g., 'must be a valid email address', 'required field missing')
+            required:
+                - field
+                - description
+            description: FieldViolation describes a single validation error for a specific field.
+        ValidationError:
+            type: object
+            properties:
+                violations:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/FieldViolation'
+                    description: List of validation violations
+            required:
+                - violations
+            description: ValidationError is returned when request validation fails. It contains a list of field violations describing what went wrong.
+        ListSignalMapEventsRequest:
+            type: object
+            properties:
+                startMs:
+                    type: integer
+                    format: int64
+                    description: 'Warning: Values > 2^53 may lose precision in JavaScript'
+                endMs:
+                    type: integer
+                    format: int64
+                    description: 'Warning: Values > 2^53 may lose precision in JavaScript'
+                categories:
+                    type: array
+                    items:
+                        type: string
+                watchRegions:
+                    type: array
+                    items:
+                        type: string
+                watchProviders:
+                    type: array
+                    items:
+                        type: string
+                watchlistOnly:
+                    type: boolean
+        ListSignalMapEventsResponse:
+            type: object
+            properties:
+                events:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/SignalMapEvent'
+                sourceHealth:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/SignalMapSourceHealth'
+                fetchedAt:
+                    type: integer
+                    format: int64
+                    description: 'Warning: Values > 2^53 may lose precision in JavaScript'
+                upstreamUnavailable:
+                    type: boolean
+        SignalMapEvent:
+            type: object
+            properties:
+                id:
+                    type: string
+                category:
+                    type: string
+                severity:
+                    type: string
+                title:
+                    type: string
+                summary:
+                    type: string
+                tags:
+                    type: array
+                    items:
+                        type: string
+                startedAt:
+                    type: string
+                endedAt:
+                    type: string
+                lastObservedAt:
+                    type: string
+                locations:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/SignalMapLocation'
+                sources:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/SignalMapSource'
+                confidence:
+                    type: number
+                    format: double
+                provider:
+                    type: string
+                kind:
+                    type: string
+                watchlistMatch:
+                    type: boolean
+                markerEligible:
+                    type: boolean
+        SignalMapLocation:
+            type: object
+            properties:
+                name:
+                    type: string
+                countryIso2:
+                    type: string
+                lat:
+                    type: number
+                    format: double
+                lon:
+                    type: number
+                    format: double
+                scope:
+                    type: string
+                confidence:
+                    type: number
+                    format: double
+                evidence:
+                    type: string
+        SignalMapSource:
+            type: object
+            properties:
+                id:
+                    type: string
+                label:
+                    type: string
+                url:
+                    type: string
+                tier:
+                    type: integer
+                    format: int32
+                verified:
+                    type: boolean
+                fetchedAt:
+                    type: string
+        SignalMapSourceHealth:
+            type: object
+            properties:
+                id:
+                    type: string
+                label:
+                    type: string
+                status:
+                    type: string
+                fetchedAt:
+                    type: integer
+                    format: int64
+                    description: 'Warning: Values > 2^53 may lose precision in JavaScript'
+                eventCount:
+                    type: integer
+                    format: int32
+                detail:
+                    type: string

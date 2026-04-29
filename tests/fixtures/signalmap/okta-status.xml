@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- UNVERIFIED: status.okta.com unauthenticated summary/history endpoints returned 401 when probed. Okta public guidance points users to trust.okta.com with statuses such as Operational, Degradation, and Failed to load. This fixture is representative only. -->
+<rss version="2.0">
+  <channel>
+    <title>Okta Trust Status - Incident History</title>
+    <link>https://trust.okta.com/</link>
+    <description>Representative Okta service status incident history.</description>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 25 Apr 2026 02:44:00 Z</lastBuildDate>
+    <item>
+      <title>Resolved degradation affecting Single Sign-On</title>
+      <link>https://trust.okta.com/example/resolved-sso-degradation</link>
+      <pubDate>Fri, 24 Apr 2026 18:10:00 Z</pubDate>
+      <guid isPermaLink="false">okta-resolved-sso-degradation-2026-04-24</guid>
+      <description>Okta observed a service degradation affecting a subset of Single Sign-On requests. The incident has been resolved.</description>
+    </item>
+  </channel>
+</rss>

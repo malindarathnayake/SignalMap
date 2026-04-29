@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- UNVERIFIED: status.office365.com/api/feed/ returned a Microsoft service health HTML shell, not XML. Microsoft 365 service health is commonly exposed through authenticated tenant/admin and Microsoft Graph service-health surfaces. This fixture is representative only. -->
+<rss version="2.0">
+  <channel>
+    <title>Microsoft 365 Service Health</title>
+    <link>https://status.office365.com/</link>
+    <description>Representative Microsoft 365 service health incident feed.</description>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 25 Apr 2026 02:44:00 Z</lastBuildDate>
+    <item>
+      <title>Service degradation affecting Exchange Online mail flow</title>
+      <link>https://status.office365.com/example/exchange-online-mail-flow</link>
+      <pubDate>Sat, 25 Apr 2026 01:15:00 Z</pubDate>
+      <guid isPermaLink="false">m365-exchange-online-mail-flow-2026-04-25</guid>
+      <description>Microsoft 365 reported an incident causing delayed mail delivery for a subset of Exchange Online users.</description>
+    </item>
+  </channel>
+</rss>

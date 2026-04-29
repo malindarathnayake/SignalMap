@@ -1,0 +1,7 @@
+{
+  "model": "sonar-pro",
+  "messages": [{"role": "user", "content": "What major cybersecurity incidents were reported in the last hour? Cite outlets by name."}],
+  "search_domain_filter": ["reuters.com", "apnews.com", "bbc.com", "theguardian.com", "ft.com", "bloomberg.com", "wsj.com", "nytimes.com", "washingtonpost.com", "axios.com", "politico.com", "foreignpolicy.com", "economist.com", "cyberscoop.com", "krebsonsecurity.com", "therecord.media", "risky.biz", "thehackernews.com", "bleepingcomputer.com", "aljazeera.com"],
+  "search_recency_filter": "hour",
+  "max_tokens": 200
+}

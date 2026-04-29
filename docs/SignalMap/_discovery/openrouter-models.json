@@ -1,0 +1,1833 @@
+[
+  {
+    "id": "deepseek/deepseek-v4-pro",
+    "canonical_slug": "deepseek/deepseek-v4-pro-20260423",
+    "hugging_face_id": "deepseek-ai/DeepSeek-V4-Pro",
+    "name": "DeepSeek: DeepSeek V4 Pro",
+    "created": 1777000679,
+    "description": "DeepSeek V4 Pro is a large-scale Mixture-of-Experts model from DeepSeek with 1.6T total parameters and 49B activated parameters, supporting a 1M-token context window. It is designed for advanced reasoning, coding,...",
+    "context_length": 1048576,
+    "architecture": {
+      "modality": "text->text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "DeepSeek",
+      "instruct_type": null
+    },
+    "pricing": {
+      "prompt": "0.000000435",
+      "completion": "0.00000087",
+      "input_cache_read": "0.000000003625"
+    },
+    "top_provider": {
+      "context_length": 1048576,
+      "max_completion_tokens": 384000,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "frequency_penalty",
+      "include_reasoning",
+      "logprobs",
+      "max_tokens",
+      "presence_penalty",
+      "reasoning",
+      "response_format",
+      "seed",
+      "stop",
+      "temperature",
+      "tool_choice",
+      "tools",
+      "top_k",
+      "top_logprobs",
+      "top_p"
+    ],
+    "default_parameters": {
+      "temperature": 1,
+      "top_p": 1,
+      "top_k": null,
+      "frequency_penalty": null,
+      "presence_penalty": null,
+      "repetition_penalty": null
+    },
+    "knowledge_cutoff": null,
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/deepseek/deepseek-v4-pro-20260423/endpoints"
+    }
+  },
+  {
+    "id": "deepseek/deepseek-v4-flash",
+    "canonical_slug": "deepseek/deepseek-v4-flash-20260423",
+    "hugging_face_id": "deepseek-ai/DeepSeek-V4-Flash",
+    "name": "DeepSeek: DeepSeek V4 Flash",
+    "created": 1777000666,
+    "description": "DeepSeek V4 Flash is an efficiency-optimized Mixture-of-Experts model from DeepSeek with 284B total parameters and 13B activated parameters, supporting a 1M-token context window. It is designed for fast inference and...",
+    "context_length": 1048576,
+    "architecture": {
+      "modality": "text->text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "DeepSeek",
+      "instruct_type": null
+    },
+    "pricing": {
+      "prompt": "0.00000014",
+      "completion": "0.00000028",
+      "input_cache_read": "0.0000000028"
+    },
+    "top_provider": {
+      "context_length": 1048576,
+      "max_completion_tokens": 384000,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "frequency_penalty",
+      "include_reasoning",
+      "logit_bias",
+      "logprobs",
+      "max_tokens",
+      "min_p",
+      "presence_penalty",
+      "reasoning",
+      "repetition_penalty",
+      "response_format",
+      "seed",
+      "stop",
+      "structured_outputs",
+      "temperature",
+      "tool_choice",
+      "tools",
+      "top_k",
+      "top_logprobs",
+      "top_p"
+    ],
+    "default_parameters": {
+      "temperature": null,
+      "top_p": null,
+      "top_k": null,
+      "frequency_penalty": null,
+      "presence_penalty": null,
+      "repetition_penalty": null
+    },
+    "knowledge_cutoff": null,
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/deepseek/deepseek-v4-flash-20260423/endpoints"
+    }
+  },
+  {
+    "id": "moonshotai/kimi-k2.6",
+    "canonical_slug": "moonshotai/kimi-k2.6-20260420",
+    "hugging_face_id": "moonshotai/Kimi-K2.6",
+    "name": "MoonshotAI: Kimi K2.6",
+    "created": 1776699402,
+    "description": "Kimi K2.6 is Moonshot AI's next-generation multimodal model, designed for long-horizon coding, coding-driven UI/UX generation, and multi-agent orchestration. It handles complex end-to-end coding tasks across Python, Rust, and Go, and...",
+    "context_length": 256000,
+    "architecture": {
+      "modality": "text+image->text",
+      "input_modalities": [
+        "text",
+        "image"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "Other",
+      "instruct_type": null
+    },
+    "pricing": {
+      "prompt": "0.0000007448",
+      "completion": "0.000004655",
+      "input_cache_read": "0.0000001463"
+    },
+    "top_provider": {
+      "context_length": 256000,
+      "max_completion_tokens": 65536,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "frequency_penalty",
+      "include_reasoning",
+      "logit_bias",
+      "logprobs",
+      "max_tokens",
+      "min_p",
+      "parallel_tool_calls",
+      "presence_penalty",
+      "reasoning",
+      "reasoning_effort",
+      "repetition_penalty",
+      "response_format",
+      "seed",
+      "stop",
+      "structured_outputs",
+      "temperature",
+      "tool_choice",
+      "tools",
+      "top_k",
+      "top_logprobs",
+      "top_p"
+    ],
+    "default_parameters": {
+      "temperature": null,
+      "top_p": null,
+      "top_k": null,
+      "frequency_penalty": null,
+      "presence_penalty": null,
+      "repetition_penalty": null
+    },
+    "knowledge_cutoff": null,
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/moonshotai/kimi-k2.6-20260420/endpoints"
+    }
+  },
+  {
+    "id": "nvidia/nemotron-3-super-120b-a12b:free",
+    "canonical_slug": "nvidia/nemotron-3-super-120b-a12b-20230311",
+    "hugging_face_id": "nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-FP8",
+    "name": "NVIDIA: Nemotron 3 Super (free)",
+    "created": 1773245239,
+    "description": "NVIDIA Nemotron 3 Super is a 120B-parameter open hybrid MoE model, activating just 12B parameters for maximum compute efficiency and accuracy in complex multi-agent applications. Built on a hybrid Mamba-Transformer...",
+    "context_length": 262144,
+    "architecture": {
+      "modality": "text->text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "Other",
+      "instruct_type": null
+    },
+    "pricing": {
+      "prompt": "0",
+      "completion": "0"
+    },
+    "top_provider": {
+      "context_length": 262144,
+      "max_completion_tokens": 262144,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "include_reasoning",
+      "max_tokens",
+      "reasoning",
+      "response_format",
+      "seed",
+      "structured_outputs",
+      "temperature",
+      "tool_choice",
+      "tools",
+      "top_p"
+    ],
+    "default_parameters": {
+      "temperature": 1,
+      "top_p": 0.95,
+      "top_k": null,
+      "frequency_penalty": null,
+      "presence_penalty": null,
+      "repetition_penalty": null
+    },
+    "knowledge_cutoff": null,
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/nvidia/nemotron-3-super-120b-a12b-20230311/endpoints"
+    }
+  },
+  {
+    "id": "nvidia/nemotron-3-super-120b-a12b",
+    "canonical_slug": "nvidia/nemotron-3-super-120b-a12b-20230311",
+    "hugging_face_id": "nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-FP8",
+    "name": "NVIDIA: Nemotron 3 Super",
+    "created": 1773245239,
+    "description": "NVIDIA Nemotron 3 Super is a 120B-parameter open hybrid MoE model, activating just 12B parameters for maximum compute efficiency and accuracy in complex multi-agent applications. Built on a hybrid Mamba-Transformer...",
+    "context_length": 262144,
+    "architecture": {
+      "modality": "text->text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "Other",
+      "instruct_type": null
+    },
+    "pricing": {
+      "prompt": "0.00000009",
+      "completion": "0.00000045"
+    },
+    "top_provider": {
+      "context_length": 262144,
+      "max_completion_tokens": null,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "frequency_penalty",
+      "include_reasoning",
+      "logit_bias",
+      "max_tokens",
+      "min_p",
+      "presence_penalty",
+      "reasoning",
+      "repetition_penalty",
+      "response_format",
+      "seed",
+      "stop",
+      "temperature",
+      "tool_choice",
+      "tools",
+      "top_k",
+      "top_p"
+    ],
+    "default_parameters": {
+      "temperature": 1,
+      "top_p": 0.95,
+      "top_k": null,
+      "frequency_penalty": null,
+      "presence_penalty": null,
+      "repetition_penalty": null
+    },
+    "knowledge_cutoff": null,
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/nvidia/nemotron-3-super-120b-a12b-20230311/endpoints"
+    }
+  },
+  {
+    "id": "moonshotai/kimi-k2.5",
+    "canonical_slug": "moonshotai/kimi-k2.5-0127",
+    "hugging_face_id": "moonshotai/Kimi-K2.5",
+    "name": "MoonshotAI: Kimi K2.5",
+    "created": 1769487076,
+    "description": "Kimi K2.5 is Moonshot AI's native multimodal model, delivering state-of-the-art visual coding capability and a self-directed agent swarm paradigm. Built on Kimi K2 with continued pretraining over approximately 15T mixed...",
+    "context_length": 262144,
+    "architecture": {
+      "modality": "text+image->text",
+      "input_modalities": [
+        "text",
+        "image"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "Other",
+      "instruct_type": null
+    },
+    "pricing": {
+      "prompt": "0.00000044",
+      "completion": "0.000002",
+      "input_cache_read": "0.00000022"
+    },
+    "top_provider": {
+      "context_length": 262144,
+      "max_completion_tokens": 65535,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "frequency_penalty",
+      "include_reasoning",
+      "logit_bias",
+      "logprobs",
+      "max_tokens",
+      "min_p",
+      "parallel_tool_calls",
+      "presence_penalty",
+      "reasoning",
+      "repetition_penalty",
+      "response_format",
+      "seed",
+      "stop",
+      "structured_outputs",
+      "temperature",
+      "tool_choice",
+      "tools",
+      "top_k",
+      "top_logprobs",
+      "top_p"
+    ],
+    "default_parameters": {
+      "temperature": null,
+      "top_p": null,
+      "top_k": null,
+      "frequency_penalty": null,
+      "presence_penalty": null,
+      "repetition_penalty": null
+    },
+    "knowledge_cutoff": null,
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/moonshotai/kimi-k2.5-0127/endpoints"
+    }
+  },
+  {
+    "id": "nvidia/nemotron-3-nano-30b-a3b:free",
+    "canonical_slug": "nvidia/nemotron-3-nano-30b-a3b",
+    "hugging_face_id": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16",
+    "name": "NVIDIA: Nemotron 3 Nano 30B A3B (free)",
+    "created": 1765731275,
+    "description": "NVIDIA Nemotron 3 Nano 30B A3B is a small language MoE model with highest compute efficiency and accuracy for developers to build specialized agentic AI systems. The model is fully...",
+    "context_length": 256000,
+    "architecture": {
+      "modality": "text->text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "Other",
+      "instruct_type": null
+    },
+    "pricing": {
+      "prompt": "0",
+      "completion": "0"
+    },
+    "top_provider": {
+      "context_length": 256000,
+      "max_completion_tokens": null,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "include_reasoning",
+      "max_tokens",
+      "reasoning",
+      "seed",
+      "temperature",
+      "tool_choice",
+      "tools",
+      "top_p"
+    ],
+    "default_parameters": {
+      "temperature": null,
+      "top_p": null,
+      "frequency_penalty": null
+    },
+    "knowledge_cutoff": null,
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/nvidia/nemotron-3-nano-30b-a3b/endpoints"
+    }
+  },
+  {
+    "id": "nvidia/nemotron-3-nano-30b-a3b",
+    "canonical_slug": "nvidia/nemotron-3-nano-30b-a3b",
+    "hugging_face_id": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16",
+    "name": "NVIDIA: Nemotron 3 Nano 30B A3B",
+    "created": 1765731275,
+    "description": "NVIDIA Nemotron 3 Nano 30B A3B is a small language MoE model with highest compute efficiency and accuracy for developers to build specialized agentic AI systems. The model is fully...",
+    "context_length": 262144,
+    "architecture": {
+      "modality": "text->text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "Other",
+      "instruct_type": null
+    },
+    "pricing": {
+      "prompt": "0.00000005",
+      "completion": "0.0000002"
+    },
+    "top_provider": {
+      "context_length": 262144,
+      "max_completion_tokens": 228000,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "frequency_penalty",
+      "include_reasoning",
+      "logit_bias",
+      "max_tokens",
+      "min_p",
+      "presence_penalty",
+      "reasoning",
+      "repetition_penalty",
+      "response_format",
+      "seed",
+      "stop",
+      "temperature",
+      "tool_choice",
+      "tools",
+      "top_k",
+      "top_p"
+    ],
+    "default_parameters": {
+      "temperature": null,
+      "top_p": null,
+      "frequency_penalty": null
+    },
+    "knowledge_cutoff": null,
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/nvidia/nemotron-3-nano-30b-a3b/endpoints"
+    }
+  },
+  {
+    "id": "nex-agi/deepseek-v3.1-nex-n1",
+    "canonical_slug": "nex-agi/deepseek-v3.1-nex-n1",
+    "hugging_face_id": "nex-agi/DeepSeek-V3.1-Nex-N1",
+    "name": "Nex AGI: DeepSeek V3.1 Nex N1",
+    "created": 1765204393,
+    "description": "DeepSeek V3.1 Nex-N1 is the flagship release of the Nex-N1 series — a post-trained model designed to highlight agent autonomy, tool use, and real-world productivity. Nex-N1 demonstrates competitive performance across...",
+    "context_length": 131072,
+    "architecture": {
+      "modality": "text->text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "DeepSeek",
+      "instruct_type": null
+    },
+    "pricing": {
+      "prompt": "0.000000135",
+      "completion": "0.0000005"
+    },
+    "top_provider": {
+      "context_length": 131072,
+      "max_completion_tokens": 163840,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "frequency_penalty",
+      "max_tokens",
+      "response_format",
+      "structured_outputs",
+      "temperature",
+      "tool_choice",
+      "tools",
+      "top_k",
+      "top_p"
+    ],
+    "default_parameters": {
+      "temperature": null,
+      "top_p": null,
+      "frequency_penalty": null
+    },
+    "knowledge_cutoff": null,
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/nex-agi/deepseek-v3.1-nex-n1/endpoints"
+    }
+  },
+  {
+    "id": "deepseek/deepseek-v3.2-speciale",
+    "canonical_slug": "deepseek/deepseek-v3.2-speciale-20251201",
+    "hugging_face_id": "deepseek-ai/DeepSeek-V3.2-Speciale",
+    "name": "DeepSeek: DeepSeek V3.2 Speciale",
+    "created": 1764594837,
+    "description": "DeepSeek-V3.2-Speciale is a high-compute variant of DeepSeek-V3.2 optimized for maximum reasoning and agentic performance. It builds on DeepSeek Sparse Attention (DSA) for efficient long-context processing, then scales post-training reinforcement learning...",
+    "context_length": 163840,
+    "architecture": {
+      "modality": "text->text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "DeepSeek",
+      "instruct_type": null
+    },
+    "pricing": {
+      "prompt": "0.0000004",
+      "completion": "0.0000012",
+      "input_cache_read": "0.0000002"
+    },
+    "top_provider": {
+      "context_length": 163840,
+      "max_completion_tokens": 163840,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "frequency_penalty",
+      "include_reasoning",
+      "logit_bias",
+      "max_tokens",
+      "min_p",
+      "presence_penalty",
+      "reasoning",
+      "repetition_penalty",
+      "response_format",
+      "seed",
+      "stop",
+      "structured_outputs",
+      "temperature",
+      "top_k",
+      "top_p"
+    ],
+    "default_parameters": {
+      "temperature": 1,
+      "top_p": 0.95,
+      "frequency_penalty": null
+    },
+    "knowledge_cutoff": null,
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/deepseek/deepseek-v3.2-speciale-20251201/endpoints"
+    }
+  },
+  {
+    "id": "deepseek/deepseek-v3.2",
+    "canonical_slug": "deepseek/deepseek-v3.2-20251201",
+    "hugging_face_id": "deepseek-ai/DeepSeek-V3.2",
+    "name": "DeepSeek: DeepSeek V3.2",
+    "created": 1764594642,
+    "description": "DeepSeek-V3.2 is a large language model designed to harmonize high computational efficiency with strong reasoning and agentic tool-use performance. It introduces DeepSeek Sparse Attention (DSA), a fine-grained sparse attention mechanism...",
+    "context_length": 131072,
+    "architecture": {
+      "modality": "text->text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "DeepSeek",
+      "instruct_type": null
+    },
+    "pricing": {
+      "prompt": "0.000000252",
+      "completion": "0.000000378",
+      "input_cache_read": "0.0000000252"
+    },
+    "top_provider": {
+      "context_length": 131072,
+      "max_completion_tokens": 65536,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "frequency_penalty",
+      "include_reasoning",
+      "logit_bias",
+      "max_tokens",
+      "min_p",
+      "presence_penalty",
+      "reasoning",
+      "repetition_penalty",
+      "response_format",
+      "seed",
+      "stop",
+      "structured_outputs",
+      "temperature",
+      "tool_choice",
+      "tools",
+      "top_k",
+      "top_p"
+    ],
+    "default_parameters": {
+      "temperature": 1,
+      "top_p": 0.95,
+      "top_k": null,
+      "frequency_penalty": null,
+      "presence_penalty": null,
+      "repetition_penalty": null
+    },
+    "knowledge_cutoff": null,
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/deepseek/deepseek-v3.2-20251201/endpoints"
+    }
+  },
+  {
+    "id": "moonshotai/kimi-k2-thinking",
+    "canonical_slug": "moonshotai/kimi-k2-thinking-20251106",
+    "hugging_face_id": "moonshotai/Kimi-K2-Thinking",
+    "name": "MoonshotAI: Kimi K2 Thinking",
+    "created": 1762440622,
+    "description": "Kimi K2 Thinking is Moonshot AI’s most advanced open reasoning model to date, extending the K2 series into agentic, long-horizon reasoning. Built on the trillion-parameter Mixture-of-Experts (MoE) architecture introduced in...",
+    "context_length": 262144,
+    "architecture": {
+      "modality": "text->text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "Other",
+      "instruct_type": null
+    },
+    "pricing": {
+      "prompt": "0.0000006",
+      "completion": "0.0000025",
+      "input_cache_read": "0.00000015"
+    },
+    "top_provider": {
+      "context_length": 262144,
+      "max_completion_tokens": 262144,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "frequency_penalty",
+      "include_reasoning",
+      "logit_bias",
+      "max_tokens",
+      "min_p",
+      "presence_penalty",
+      "reasoning",
+      "repetition_penalty",
+      "response_format",
+      "seed",
+      "stop",
+      "structured_outputs",
+      "temperature",
+      "tool_choice",
+      "tools",
+      "top_k",
+      "top_p"
+    ],
+    "default_parameters": {
+      "temperature": null,
+      "top_p": null,
+      "frequency_penalty": null
+    },
+    "knowledge_cutoff": null,
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/moonshotai/kimi-k2-thinking-20251106/endpoints"
+    }
+  },
+  {
+    "id": "nvidia/nemotron-nano-12b-v2-vl:free",
+    "canonical_slug": "nvidia/nemotron-nano-12b-v2-vl",
+    "hugging_face_id": "nvidia/NVIDIA-Nemotron-Nano-12B-v2-VL-BF16",
+    "name": "NVIDIA: Nemotron Nano 12B 2 VL (free)",
+    "created": 1761675565,
+    "description": "NVIDIA Nemotron Nano 2 VL is a 12-billion-parameter open multimodal reasoning model designed for video understanding and document intelligence. It introduces a hybrid Transformer-Mamba architecture, combining transformer-level accuracy with Mamba’s...",
+    "context_length": 128000,
+    "architecture": {
+      "modality": "text+image+video->text",
+      "input_modalities": [
+        "image",
+        "text",
+        "video"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "Other",
+      "instruct_type": null
+    },
+    "pricing": {
+      "prompt": "0",
+      "completion": "0"
+    },
+    "top_provider": {
+      "context_length": 128000,
+      "max_completion_tokens": 128000,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "include_reasoning",
+      "max_tokens",
+      "reasoning",
+      "seed",
+      "temperature",
+      "tool_choice",
+      "tools",
+      "top_p"
+    ],
+    "default_parameters": {
+      "temperature": null,
+      "top_p": null,
+      "frequency_penalty": null
+    },
+    "knowledge_cutoff": null,
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/nvidia/nemotron-nano-12b-v2-vl/endpoints"
+    }
+  },
+  {
+    "id": "nvidia/nemotron-nano-12b-v2-vl",
+    "canonical_slug": "nvidia/nemotron-nano-12b-v2-vl",
+    "hugging_face_id": "nvidia/NVIDIA-Nemotron-Nano-12B-v2-VL-BF16",
+    "name": "NVIDIA: Nemotron Nano 12B 2 VL",
+    "created": 1761675565,
+    "description": "NVIDIA Nemotron Nano 2 VL is a 12-billion-parameter open multimodal reasoning model designed for video understanding and document intelligence. It introduces a hybrid Transformer-Mamba architecture, combining transformer-level accuracy with Mamba’s...",
+    "context_length": 131072,
+    "architecture": {
+      "modality": "text+image+video->text",
+      "input_modalities": [
+        "image",
+        "text",
+        "video"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "Other",
+      "instruct_type": null
+    },
+    "pricing": {
+      "prompt": "0.0000002",
+      "completion": "0.0000006"
+    },
+    "top_provider": {
+      "context_length": 131072,
+      "max_completion_tokens": 16384,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "frequency_penalty",
+      "include_reasoning",
+      "logit_bias",
+      "max_tokens",
+      "min_p",
+      "presence_penalty",
+      "reasoning",
+      "repetition_penalty",
+      "response_format",
+      "seed",
+      "stop",
+      "temperature",
+      "top_k",
+      "top_p"
+    ],
+    "default_parameters": {
+      "temperature": null,
+      "top_p": null,
+      "frequency_penalty": null
+    },
+    "knowledge_cutoff": null,
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/nvidia/nemotron-nano-12b-v2-vl/endpoints"
+    }
+  },
+  {
+    "id": "nvidia/llama-3.3-nemotron-super-49b-v1.5",
+    "canonical_slug": "nvidia/llama-3.3-nemotron-super-49b-v1.5",
+    "hugging_face_id": "nvidia/Llama-3_3-Nemotron-Super-49B-v1_5",
+    "name": "NVIDIA: Llama 3.3 Nemotron Super 49B V1.5",
+    "created": 1760101395,
+    "description": "Llama-3.3-Nemotron-Super-49B-v1.5 is a 49B-parameter, English-centric reasoning/chat model derived from Meta’s Llama-3.3-70B-Instruct with a 128K context. It’s post-trained for agentic workflows (RAG, tool calling) via SFT across math, code, science, and...",
+    "context_length": 131072,
+    "architecture": {
+      "modality": "text->text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "Llama3",
+      "instruct_type": null
+    },
+    "pricing": {
+      "prompt": "0.0000001",
+      "completion": "0.0000004"
+    },
+    "top_provider": {
+      "context_length": 131072,
+      "max_completion_tokens": 16384,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "frequency_penalty",
+      "include_reasoning",
+      "logit_bias",
+      "max_tokens",
+      "min_p",
+      "presence_penalty",
+      "reasoning",
+      "repetition_penalty",
+      "response_format",
+      "seed",
+      "stop",
+      "temperature",
+      "tool_choice",
+      "tools",
+      "top_k",
+      "top_p"
+    ],
+    "default_parameters": {
+      "temperature": 0.6,
+      "top_p": 0.95,
+      "top_k": null,
+      "frequency_penalty": null,
+      "presence_penalty": null,
+      "repetition_penalty": null
+    },
+    "knowledge_cutoff": "2024-03-31",
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/nvidia/llama-3.3-nemotron-super-49b-v1.5/endpoints"
+    }
+  },
+  {
+    "id": "deepseek/deepseek-v3.2-exp",
+    "canonical_slug": "deepseek/deepseek-v3.2-exp",
+    "hugging_face_id": "deepseek-ai/DeepSeek-V3.2-Exp",
+    "name": "DeepSeek: DeepSeek V3.2 Exp",
+    "created": 1759150481,
+    "description": "DeepSeek-V3.2-Exp is an experimental large language model released by DeepSeek as an intermediate step between V3.1 and future architectures. It introduces DeepSeek Sparse Attention (DSA), a fine-grained sparse attention mechanism...",
+    "context_length": 163840,
+    "architecture": {
+      "modality": "text->text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "DeepSeek",
+      "instruct_type": "deepseek-v3.1"
+    },
+    "pricing": {
+      "prompt": "0.00000027",
+      "completion": "0.00000041"
+    },
+    "top_provider": {
+      "context_length": 163840,
+      "max_completion_tokens": 65536,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "frequency_penalty",
+      "include_reasoning",
+      "logit_bias",
+      "max_tokens",
+      "min_p",
+      "presence_penalty",
+      "reasoning",
+      "repetition_penalty",
+      "response_format",
+      "seed",
+      "stop",
+      "structured_outputs",
+      "temperature",
+      "tool_choice",
+      "tools",
+      "top_k",
+      "top_p"
+    ],
+    "default_parameters": {
+      "temperature": 0.6,
+      "top_p": 0.95,
+      "frequency_penalty": null
+    },
+    "knowledge_cutoff": "2025-07-31",
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/deepseek/deepseek-v3.2-exp/endpoints"
+    }
+  },
+  {
+    "id": "deepseek/deepseek-v3.1-terminus",
+    "canonical_slug": "deepseek/deepseek-v3.1-terminus",
+    "hugging_face_id": "deepseek-ai/DeepSeek-V3.1-Terminus",
+    "name": "DeepSeek: DeepSeek V3.1 Terminus",
+    "created": 1758548275,
+    "description": "DeepSeek-V3.1 Terminus is an update to [DeepSeek V3.1](/deepseek/deepseek-chat-v3.1) that maintains the model's original capabilities while addressing issues reported by users, including language consistency and agent capabilities, further optimizing the model's...",
+    "context_length": 163840,
+    "architecture": {
+      "modality": "text->text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "DeepSeek",
+      "instruct_type": "deepseek-v3.1"
+    },
+    "pricing": {
+      "prompt": "0.00000021",
+      "completion": "0.00000079",
+      "input_cache_read": "0.00000013"
+    },
+    "top_provider": {
+      "context_length": 163840,
+      "max_completion_tokens": 32768,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "frequency_penalty",
+      "include_reasoning",
+      "logit_bias",
+      "max_tokens",
+      "min_p",
+      "presence_penalty",
+      "reasoning",
+      "repetition_penalty",
+      "response_format",
+      "seed",
+      "stop",
+      "structured_outputs",
+      "temperature",
+      "tool_choice",
+      "tools",
+      "top_k",
+      "top_p"
+    ],
+    "default_parameters": {
+      "temperature": null,
+      "top_p": null,
+      "frequency_penalty": null
+    },
+    "knowledge_cutoff": "2025-03-31",
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/deepseek/deepseek-v3.1-terminus/endpoints"
+    }
+  },
+  {
+    "id": "nvidia/nemotron-nano-9b-v2:free",
+    "canonical_slug": "nvidia/nemotron-nano-9b-v2",
+    "hugging_face_id": "nvidia/NVIDIA-Nemotron-Nano-9B-v2",
+    "name": "NVIDIA: Nemotron Nano 9B V2 (free)",
+    "created": 1757106807,
+    "description": "NVIDIA-Nemotron-Nano-9B-v2 is a large language model (LLM) trained from scratch by NVIDIA, and designed as a unified model for both reasoning and non-reasoning tasks. It responds to user queries and...",
+    "context_length": 128000,
+    "architecture": {
+      "modality": "text->text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "Other",
+      "instruct_type": null
+    },
+    "pricing": {
+      "prompt": "0",
+      "completion": "0"
+    },
+    "top_provider": {
+      "context_length": 128000,
+      "max_completion_tokens": null,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "include_reasoning",
+      "max_tokens",
+      "reasoning",
+      "response_format",
+      "seed",
+      "structured_outputs",
+      "temperature",
+      "tool_choice",
+      "tools",
+      "top_p"
+    ],
+    "default_parameters": {
+      "temperature": null,
+      "top_p": null,
+      "frequency_penalty": null
+    },
+    "knowledge_cutoff": "2025-03-31",
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/nvidia/nemotron-nano-9b-v2/endpoints"
+    }
+  },
+  {
+    "id": "nvidia/nemotron-nano-9b-v2",
+    "canonical_slug": "nvidia/nemotron-nano-9b-v2",
+    "hugging_face_id": "nvidia/NVIDIA-Nemotron-Nano-9B-v2",
+    "name": "NVIDIA: Nemotron Nano 9B V2",
+    "created": 1757106807,
+    "description": "NVIDIA-Nemotron-Nano-9B-v2 is a large language model (LLM) trained from scratch by NVIDIA, and designed as a unified model for both reasoning and non-reasoning tasks. It responds to user queries and...",
+    "context_length": 131072,
+    "architecture": {
+      "modality": "text->text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "Other",
+      "instruct_type": null
+    },
+    "pricing": {
+      "prompt": "0.00000004",
+      "completion": "0.00000016"
+    },
+    "top_provider": {
+      "context_length": 131072,
+      "max_completion_tokens": 16384,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "frequency_penalty",
+      "include_reasoning",
+      "logit_bias",
+      "max_tokens",
+      "min_p",
+      "presence_penalty",
+      "reasoning",
+      "repetition_penalty",
+      "response_format",
+      "seed",
+      "stop",
+      "temperature",
+      "tool_choice",
+      "tools",
+      "top_k",
+      "top_p"
+    ],
+    "default_parameters": {
+      "temperature": null,
+      "top_p": null,
+      "frequency_penalty": null
+    },
+    "knowledge_cutoff": "2025-03-31",
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/nvidia/nemotron-nano-9b-v2/endpoints"
+    }
+  },
+  {
+    "id": "moonshotai/kimi-k2-0905",
+    "canonical_slug": "moonshotai/kimi-k2-0905",
+    "hugging_face_id": "moonshotai/Kimi-K2-Instruct-0905",
+    "name": "MoonshotAI: Kimi K2 0905",
+    "created": 1757021147,
+    "description": "Kimi K2 0905 is the September update of [Kimi K2 0711](moonshotai/kimi-k2). It is a large-scale Mixture-of-Experts (MoE) language model developed by Moonshot AI, featuring 1 trillion total parameters with 32...",
+    "context_length": 262144,
+    "architecture": {
+      "modality": "text->text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "Other",
+      "instruct_type": null
+    },
+    "pricing": {
+      "prompt": "0.0000004",
+      "completion": "0.000002"
+    },
+    "top_provider": {
+      "context_length": 262144,
+      "max_completion_tokens": 262144,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "frequency_penalty",
+      "logit_bias",
+      "max_tokens",
+      "min_p",
+      "presence_penalty",
+      "repetition_penalty",
+      "response_format",
+      "seed",
+      "stop",
+      "structured_outputs",
+      "temperature",
+      "tool_choice",
+      "tools",
+      "top_k",
+      "top_p"
+    ],
+    "default_parameters": {},
+    "knowledge_cutoff": "2024-12-31",
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/moonshotai/kimi-k2-0905/endpoints"
+    }
+  },
+  {
+    "id": "deepseek/deepseek-chat-v3.1",
+    "canonical_slug": "deepseek/deepseek-chat-v3.1",
+    "hugging_face_id": "deepseek-ai/DeepSeek-V3.1",
+    "name": "DeepSeek: DeepSeek V3.1",
+    "created": 1755779628,
+    "description": "DeepSeek-V3.1 is a large hybrid reasoning model (671B parameters, 37B active) that supports both thinking and non-thinking modes via prompt templates. It extends the DeepSeek-V3 base with a two-phase long-context...",
+    "context_length": 32768,
+    "architecture": {
+      "modality": "text->text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "DeepSeek",
+      "instruct_type": "deepseek-v3.1"
+    },
+    "pricing": {
+      "prompt": "0.00000015",
+      "completion": "0.00000075"
+    },
+    "top_provider": {
+      "context_length": 32768,
+      "max_completion_tokens": 7168,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "frequency_penalty",
+      "include_reasoning",
+      "logit_bias",
+      "logprobs",
+      "max_tokens",
+      "min_p",
+      "presence_penalty",
+      "reasoning",
+      "repetition_penalty",
+      "response_format",
+      "seed",
+      "stop",
+      "structured_outputs",
+      "temperature",
+      "tool_choice",
+      "tools",
+      "top_k",
+      "top_logprobs",
+      "top_p"
+    ],
+    "default_parameters": {},
+    "knowledge_cutoff": "2025-03-31",
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/deepseek/deepseek-chat-v3.1/endpoints"
+    }
+  },
+  {
+    "id": "moonshotai/kimi-k2",
+    "canonical_slug": "moonshotai/kimi-k2",
+    "hugging_face_id": "moonshotai/Kimi-K2-Instruct",
+    "name": "MoonshotAI: Kimi K2 0711",
+    "created": 1752263252,
+    "description": "Kimi K2 Instruct is a large-scale Mixture-of-Experts (MoE) language model developed by Moonshot AI, featuring 1 trillion total parameters with 32 billion active per forward pass. It is optimized for...",
+    "context_length": 131072,
+    "architecture": {
+      "modality": "text->text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "Other",
+      "instruct_type": null
+    },
+    "pricing": {
+      "prompt": "0.00000057",
+      "completion": "0.0000023"
+    },
+    "top_provider": {
+      "context_length": 131072,
+      "max_completion_tokens": 32768,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "frequency_penalty",
+      "max_tokens",
+      "presence_penalty",
+      "repetition_penalty",
+      "seed",
+      "stop",
+      "temperature",
+      "tool_choice",
+      "tools",
+      "top_k",
+      "top_p"
+    ],
+    "default_parameters": {},
+    "knowledge_cutoff": "2024-12-31",
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/moonshotai/kimi-k2/endpoints"
+    }
+  },
+  {
+    "id": "tngtech/deepseek-r1t2-chimera",
+    "canonical_slug": "tngtech/deepseek-r1t2-chimera",
+    "hugging_face_id": "tngtech/DeepSeek-TNG-R1T2-Chimera",
+    "name": "TNG: DeepSeek R1T2 Chimera",
+    "created": 1751986985,
+    "description": "DeepSeek-TNG-R1T2-Chimera is the second-generation Chimera model from TNG Tech. It is a 671 B-parameter mixture-of-experts text-generation model assembled from DeepSeek-AI’s R1-0528, R1, and V3-0324 checkpoints with an Assembly-of-Experts merge. The...",
+    "context_length": 163840,
+    "architecture": {
+      "modality": "text->text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "DeepSeek",
+      "instruct_type": null
+    },
+    "pricing": {
+      "prompt": "0.0000003",
+      "completion": "0.0000011",
+      "input_cache_read": "0.00000015"
+    },
+    "top_provider": {
+      "context_length": 163840,
+      "max_completion_tokens": 163840,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "frequency_penalty",
+      "include_reasoning",
+      "max_tokens",
+      "presence_penalty",
+      "reasoning",
+      "repetition_penalty",
+      "response_format",
+      "seed",
+      "stop",
+      "structured_outputs",
+      "temperature",
+      "tool_choice",
+      "tools",
+      "top_k",
+      "top_p"
+    ],
+    "default_parameters": {},
+    "knowledge_cutoff": "2024-07-31",
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/tngtech/deepseek-r1t2-chimera/endpoints"
+    }
+  },
+  {
+    "id": "deepseek/deepseek-r1-0528",
+    "canonical_slug": "deepseek/deepseek-r1-0528",
+    "hugging_face_id": "deepseek-ai/DeepSeek-R1-0528",
+    "name": "DeepSeek: R1 0528",
+    "created": 1748455170,
+    "description": "May 28th update to the [original DeepSeek R1](/deepseek/deepseek-r1) Performance on par with [OpenAI o1](/openai/o1), but open-sourced and with fully open reasoning tokens. It's 671B parameters in size, with 37B active...",
+    "context_length": 163840,
+    "architecture": {
+      "modality": "text->text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "DeepSeek",
+      "instruct_type": "deepseek-r1"
+    },
+    "pricing": {
+      "prompt": "0.0000005",
+      "completion": "0.00000215",
+      "input_cache_read": "0.00000035"
+    },
+    "top_provider": {
+      "context_length": 163840,
+      "max_completion_tokens": 32768,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "frequency_penalty",
+      "include_reasoning",
+      "logit_bias",
+      "max_tokens",
+      "min_p",
+      "presence_penalty",
+      "reasoning",
+      "repetition_penalty",
+      "response_format",
+      "seed",
+      "stop",
+      "structured_outputs",
+      "temperature",
+      "tool_choice",
+      "tools",
+      "top_k",
+      "top_p"
+    ],
+    "default_parameters": {
+      "temperature": null,
+      "top_p": null,
+      "frequency_penalty": null
+    },
+    "knowledge_cutoff": "2025-03-31",
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/deepseek/deepseek-r1-0528/endpoints"
+    }
+  },
+  {
+    "id": "deepseek/deepseek-chat-v3-0324",
+    "canonical_slug": "deepseek/deepseek-chat-v3-0324",
+    "hugging_face_id": "deepseek-ai/DeepSeek-V3-0324",
+    "name": "DeepSeek: DeepSeek V3 0324",
+    "created": 1742824755,
+    "description": "DeepSeek V3, a 685B-parameter, mixture-of-experts model, is the latest iteration of the flagship chat model family from the DeepSeek team. It succeeds the [DeepSeek V3](/deepseek/deepseek-chat-v3) model and performs really well...",
+    "context_length": 163840,
+    "architecture": {
+      "modality": "text->text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "DeepSeek",
+      "instruct_type": null
+    },
+    "pricing": {
+      "prompt": "0.0000002",
+      "completion": "0.00000077",
+      "input_cache_read": "0.000000135"
+    },
+    "top_provider": {
+      "context_length": 163840,
+      "max_completion_tokens": 16384,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "frequency_penalty",
+      "logit_bias",
+      "max_tokens",
+      "min_p",
+      "presence_penalty",
+      "repetition_penalty",
+      "response_format",
+      "seed",
+      "stop",
+      "structured_outputs",
+      "temperature",
+      "tool_choice",
+      "tools",
+      "top_k",
+      "top_p"
+    ],
+    "default_parameters": {},
+    "knowledge_cutoff": "2024-07-31",
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/deepseek/deepseek-chat-v3-0324/endpoints"
+    }
+  },
+  {
+    "id": "google/gemini-2.0-flash-lite-001",
+    "canonical_slug": "google/gemini-2.0-flash-lite-001",
+    "hugging_face_id": "",
+    "name": "Google: Gemini 2.0 Flash Lite",
+    "created": 1740506212,
+    "description": "Gemini 2.0 Flash Lite offers a significantly faster time to first token (TTFT) compared to [Gemini Flash 1.5](/google/gemini-flash-1.5), while maintaining quality on par with larger models like [Gemini Pro 1.5](/google/gemini-pro-1.5),...",
+    "context_length": 1048576,
+    "architecture": {
+      "modality": "text+image+file+audio+video->text",
+      "input_modalities": [
+        "text",
+        "image",
+        "file",
+        "audio",
+        "video"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "Gemini",
+      "instruct_type": null
+    },
+    "pricing": {
+      "prompt": "0.000000075",
+      "completion": "0.0000003",
+      "image": "0.000000075",
+      "audio": "0.000000075",
+      "web_search": "0.014",
+      "internal_reasoning": "0.0000003"
+    },
+    "top_provider": {
+      "context_length": 1048576,
+      "max_completion_tokens": 8192,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "max_tokens",
+      "response_format",
+      "seed",
+      "stop",
+      "structured_outputs",
+      "temperature",
+      "tool_choice",
+      "tools",
+      "top_p"
+    ],
+    "default_parameters": {
+      "temperature": null,
+      "top_p": null,
+      "frequency_penalty": null
+    },
+    "knowledge_cutoff": "2024-08-31",
+    "expiration_date": "2026-06-01",
+    "links": {
+      "details": "/api/v1/models/google/gemini-2.0-flash-lite-001/endpoints"
+    }
+  },
+  {
+    "id": "google/gemini-2.0-flash-001",
+    "canonical_slug": "google/gemini-2.0-flash-001",
+    "hugging_face_id": "",
+    "name": "Google: Gemini 2.0 Flash",
+    "created": 1738769413,
+    "description": "Gemini Flash 2.0 offers a significantly faster time to first token (TTFT) compared to [Gemini Flash 1.5](/google/gemini-flash-1.5), while maintaining quality on par with larger models like [Gemini Pro 1.5](/google/gemini-pro-1.5). It...",
+    "context_length": 1048576,
+    "architecture": {
+      "modality": "text+image+file+audio+video->text",
+      "input_modalities": [
+        "text",
+        "image",
+        "file",
+        "audio",
+        "video"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "Gemini",
+      "instruct_type": null
+    },
+    "pricing": {
+      "prompt": "0.0000001",
+      "completion": "0.0000004",
+      "image": "0.0000001",
+      "audio": "0.0000007",
+      "web_search": "0.014",
+      "internal_reasoning": "0.0000004",
+      "input_cache_read": "0.000000025",
+      "input_cache_write": "0.00000008333333333333334"
+    },
+    "top_provider": {
+      "context_length": 1048576,
+      "max_completion_tokens": 8192,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "max_tokens",
+      "response_format",
+      "seed",
+      "stop",
+      "structured_outputs",
+      "temperature",
+      "tool_choice",
+      "tools",
+      "top_p"
+    ],
+    "default_parameters": {
+      "temperature": null,
+      "top_p": null,
+      "frequency_penalty": null
+    },
+    "knowledge_cutoff": "2024-08-31",
+    "expiration_date": "2026-06-01",
+    "links": {
+      "details": "/api/v1/models/google/gemini-2.0-flash-001/endpoints"
+    }
+  },
+  {
+    "id": "deepseek/deepseek-r1-distill-qwen-32b",
+    "canonical_slug": "deepseek/deepseek-r1-distill-qwen-32b",
+    "hugging_face_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+    "name": "DeepSeek: R1 Distill Qwen 32B",
+    "created": 1738194830,
+    "description": "DeepSeek R1 Distill Qwen 32B is a distilled large language model based on [Qwen 2.5 32B](https://huggingface.co/Qwen/Qwen2.5-32B), using outputs from [DeepSeek R1](/deepseek/deepseek-r1). It outperforms OpenAI's o1-mini across various benchmarks, achieving new...",
+    "context_length": 32768,
+    "architecture": {
+      "modality": "text->text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "Qwen",
+      "instruct_type": "deepseek-r1"
+    },
+    "pricing": {
+      "prompt": "0.00000029",
+      "completion": "0.00000029"
+    },
+    "top_provider": {
+      "context_length": 32768,
+      "max_completion_tokens": 32768,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "frequency_penalty",
+      "include_reasoning",
+      "logprobs",
+      "max_tokens",
+      "presence_penalty",
+      "reasoning",
+      "repetition_penalty",
+      "response_format",
+      "seed",
+      "stop",
+      "structured_outputs",
+      "temperature",
+      "top_logprobs",
+      "top_p"
+    ],
+    "default_parameters": {},
+    "knowledge_cutoff": "2024-07-31",
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/deepseek/deepseek-r1-distill-qwen-32b/endpoints"
+    }
+  },
+  {
+    "id": "deepseek/deepseek-r1-distill-llama-70b",
+    "canonical_slug": "deepseek/deepseek-r1-distill-llama-70b",
+    "hugging_face_id": "deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
+    "name": "DeepSeek: R1 Distill Llama 70B",
+    "created": 1737663169,
+    "description": "DeepSeek R1 Distill Llama 70B is a distilled large language model based on [Llama-3.3-70B-Instruct](/meta-llama/llama-3.3-70b-instruct), using outputs from [DeepSeek R1](/deepseek/deepseek-r1). The model combines advanced distillation techniques to achieve high performance across...",
+    "context_length": 131072,
+    "architecture": {
+      "modality": "text->text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "Llama3",
+      "instruct_type": "deepseek-r1"
+    },
+    "pricing": {
+      "prompt": "0.0000007",
+      "completion": "0.0000008"
+    },
+    "top_provider": {
+      "context_length": 131072,
+      "max_completion_tokens": 16384,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "frequency_penalty",
+      "include_reasoning",
+      "logit_bias",
+      "max_tokens",
+      "min_p",
+      "presence_penalty",
+      "reasoning",
+      "repetition_penalty",
+      "response_format",
+      "seed",
+      "stop",
+      "temperature",
+      "top_k",
+      "top_p"
+    ],
+    "default_parameters": {},
+    "knowledge_cutoff": "2024-07-31",
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/deepseek/deepseek-r1-distill-llama-70b/endpoints"
+    }
+  },
+  {
+    "id": "deepseek/deepseek-r1",
+    "canonical_slug": "deepseek/deepseek-r1",
+    "hugging_face_id": "deepseek-ai/DeepSeek-R1",
+    "name": "DeepSeek: R1",
+    "created": 1737381095,
+    "description": "DeepSeek R1 is here: Performance on par with [OpenAI o1](/openai/o1), but open-sourced and with fully open reasoning tokens. It's 671B parameters in size, with 37B active in an inference pass....",
+    "context_length": 64000,
+    "architecture": {
+      "modality": "text->text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "DeepSeek",
+      "instruct_type": "deepseek-r1"
+    },
+    "pricing": {
+      "prompt": "0.0000007",
+      "completion": "0.0000025"
+    },
+    "top_provider": {
+      "context_length": 64000,
+      "max_completion_tokens": 16000,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "frequency_penalty",
+      "include_reasoning",
+      "max_completion_tokens",
+      "max_tokens",
+      "presence_penalty",
+      "reasoning",
+      "repetition_penalty",
+      "seed",
+      "stop",
+      "temperature",
+      "tool_choice",
+      "tools",
+      "top_k",
+      "top_p"
+    ],
+    "default_parameters": {
+      "temperature": null,
+      "top_p": null,
+      "top_k": null,
+      "frequency_penalty": null,
+      "presence_penalty": null,
+      "repetition_penalty": null
+    },
+    "knowledge_cutoff": "2024-07-31",
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/deepseek/deepseek-r1/endpoints"
+    }
+  },
+  {
+    "id": "deepseek/deepseek-chat",
+    "canonical_slug": "deepseek/deepseek-chat-v3",
+    "hugging_face_id": "deepseek-ai/DeepSeek-V3",
+    "name": "DeepSeek: DeepSeek V3",
+    "created": 1735241320,
+    "description": "DeepSeek-V3 is the latest model from the DeepSeek team, building upon the instruction following and coding abilities of the previous versions. Pre-trained on nearly 15 trillion tokens, the reported evaluations...",
+    "context_length": 163840,
+    "architecture": {
+      "modality": "text->text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "DeepSeek",
+      "instruct_type": null
+    },
+    "pricing": {
+      "prompt": "0.00000032",
+      "completion": "0.00000089"
+    },
+    "top_provider": {
+      "context_length": 163840,
+      "max_completion_tokens": 16384,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "frequency_penalty",
+      "logit_bias",
+      "max_tokens",
+      "min_p",
+      "presence_penalty",
+      "repetition_penalty",
+      "response_format",
+      "seed",
+      "stop",
+      "temperature",
+      "tool_choice",
+      "tools",
+      "top_k",
+      "top_p"
+    ],
+    "default_parameters": {},
+    "knowledge_cutoff": "2024-07-31",
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/deepseek/deepseek-chat-v3/endpoints"
+    }
+  },
+  {
+    "id": "nvidia/llama-3.1-nemotron-70b-instruct",
+    "canonical_slug": "nvidia/llama-3.1-nemotron-70b-instruct",
+    "hugging_face_id": "nvidia/Llama-3.1-Nemotron-70B-Instruct-HF",
+    "name": "NVIDIA: Llama 3.1 Nemotron 70B Instruct",
+    "created": 1728950400,
+    "description": "NVIDIA's Llama 3.1 Nemotron 70B is a language model designed for generating precise and useful responses. Leveraging [Llama 3.1 70B](/models/meta-llama/llama-3.1-70b-instruct) architecture and Reinforcement Learning from Human Feedback (RLHF), it excels...",
+    "context_length": 131072,
+    "architecture": {
+      "modality": "text->text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ],
+      "tokenizer": "Llama3",
+      "instruct_type": "llama3"
+    },
+    "pricing": {
+      "prompt": "0.0000012",
+      "completion": "0.0000012"
+    },
+    "top_provider": {
+      "context_length": 131072,
+      "max_completion_tokens": 16384,
+      "is_moderated": false
+    },
+    "per_request_limits": null,
+    "supported_parameters": [
+      "frequency_penalty",
+      "logit_bias",
+      "max_tokens",
+      "min_p",
+      "presence_penalty",
+      "repetition_penalty",
+      "response_format",
+      "seed",
+      "stop",
+      "temperature",
+      "tool_choice",
+      "tools",
+      "top_k",
+      "top_p"
+    ],
+    "default_parameters": {},
+    "knowledge_cutoff": "2023-12-31",
+    "expiration_date": null,
+    "links": {
+      "details": "/api/v1/models/nvidia/llama-3.1-nemotron-70b-instruct/endpoints"
+    }
+  }
+]

@@ -1,0 +1,47 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "jsx": "preserve",
+    "jsxImportSource": "preact",
+    "types": ["vite/client"],
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": [
+    "src/main.tsx",
+    "src/app.tsx",
+    "src/state/**/*.ts",
+    "src/components/chrome/**/*.tsx",
+    "src/components/feed/**/*.tsx",
+    "src/components/inspector/**/*.tsx",
+    "src/components/rail/**/*.tsx",
+    "src/components/map/**/*.tsx",
+    "src/server/**/*.ts",
+    "src/client/**/*.ts",
+    "src/fixtures/**/*.ts",
+    "src/types/**/*.ts",
+    "src/vite-env.d.ts",
+    "src/services/runtime.ts",
+    "src/utils/sync-keys.ts",
+    "src/utils/settings-persistence.ts"
+  ],
+  "exclude": ["src/workers/ml.worker.ts"]
+}

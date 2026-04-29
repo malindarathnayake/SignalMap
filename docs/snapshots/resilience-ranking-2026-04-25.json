@@ -1,0 +1,233 @@
+{
+  "capturedAt": "2026-04-25",
+  "commitSha": "unknown",
+  "schemaVersion": "2.0",
+  "methodologyFormula": "domain-weighted-6d",
+  "methodology": {
+    "domainCount": 6,
+    "dimensionCount": 19,
+    "pillarCount": 3,
+    "greyOutThreshold": 0.4
+  },
+  "tables": {
+    "topTen": [
+      {
+        "rank": 1,
+        "countryCode": "CH",
+        "countryName": "Switzerland",
+        "overallScore": 82.4,
+        "dimensionCoverage": 0.96
+      },
+      {
+        "rank": 2,
+        "countryCode": "NO",
+        "countryName": "Norway",
+        "overallScore": 81.9,
+        "dimensionCoverage": 0.95
+      },
+      {
+        "rank": 3,
+        "countryCode": "DK",
+        "countryName": "Denmark",
+        "overallScore": 80.7,
+        "dimensionCoverage": 0.95
+      },
+      {
+        "rank": 4,
+        "countryCode": "FI",
+        "countryName": "Finland",
+        "overallScore": 79.8,
+        "dimensionCoverage": 0.94
+      },
+      {
+        "rank": 5,
+        "countryCode": "SE",
+        "countryName": "Sweden",
+        "overallScore": 79.2,
+        "dimensionCoverage": 0.95
+      },
+      {
+        "rank": 6,
+        "countryCode": "IS",
+        "countryName": "Iceland",
+        "overallScore": 78.4,
+        "dimensionCoverage": 0.91
+      },
+      {
+        "rank": 7,
+        "countryCode": "NZ",
+        "countryName": "New Zealand",
+        "overallScore": 77.6,
+        "dimensionCoverage": 0.93
+      },
+      {
+        "rank": 8,
+        "countryCode": "NL",
+        "countryName": "Netherlands",
+        "overallScore": 76.5,
+        "dimensionCoverage": 0.94
+      },
+      {
+        "rank": 9,
+        "countryCode": "JP",
+        "countryName": "Japan",
+        "overallScore": 75.3,
+        "dimensionCoverage": 0.94
+      },
+      {
+        "rank": 10,
+        "countryCode": "SG",
+        "countryName": "Singapore",
+        "overallScore": 74.8,
+        "dimensionCoverage": 0.92
+      }
+    ],
+    "bottomTen": [
+      {
+        "rank": 186,
+        "countryCode": "HT",
+        "countryName": "Haiti",
+        "overallScore": 38.9,
+        "dimensionCoverage": 0.72
+      },
+      {
+        "rank": 187,
+        "countryCode": "AF",
+        "countryName": "Afghanistan",
+        "overallScore": 37.4,
+        "dimensionCoverage": 0.68
+      },
+      {
+        "rank": 188,
+        "countryCode": "SY",
+        "countryName": "Syria",
+        "overallScore": 36.6,
+        "dimensionCoverage": 0.66
+      },
+      {
+        "rank": 189,
+        "countryCode": "MM",
+        "countryName": "Myanmar",
+        "overallScore": 35.2,
+        "dimensionCoverage": 0.7
+      },
+      {
+        "rank": 190,
+        "countryCode": "YE",
+        "countryName": "Yemen",
+        "overallScore": 34.1,
+        "dimensionCoverage": 0.62
+      },
+      {
+        "rank": 191,
+        "countryCode": "SD",
+        "countryName": "Sudan",
+        "overallScore": 33.2,
+        "dimensionCoverage": 0.64
+      },
+      {
+        "rank": 192,
+        "countryCode": "SO",
+        "countryName": "Somalia",
+        "overallScore": 32.1,
+        "dimensionCoverage": 0.58
+      },
+      {
+        "rank": 193,
+        "countryCode": "CD",
+        "countryName": "Democratic Republic of the Congo",
+        "overallScore": 31,
+        "dimensionCoverage": 0.61
+      },
+      {
+        "rank": 194,
+        "countryCode": "CF",
+        "countryName": "Central African Republic",
+        "overallScore": 29.8,
+        "dimensionCoverage": 0.59
+      },
+      {
+        "rank": 195,
+        "countryCode": "SS",
+        "countryName": "South Sudan",
+        "overallScore": 28.7,
+        "dimensionCoverage": 0.57
+      }
+    ],
+    "majorEconomies": [
+      {
+        "rank": 9,
+        "countryCode": "JP",
+        "countryName": "Japan",
+        "overallScore": 75.3,
+        "dimensionCoverage": 0.94
+      },
+      {
+        "rank": 12,
+        "countryCode": "DE",
+        "countryName": "Germany",
+        "overallScore": 73.9,
+        "dimensionCoverage": 0.95
+      },
+      {
+        "rank": 13,
+        "countryCode": "AU",
+        "countryName": "Australia",
+        "overallScore": 73.4,
+        "dimensionCoverage": 0.94
+      },
+      {
+        "rank": 14,
+        "countryCode": "CA",
+        "countryName": "Canada",
+        "overallScore": 73.1,
+        "dimensionCoverage": 0.94
+      },
+      {
+        "rank": 16,
+        "countryCode": "GB",
+        "countryName": "United Kingdom",
+        "overallScore": 72.6,
+        "dimensionCoverage": 0.95
+      },
+      {
+        "rank": 18,
+        "countryCode": "FR",
+        "countryName": "France",
+        "overallScore": 71.7,
+        "dimensionCoverage": 0.95
+      },
+      {
+        "rank": 24,
+        "countryCode": "US",
+        "countryName": "United States",
+        "overallScore": 68.3,
+        "dimensionCoverage": 0.95
+      },
+      {
+        "rank": 42,
+        "countryCode": "CN",
+        "countryName": "China",
+        "overallScore": 62.4,
+        "dimensionCoverage": 0.9
+      },
+      {
+        "rank": 58,
+        "countryCode": "BR",
+        "countryName": "Brazil",
+        "overallScore": 58.9,
+        "dimensionCoverage": 0.88
+      },
+      {
+        "rank": 71,
+        "countryCode": "IN",
+        "countryName": "India",
+        "overallScore": 55.8,
+        "dimensionCoverage": 0.86
+      }
+    ]
+  },
+  "totals": {
+    "rankedCountries": 195
+  }
+}

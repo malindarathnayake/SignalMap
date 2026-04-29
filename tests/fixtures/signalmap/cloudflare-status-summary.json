@@ -1,0 +1,50 @@
+{
+  "page": {
+    "id": "cloudflare",
+    "name": "Cloudflare",
+    "url": "https://www.cloudflarestatus.com",
+    "time_zone": "Etc/UTC",
+    "updated_at": "2026-04-25T02:44:00Z"
+  },
+  "components": [
+    {
+      "id": "cdn",
+      "name": "CDN",
+      "status": "operational",
+      "created_at": "2026-01-01T00:00:00Z",
+      "updated_at": "2026-04-25T02:40:00Z"
+    },
+    {
+      "id": "workers",
+      "name": "Workers",
+      "status": "degraded_performance",
+      "created_at": "2026-01-01T00:00:00Z",
+      "updated_at": "2026-04-25T02:42:00Z"
+    }
+  ],
+  "incidents": [
+    {
+      "id": "incident-workers-latency",
+      "name": "Elevated Workers latency in Western Europe",
+      "status": "monitoring",
+      "impact": "minor",
+      "created_at": "2026-04-25T01:50:00Z",
+      "updated_at": "2026-04-25T02:35:00Z",
+      "shortlink": "https://stspg.io/example-workers-latency"
+    }
+  ],
+  "scheduled_maintenances": [
+    {
+      "id": "maintenance-dashboard",
+      "name": "Dashboard maintenance",
+      "status": "scheduled",
+      "impact": "maintenance",
+      "scheduled_for": "2026-04-30T04:00:00Z",
+      "scheduled_until": "2026-04-30T05:00:00Z"
+    }
+  ],
+  "status": {
+    "indicator": "minor",
+    "description": "Minor Service Outage"
+  }
+}
