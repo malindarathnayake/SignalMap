@@ -736,6 +736,178 @@
     margin: 0;
   }
 
+  /* Bottom panel — owns the resizer + tab strip + active tab body */
+  .sm-bottom-panel {
+    background: var(--bg-1);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .sm-bottom-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--line-1);
+    flex: 0 0 auto;
+  }
+  .sm-bottom-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--ink-3);
+    cursor: pointer;
+    font-family: inherit;
+    transition: color 100ms, border-color 100ms;
+  }
+  .sm-bottom-tab:hover { color: var(--ink-2); }
+  .sm-bottom-tab.active {
+    color: var(--ink-1);
+    border-bottom-color: var(--accent);
+  }
+  .sm-bottom-tab .eyebrow { font-size: 10.5px; }
+  .sm-bottom-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .sm-bottom-body > .sm-feed,
+  .sm-bottom-body > .sm-cameras {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  /* Live cameras grid */
+  .sm-cameras {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+  .sm-cameras-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-bottom: 1px solid var(--line-1);
+    flex: 0 0 auto;
+  }
+  .sm-cameras-meta {
+    flex: 1 1 auto;
+    color: var(--ink-3);
+    font-size: 11px;
+  }
+  .sm-cameras-grid {
+    flex: 1 1 auto;
+    display: grid;
+    gap: 4px;
+    padding: 4px;
+    background: var(--line-1);
+    min-height: 0;
+  }
+  .sm-cameras-grid.layout-1 { grid-template-columns: 1fr; grid-template-rows: 1fr; }
+  .sm-cameras-grid.layout-2 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; }
+  .sm-cameras-grid.layout-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+
+  .sm-camera-cell {
+    position: relative;
+    background: #000;
+    overflow: hidden;
+    min-height: 0;
+    min-width: 0;
+  }
+  .sm-camera-cell.empty {
+    background: var(--bg-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .sm-camera-cell-pick {
+    background: transparent;
+    border: 1px dashed var(--line-3);
+    color: var(--ink-3);
+    padding: 8px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+  }
+  .sm-camera-cell-pick:hover { color: var(--ink-1); border-color: var(--accent); }
+  .sm-camera-iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+  }
+  .sm-camera-overlay {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(6px);
+    border-radius: 3px;
+    padding: 3px 8px;
+    pointer-events: none;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+  .sm-camera-city { color: #fff; font-size: 12px; font-weight: 500; }
+  .sm-camera-country { color: rgba(255, 255, 255, 0.6); font-size: 10.5px; }
+
+  .sm-cameras-options { width: min(560px, 100%); }
+  .sm-cameras-layout-row,
+  .sm-cameras-region-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+    padding: 4px 0;
+  }
+  .sm-cameras-options-label {
+    margin-right: 8px;
+    color: var(--ink-3);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .sm-cameras-options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    border-top: 1px solid var(--line-1);
+    border-bottom: 1px solid var(--line-1);
+    padding: 12px 0;
+  }
+  .sm-cameras-options-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .sm-cameras-options-cell-label {
+    font-size: 10.5px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .sm-cameras-options-select {
+    background: var(--bg-2);
+    border: 1px solid var(--line-1);
+    border-radius: 3px;
+    padding: 5px 8px;
+    color: var(--ink-1);
+    font-size: 12px;
+    font-family: inherit;
+  }
+  .sm-cameras-options-select:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
   /* Live feed resize handle + collapse / expand */
   .sm-feed-resizer {
     display: flex;

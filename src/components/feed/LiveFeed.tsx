@@ -27,7 +27,9 @@ function toggleSeverity(sev: FeedSeverity): void {
   }
 }
 
-export function LiveFeed() {
+type Props = { embedded?: boolean };
+
+export function LiveFeed({ embedded = false }: Props = {}) {
   const active = activeCategories.value;
   const sevFilter = feedSeverityFilter.value;
   const mainSet = mainSeverities.value;
@@ -44,7 +46,7 @@ export function LiveFeed() {
 
   return (
     <section className="sm-feed" data-testid="signalmap-feed" aria-label="Live feed">
-      <FeedResizer />
+      {!embedded && <FeedResizer />}
       <div className="sm-feed-head">
         <span className="eyebrow">Live feed</span>
         <span className="sm-feed-count mono tnum" data-testid="signalmap-feed-count">{visible.length}</span>

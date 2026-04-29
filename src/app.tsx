@@ -5,7 +5,7 @@ import { RadarStrip } from './components/chrome/RadarStrip.tsx';
 import { ProviderStrip } from './components/chrome/ProviderStrip.tsx';
 import { LeftRail } from './components/rail/LeftRail.tsx';
 import { BriefStrip } from './components/chrome/BriefStrip.tsx';
-import { LiveFeed } from './components/feed/LiveFeed.tsx';
+import { BottomPanel } from './components/feed/BottomPanel.tsx';
 import { FeedExpandButton } from './components/feed/FeedResizer.tsx';
 import { Inspector } from './components/inspector/Inspector.tsx';
 import { WorldMap } from './components/map/WorldMap.tsx';
@@ -46,7 +46,7 @@ export function App() {
             <MapOverlays />
             {collapsed && <FeedExpandButton />}
           </div>
-          {!collapsed && <LiveFeed />}
+          {!collapsed && <BottomPanel />}
         </div>
         <Inspector />
       </div>
