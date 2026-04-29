@@ -22,7 +22,7 @@ export function MapControls() {
           <input
             type="range"
             min={0.5}
-            max={2}
+            max={4}
             step={0.05}
             value={mc.brightness ?? 1}
             data-testid="signalmap-rail-brightness"

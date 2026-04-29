@@ -130,6 +130,9 @@ export function WorldMap() {
               <path
                 key={key}
                 d={d}
+                fill="var(--land)"
+                stroke="var(--land-stroke)"
+                strokeWidth={0.5}
                 vectorEffect="non-scaling-stroke"
               />
             ))}
