@@ -1,5 +1,8 @@
 import { useSignal } from '@preact/signals';
+import { useState } from 'preact/hooks';
 import { query, timeRange, TIME_RANGES } from '../../state/filters.ts';
+import { RefreshControl } from './RefreshControl.tsx';
+import { HealthPanel } from './HealthPanel.tsx';
 
 type SourceStatus = 'ok' | 'degraded' | 'stale';
 type SourceHealth = { id: string; label: string; tier: 1 | 2; status: SourceStatus; latencyMs: number };
@@ -34,6 +37,7 @@ function dotClass(status: SourceStatus): string {
 
 export function CommandBar() {
   const popOpen = useSignal(false);
+  const [healthOpen, setHealthOpen] = useState(false);
 
   const ok = MOCK_SOURCES.filter(s => s.status === 'ok').length;
   const total = MOCK_SOURCES.length;
@@ -79,6 +83,24 @@ export function CommandBar() {
             </button>
           ))}
         </div>
+
+        {/* Refresh countdown + force-refresh button */}
+        <RefreshControl />
+
+        {/* Health panel button — opens a modal with Redis / LanceDB /
+            collector / brief / OpenRouter / Perplexity status */}
+        <button
+          className="sm-pill"
+          data-testid="signalmap-health-pill"
+          aria-label="System health"
+          title="System health"
+          onClick={() => setHealthOpen(true)}
+        >
+          <span className="sm-dot ok" />
+          <span className="sm-pill-label">health</span>
+        </button>
+
+        {healthOpen && <HealthPanel onClose={() => setHealthOpen(false)} />}
 
         {/* Source health pill */}
         <button

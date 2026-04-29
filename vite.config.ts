@@ -403,6 +403,21 @@ function signalmapFixturePlugin(): Plugin {
           return;
         }
 
+        // ---- health endpoint ----
+        if (url === '/api/signalmap/health') {
+          try {
+            const { HEALTH_FIXTURE } = await getFixtures();
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/json');
+            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+            res.end(JSON.stringify(HEALTH_FIXTURE));
+          } catch (err) {
+            console.error('[signalmap-fixtures] health error:', err);
+            next();
+          }
+          return;
+        }
+
         // ---- brief refresh endpoint ----
         if (url === '/api/signalmap/brief/refresh') {
           res.statusCode = 200;

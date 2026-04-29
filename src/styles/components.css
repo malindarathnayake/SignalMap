@@ -1225,6 +1225,156 @@
     grid-template-columns: 70px 1fr 38px;
   }
 
+  /* Refresh control (countdown + force button) — sits in CommandBar */
+  .sm-refresh {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border: 1px solid var(--line-1);
+    border-radius: 4px;
+    background: var(--bg-2);
+  }
+  .sm-refresh-meta {
+    font-size: 10.5px;
+    color: var(--ink-3);
+    white-space: nowrap;
+  }
+  .sm-refresh-label { color: var(--ink-3); }
+  .sm-refresh-age, .sm-refresh-next { color: var(--ink-1); }
+  .sm-refresh-btn {
+    background: transparent;
+    border: 1px solid var(--line-2);
+    color: var(--ink-2);
+    width: 22px;
+    height: 22px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 100ms, border-color 100ms;
+  }
+  .sm-refresh-btn:hover:not(:disabled) {
+    color: var(--ink-1);
+    border-color: var(--accent);
+  }
+  .sm-refresh-btn:disabled { opacity: 0.6; cursor: progress; }
+  .sm-refresh-btn.spinning {
+    animation: sm-spin 700ms linear infinite;
+  }
+  @keyframes sm-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  /* Health panel modal — reuses sm-watchpoint-options-* backdrop.
+     Combined class selector is required: .sm-watchpoint-options is
+     declared later in the file with the same specificity, so a plain
+     .sm-health-panel rule loses on source order. Chaining both classes
+     bumps specificity to (0,2,0,0). */
+  .sm-watchpoint-options.sm-health-panel {
+    width: min(760px, 100%);
+    max-height: min(900px, 92vh);
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .sm-health-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .sm-health-card {
+    border: 1px solid var(--line-1);
+    border-left-width: 3px;
+    border-radius: 4px;
+    padding: 8px 10px;
+    background: var(--bg-2);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .sm-health-card.status-ok    { border-left-color: var(--sev-resolved, #58c474); }
+  .sm-health-card.status-warn  { border-left-color: var(--sev-major, #ffb020); }
+  .sm-health-card.status-err   { border-left-color: var(--sev-critical, #e85a5a); }
+  .sm-health-card.status-unknown { border-left-color: var(--line-2); }
+  .sm-health-card-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sm-health-card-name {
+    flex: 1 1 auto;
+    color: var(--ink-1);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+  .sm-health-card-status {
+    color: var(--ink-3);
+    font-size: 10.5px;
+    text-transform: uppercase;
+  }
+  .sm-health-card-detail {
+    color: var(--ink-3);
+    font-size: 11px;
+    font-family: var(--sm-font-mono);
+  }
+  .sm-health-metrics {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .sm-health-metrics li {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 11px;
+  }
+  .sm-health-metric-key { color: var(--ink-3); }
+  .sm-health-metric-val { color: var(--ink-1); }
+
+  .sm-health-sources {
+    border-top: 1px solid var(--line-1);
+    padding-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .sm-health-source-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    /* No max-height — let the modal handle scroll. Single scroll
+       container is friendlier than nested scrolling. */
+  }
+  .sm-health-source-row {
+    display: grid;
+    grid-template-columns: 8px 1fr 30px 60px;
+    gap: 8px;
+    align-items: center;
+    padding: 4px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+  }
+  .sm-health-source-row:hover { background: var(--bg-2); }
+  .sm-health-source-label { color: var(--ink-1); }
+  .sm-health-source-tier  { color: var(--ink-3); text-align: right; }
+  .sm-health-source-latency { color: var(--ink-3); text-align: right; }
+  .sm-health-footer {
+    color: var(--ink-3);
+    font-size: 10.5px;
+    text-align: right;
+  }
+
   /* Custom hover tooltip for undersea cables */
   .sm-cable-tip {
     background: rgba(8, 12, 18, 0.92);

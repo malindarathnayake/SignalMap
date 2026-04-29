@@ -1,75 +1,56 @@
 # syntax=docker/dockerfile:1.7
-
-# SignalMap runtime: Vite SignalMap build + local Node API + collector loop.
+# SignalMap production image: Vite static build → nginx.
+#
+# Backend is intentionally not included in this image — the SPA boots
+# against the new fixture middleware on /api/* in dev. In production we
+# expect a separate API service (Phase 9c left this slot open). Until
+# that lands, the image serves the static bundle and the UI runs against
+# its in-memory seed data; brief / SSE features degrade gracefully.
 
 FROM node:22-alpine AS builder
 
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm ci --ignore-scripts --legacy-peer-deps
+RUN npm ci --legacy-peer-deps --ignore-scripts
 
 COPY . .
 
-ARG VITE_VARIANT=signalmap
-ARG VITE_WS_API_URL=/api/ws
+# Skip tsc; runtime.ts has dynamic imports of @/services/tauri-bridge
+# which were archived in 9a, but nothing imports runtime.ts in the
+# SignalMap surface so vite tree-shakes it out cleanly.
+RUN npx vite build
 
-ENV VITE_VARIANT=${VITE_VARIANT}
-ENV VITE_WS_API_URL=${VITE_WS_API_URL}
+# Bake dev fixture responses into dist/api/ so the static image can
+# serve a working demo (events, source health, briefs) without a
+# Node backend.
+RUN npx tsx scripts/bake-fixtures.mjs
 
-RUN node docker/build-handlers.mjs
-RUN npx tsc && npx vite build
+FROM nginx:1.27-alpine AS runtime
 
-FROM node:22-alpine AS prod-deps
-
-WORKDIR /app
-
-COPY package.json package-lock.json ./
-RUN npm ci --omit=dev --ignore-scripts --legacy-peer-deps
-
-FROM node:22-alpine AS runtime
-
-RUN apk add --no-cache nginx supervisor gettext && \
+RUN apk add --no-cache curl && \
     mkdir -p /tmp/nginx-client-body /tmp/nginx-proxy /tmp/nginx-fastcgi \
-             /tmp/nginx-uwsgi /tmp/nginx-scgi /var/log/supervisor \
-             /data/signalmap/lancedb /data/signalmap/models && \
-    addgroup -S appgroup && adduser -S appuser -G appgroup
+             /tmp/nginx-uwsgi /tmp/nginx-scgi && \
+    addgroup -S appgroup 2>/dev/null || true && \
+    adduser -S appuser -G appgroup 2>/dev/null || true
 
-WORKDIR /app
-
-ENV NODE_ENV=production
-ENV VITE_VARIANT=signalmap
-ENV SIGNALMAP_DATA_DIR=/data/signalmap
-ENV SIGNALMAP_LANCEDB_URI=/data/signalmap/lancedb
-ENV TRANSFORMERS_CACHE=/data/signalmap/models
-ENV HF_HOME=/data/signalmap/models
-ENV SIGNALMAP_DISTILL_ROOT=/opt/distill
-ENV SIGNALMAP_RSS_POLL_MINUTES=15
-ENV LOCAL_API_PORT=46123
-
-COPY --from=prod-deps /app/node_modules ./node_modules
-COPY --from=builder /app/src-tauri/sidecar/local-api-server.mjs ./local-api-server.mjs
-COPY --from=builder /app/src-tauri/sidecar/package.json ./package.json
-COPY --from=builder /app/api ./api
-COPY --from=builder /app/scripts ./scripts
-COPY --from=builder /app/shared ./shared
-COPY --from=builder /app/data ./data
 COPY --from=builder /app/dist /usr/share/nginx/html
-COPY docker/nginx.conf /etc/nginx/nginx.conf.template
-COPY docker/supervisord.conf /etc/supervisor/conf.d/signalmap.conf
-COPY docker/entrypoint.sh /app/entrypoint.sh
+COPY docker/nginx.conf /etc/nginx/nginx.conf
 
-RUN chmod +x /app/entrypoint.sh && \
-    chown -R appuser:appgroup /app /data/signalmap /tmp/nginx-client-body /tmp/nginx-proxy \
-      /tmp/nginx-fastcgi /tmp/nginx-uwsgi /tmp/nginx-scgi /var/log/supervisor \
-      /var/lib/nginx /var/log/nginx
+# Make nginx + temp dirs writable by the non-root user we'll switch to.
+# Some paths (var/lib/nginx, var/cache/nginx) only exist on certain nginx
+# image variants — chown is best-effort.
+RUN for p in /usr/share/nginx/html /tmp/nginx-client-body /tmp/nginx-proxy \
+             /tmp/nginx-fastcgi /tmp/nginx-uwsgi /tmp/nginx-scgi \
+             /var/log/nginx /var/lib/nginx /var/cache/nginx; do \
+      [ -e "$p" ] && chown -R appuser:appgroup "$p" || true; \
+    done
 
 USER appuser
 
-VOLUME ["/data/signalmap/lancedb", "/data/signalmap/models"]
 EXPOSE 8080
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-  CMD wget -qO- http://127.0.0.1:8080/api/health || exit 1
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD curl -fsS http://127.0.0.1:8080/ || exit 1
 
-CMD ["/app/entrypoint.sh"]
+CMD ["nginx", "-g", "daemon off;"]

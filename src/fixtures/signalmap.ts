@@ -24,6 +24,72 @@ export const LIST_EVENTS_FIXTURE: { events: SignalEvent[] } = {
   ],
 };
 
+export const HEALTH_FIXTURE = {
+  redis: {
+    status: 'ok' as const,
+    detail: 'redis://signalmap-redis:6379',
+    metrics: {
+      version: '7.4.0',
+      latencyMs: 8,
+      usedMemoryMB: 32,
+      keys: 1842,
+      uptimeSec: 86400,
+    },
+  },
+  lancedb: {
+    status: 'ok' as const,
+    detail: '/data/signalmap/lancedb',
+    metrics: {
+      tables: 3,
+      rows: 12453,
+      sizeMB: 187,
+      lastWriteAt: '2026-04-29T17:30:00Z',
+    },
+  },
+  collector: {
+    status: 'ok' as const,
+    detail: 'RSS poll loop',
+    metrics: {
+      lastTickAt: '2026-04-29T17:55:12Z',
+      ticksLastHour: 4,
+      itemsIngested24h: 2871,
+      pollIntervalMin: 15,
+    },
+  },
+  brief: {
+    status: 'ok' as const,
+    detail: 'Perplexity Sonar Pro + OpenRouter Nemotron',
+    metrics: {
+      lastGeneratedAt: '2026-04-28T12:00:00Z',
+      dailySpendUsd: 0.42,
+      dailyBudgetUsd: 2,
+      modelInUse: 'anthropic/claude-sonnet-4.6',
+    },
+  },
+  openrouter: {
+    status: 'ok' as const,
+    detail: 'OPENROUTER_API_KEY configured',
+    metrics: {
+      keyPrefix: 'sk-or-v1-…ab8f',
+      remainingCreditsUsd: 47.83,
+      lastCallAt: '2026-04-29T11:42:00Z',
+      lastCallStatus: '200',
+    },
+  },
+  perplexity: {
+    status: 'ok' as const,
+    detail: 'PERPLEXITY_API_KEY configured',
+    metrics: {
+      keyPrefix: 'pplx-…7c2a',
+      lastCallAt: '2026-04-29T11:42:01Z',
+      lastCallStatus: '200',
+      domainAllowlistSize: 18,
+    },
+  },
+  sources: [] as { id: string; label: string; status: 'ok' | 'degraded' | 'stale'; latencyMs: number; tier: number }[],
+  generatedAt: '2026-04-29T18:00:00Z',
+};
+
 export const SOURCE_HEALTH_FIXTURE = {
   sources: [
     { id: 'radar',         label: 'Cloudflare Radar',          tier: 1, status: 'ok' as const,        latencyMs: 42 },
@@ -41,6 +107,12 @@ export const SOURCE_HEALTH_FIXTURE = {
     { id: 'rss-tier2',     label: 'RSS / Tier-2 News',         tier: 2, status: 'stale' as const,     latencyMs: 2400 },
   ],
 };
+
+// Backfill the HEALTH_FIXTURE.sources field from SOURCE_HEALTH_FIXTURE
+// so the health endpoint and the source pill stay in sync.
+HEALTH_FIXTURE.sources = SOURCE_HEALTH_FIXTURE.sources.map(s => ({
+  id: s.id, label: s.label, status: s.status, latencyMs: s.latencyMs, tier: s.tier,
+}));
 
 export const BOOTSTRAP_FIXTURE = {
   filters: {
