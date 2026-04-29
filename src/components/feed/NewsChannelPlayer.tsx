@@ -43,6 +43,20 @@ export function NewsChannelPlayer({ channel, muted }: Props) {
     );
   }
 
+  if (channel.type === 'iframe') {
+    return (
+      <iframe
+        className="sm-news-iframe"
+        src={channel.url}
+        title={channel.name}
+        allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+        referrerPolicy="strict-origin-when-cross-origin"
+        loading="lazy"
+        allowFullscreen
+      />
+    );
+  }
+
   if (channel.type === 'rtmp') {
     return (
       <PlayerError
@@ -51,7 +65,7 @@ export function NewsChannelPlayer({ channel, muted }: Props) {
     );
   }
 
-  return <PlayerError message="Unknown stream type. Paste a YouTube, .m3u8, or .mp4 URL." />;
+  return <PlayerError message="Unknown stream type. Paste a YouTube, .m3u8, .mp4, or any https:// URL." />;
 }
 
 function PlayerError({ message }: { message: string }) {

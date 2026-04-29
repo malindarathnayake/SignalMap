@@ -1,7 +1,7 @@
 import { signal } from '@preact/signals';
 import { persist } from './persist.ts';
 
-export type NewsChannelType = 'youtube' | 'hls' | 'video' | 'rtmp' | 'unknown';
+export type NewsChannelType = 'youtube' | 'hls' | 'video' | 'iframe' | 'rtmp' | 'unknown';
 
 export interface NewsChannel {
   id: string;
@@ -17,6 +17,11 @@ export function detectType(url: string): NewsChannelType {
   if (/(?:^|\.)youtube\.com\/(?:watch|embed|live)|youtu\.be\//i.test(u)) return 'youtube';
   if (/\.m3u8(?:\?|$|#)/i.test(u)) return 'hls';
   if (/\.(?:mp4|webm|ogg|m4v|mov)(?:\?|$|#)/i.test(u)) return 'video';
+  // Any other http(s) URL — treat as a generic iframe embed. Many sites
+  // block iframe embedding via X-Frame-Options or CSP frame-ancestors;
+  // when that happens the iframe renders blank and the user just removes
+  // the channel.
+  if (/^https?:\/\//i.test(u)) return 'iframe';
   return 'unknown';
 }
 

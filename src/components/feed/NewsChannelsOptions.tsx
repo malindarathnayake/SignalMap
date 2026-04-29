@@ -14,8 +14,9 @@ const TYPE_HINT: Record<NewsChannelType, string> = {
   youtube: 'YouTube live (iframe embed)',
   hls: 'HLS (.m3u8) — plays via hls.js or native',
   video: 'Direct video file (mp4/webm)',
+  iframe: 'Generic iframe — works if the site allows embedding (X-Frame-Options / CSP)',
   rtmp: 'RTMP — not playable in browsers',
-  unknown: "Can't detect type — paste a YouTube / .m3u8 / .mp4 URL",
+  unknown: "Empty or invalid — paste an https:// URL",
 };
 
 export function NewsChannelsOptions({ onClose }: Props) {
