@@ -12,6 +12,7 @@ import {
   readOverlayLevel,
 } from '../../state/watchlist.ts';
 import { UNDERSEA_CABLES, FLAGSHIP_CABLE_IDS } from '../../data/undersea-cables.ts';
+import { DATA_CENTERS, FLAGSHIP_DATACENTER_IDS } from '../../data/datacenters.ts';
 import { MapMarker } from './MapMarker.tsx';
 
 const WIDTH = 960;
@@ -250,6 +251,81 @@ export function WorldMap() {
                       }
                       onMouseMove={(e: MouseEvent) =>
                         setHoverCable({ id: cable.id, name: cable.name, x: e.clientX, y: e.clientY })
+                      }
+                      onMouseLeave={() => setHoverCable(null)}
+                    />
+                  </g>
+                );
+              });
+            })()}
+          </g>
+          {/* Datacenters — filtered by mapControls.showDatacenters level */}
+          <g data-testid="signalmap-worldmap-datacenters">
+            {(() => {
+              if (!projection) return null;
+              const level = readOverlayLevel(mapControls.value.showDatacenters);
+              if (level === 'off') return null;
+
+              let dcs: typeof DATA_CENTERS;
+              if (level === 'main') {
+                dcs = DATA_CENTERS.filter(d => FLAGSHIP_DATACENTER_IDS.has(d.id));
+              } else if (level === 'all') {
+                dcs = DATA_CENTERS;
+              } else {
+                // 'incident' — DCs whose country matches an active event's country.
+                const incidentCountries = new Set<string>();
+                for (const ev of mappableEvents.value) {
+                  for (const loc of ev.locations) {
+                    const name = loc.name.toLowerCase();
+                    incidentCountries.add(name);
+                    const parts = name.split(',').map(p => p.trim());
+                    if (parts.length > 1) incidentCountries.add(parts[parts.length - 1]!);
+                  }
+                }
+                dcs = DATA_CENTERS.filter(d =>
+                  FLAGSHIP_DATACENTER_IDS.has(d.id) &&
+                  incidentCountries.has(d.country.toLowerCase()),
+                );
+              }
+
+              return dcs.map((dc) => {
+                const xy = projection([dc.lon, dc.lat]);
+                if (!xy) return null;
+                const size = 1.4;
+                return (
+                  <g key={dc.id}>
+                    <rect
+                      x={xy[0] - size / 2}
+                      y={xy[1] - size / 2}
+                      width={size}
+                      height={size}
+                      data-testid={`signalmap-worldmap-datacenter-${dc.id}`}
+                      style={{
+                        fill: '#ffb020',
+                        fillOpacity: 0.7,
+                        stroke: 'rgba(255,176,32,0.3)',
+                        strokeWidth: 0.4,
+                        pointerEvents: 'none',
+                      }}
+                    >
+                      <title>{dc.name} — {dc.owner}</title>
+                    </rect>
+                    <rect
+                      x={xy[0] - 2}
+                      y={xy[1] - 2}
+                      width={4}
+                      height={4}
+                      data-testid={`signalmap-worldmap-datacenter-hit-${dc.id}`}
+                      style={{
+                        fill: 'transparent',
+                        cursor: 'pointer',
+                        pointerEvents: 'all',
+                      }}
+                      onMouseEnter={(e: MouseEvent) =>
+                        setHoverCable({ id: dc.id, name: `${dc.name} (${dc.country})`, x: e.clientX, y: e.clientY })
+                      }
+                      onMouseMove={(e: MouseEvent) =>
+                        setHoverCable({ id: dc.id, name: `${dc.name} (${dc.country})`, x: e.clientX, y: e.clientY })
                       }
                       onMouseLeave={() => setHoverCable(null)}
                     />
