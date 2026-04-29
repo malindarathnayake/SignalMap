@@ -18,6 +18,22 @@ export function MapControls() {
       </div>
       <div className="sm-controls">
         <label className="sm-control-row">
+          <span>Brightness</span>
+          <input
+            type="range"
+            min={0.5}
+            max={2}
+            step={0.05}
+            value={mc.brightness ?? 1}
+            data-testid="signalmap-rail-brightness"
+            onInput={e => set('brightness', Number((e.currentTarget as HTMLInputElement).value))}
+          />
+          <span className="mono tnum" data-testid="signalmap-rail-brightness-value">
+            {Math.round((mc.brightness ?? 1) * 100)}%
+          </span>
+        </label>
+
+        <label className="sm-control-row">
           <span>Confidence</span>
           <input
             type="range"

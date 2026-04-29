@@ -16,6 +16,7 @@ export type MapControlsState = {
   minConfidence: number;     // 0..1
   showCables: boolean;
   showDatacenters: boolean;
+  brightness: number;        // 0.5..2.0, 1 = neutral
 };
 
 export const mapControls = persist(
@@ -24,6 +25,7 @@ export const mapControls = persist(
     minConfidence: 0.5,
     showCables: false,
     showDatacenters: false,
+    brightness: 1,
   }),
   'signalmap-watchlist-map-controls',
 );

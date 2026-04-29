@@ -6,7 +6,7 @@ import { select } from 'd3-selection';
 import type { Topology } from 'topojson-specification';
 import type { FeatureCollection, Geometry } from 'geojson';
 import { mappableEvents } from '../../state/signals.ts';
-import { regions as watchedRegions } from '../../state/watchlist.ts';
+import { regions as watchedRegions, mapControls } from '../../state/watchlist.ts';
 import { MapMarker } from './MapMarker.tsx';
 
 const WIDTH = 960;
@@ -105,7 +105,12 @@ export function WorldMap() {
       viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
       preserveAspectRatio="xMidYMid meet"
       data-testid="signalmap-worldmap"
-      style={{ width: '100%', height: '100%', display: 'block' }}
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'block',
+        filter: `brightness(${mapControls.value.brightness ?? 1})`,
+      }}
     >
       {error ? (
         <text
