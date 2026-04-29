@@ -11,6 +11,7 @@ import {
   mapControls,
   readOverlayLevel,
 } from '../../state/watchlist.ts';
+import { categories as activeCategories } from '../../state/filters.ts';
 import { REGION_BBOX, eventInRegions } from '../../state/regions.ts';
 import { UNDERSEA_CABLES, FLAGSHIP_CABLE_IDS } from '../../data/undersea-cables.ts';
 import { DATA_CENTERS, FLAGSHIP_DATACENTER_IDS } from '../../data/datacenters.ts';
@@ -356,9 +357,12 @@ export function WorldMap() {
               });
             })()}
           </g>
-          {/* Event markers — region-filtered the same way the LiveFeed is */}
+          {/* Event markers — category + region filtered the same way the
+              LiveFeed is, so toggling a Signal Layers chip in the rail
+              hides those markers on the map too. */}
           <g data-testid="signalmap-worldmap-markers">
             {projection && mappableEvents.value
+              .filter((ev) => activeCategories.value.includes(ev.category))
               .filter((ev) => eventInRegions(ev, watchedRegions.value))
               .map((ev) => {
                 const loc = ev.locations[0];

@@ -43,7 +43,9 @@ const SourceHealthResponse = z.object({
 });
 
 // ---------------------------------------------------------------------------
-// Endpoint 5 — POST /api/signalmap/brief/global
+// Endpoint 5 — GET /api/signalmap/brief/global
+// (Cached read of the cron-generated global brief. Cron is the sole writer
+// of signalmap:brief:global; the API only reads.)
 // ---------------------------------------------------------------------------
 
 const BriefSource = z.object({
@@ -53,20 +55,69 @@ const BriefSource = z.object({
 
 const GlobalBriefResponse = z.object({
   bullets: z.array(z.string()),
-  generatedAt: z.string(),
-  model: z.string(),
   sources: z.array(BriefSource),
-  lastGeneratedAt: z.string().optional(),
+  generatedAt: z.string().nullable(),
+  model: z.string().nullable(),
+  warnings: z.array(z.string()),
+  degraded: z.boolean(),
 });
 
 // ---------------------------------------------------------------------------
 // Endpoint 6 — POST /api/signalmap/brief/event/{id}
+// (On-demand per-event brief. POST because it triggers an LLM call against
+// the daily spend reservation; subsequent calls hit the per-event cache.)
 // ---------------------------------------------------------------------------
 
 const EventBriefResponse = z.object({
-  whyItMatters: z.string(),
-  model: z.string(),
+  bullets: z.array(z.string()),
+  sources: z.array(BriefSource),
   generatedAt: z.string(),
+  model: z.string(),
+});
+
+// ---------------------------------------------------------------------------
+// Endpoint 7 — GET /api/signalmap/health
+// (Live system status consumed by the UI Health panel. Strict shape — the
+// UI hard-codes the six component-card keys. Never expose connection URIs,
+// filesystem paths, or key prefixes in production responses.)
+// ---------------------------------------------------------------------------
+
+const HealthStatus = z.enum(['ok', 'degraded', 'down', 'unknown']);
+
+const ComponentHealth = z.object({
+  status: HealthStatus,
+  detail: z.string().optional(),
+  metrics: z.record(z.string(), z.union([z.string(), z.number()])).optional(),
+});
+
+const HealthSourceRow = z.object({
+  id: z.string(),
+  label: z.string(),
+  status: z.enum(['ok', 'degraded', 'stale']),
+  latencyMs: z.number(),
+  tier: z.number(),
+});
+
+const HealthResponse = z.object({
+  redis: ComponentHealth,
+  lancedb: ComponentHealth,
+  collector: ComponentHealth,
+  brief: ComponentHealth,
+  openrouter: ComponentHealth,
+  perplexity: ComponentHealth,
+  sources: z.array(HealthSourceRow),
+  generatedAt: z.string(),
+}).strict();
+
+// ---------------------------------------------------------------------------
+// Endpoint 8 — POST /api/signalmap/brief/refresh
+// (Admin-only — forces brief-cron to re-run. Auth via SIGNALMAP_ADMIN_TOKEN
+// in the X-Signalmap-Admin-Token header.)
+// ---------------------------------------------------------------------------
+
+const BriefRefreshResponse = z.object({
+  ok: z.boolean(),
+  triggeredAt: z.string(),
 });
 
 // ---------------------------------------------------------------------------
@@ -173,14 +224,9 @@ export const signalmapPaths: ZodOpenApiPathsObject = {
   },
 
   '/api/signalmap/brief/global': {
-    post: {
+    get: {
       operationId: 'getSignalMapGlobalBrief',
-      summary: 'Get AI-generated global SignalMap brief (cached)',
-      requestBody: {
-        content: {
-          'application/json': { schema: z.object({}) },
-        },
-      },
+      summary: 'Read the cron-generated global SignalMap brief (cached)',
       responses: {
         '200': {
           description: 'Global brief with bullet points and sources',
@@ -205,18 +251,13 @@ export const signalmapPaths: ZodOpenApiPathsObject = {
   '/api/signalmap/brief/event/{id}': {
     post: {
       operationId: 'getSignalMapEventBrief',
-      summary: 'Get AI-generated why-it-matters brief for a specific event (cached)',
+      summary: 'Generate or read the per-event "why this matters" brief (cached)',
       requestParams: {
         path: z.object({ id: z.string() }),
       },
-      requestBody: {
-        content: {
-          'application/json': { schema: z.object({}) },
-        },
-      },
       responses: {
         '200': {
-          description: 'Event brief with why-it-matters explanation',
+          description: 'Event brief with bullets + sources',
           headers: z.object({
             'X-Cache': z
               .string()
@@ -225,6 +266,55 @@ export const signalmapPaths: ZodOpenApiPathsObject = {
           }),
           content: {
             'application/json': { schema: EventBriefResponse },
+          },
+        },
+        '5XX': {
+          description: 'Server error',
+          content: { 'application/json': { schema: ErrorEnvelope } },
+        },
+      },
+    },
+  },
+
+  '/api/signalmap/brief/refresh': {
+    post: {
+      operationId: 'refreshSignalMapGlobalBrief',
+      summary: 'Force the brief cron to re-run (admin)',
+      parameters: [
+        {
+          in: 'header',
+          name: 'X-Signalmap-Admin-Token',
+          required: true,
+          schema: { type: 'string' },
+          description: 'Must match SIGNALMAP_ADMIN_TOKEN env var on the server',
+        },
+      ],
+      responses: {
+        '200': {
+          description: 'Refresh enqueued',
+          content: { 'application/json': { schema: BriefRefreshResponse } },
+        },
+        '401': {
+          description: 'Missing or invalid admin token',
+          content: { 'application/json': { schema: ErrorEnvelope } },
+        },
+        '5XX': {
+          description: 'Server error',
+          content: { 'application/json': { schema: ErrorEnvelope } },
+        },
+      },
+    },
+  },
+
+  '/api/signalmap/health': {
+    get: {
+      operationId: 'getSignalMapHealth',
+      summary: 'System health snapshot for the UI Health panel',
+      responses: {
+        '200': {
+          description: 'Strict-shape health response with six component cards + sources',
+          content: {
+            'application/json': { schema: HealthResponse },
           },
         },
         '5XX': {
