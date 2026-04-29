@@ -28,13 +28,15 @@
     min-height: 0;
   }
 
+  .sm-center.feed-collapsed { grid-template-rows: 1fr 0px !important; }
   .sm-center {
     display: grid;
-    grid-template-rows: 1fr 158px;
+    grid-template-rows: 1fr var(--sm-feed-height, 158px);
     gap: 1px;
     background: var(--line-1);
     min-height: 0;
     min-width: 0;
+    position: relative;
   }
 
   /* ===== Command bar ===== */
@@ -732,6 +734,300 @@
     width: 12px;
     height: 12px;
     margin: 0;
+  }
+
+  /* Live feed resize handle + collapse / expand */
+  .sm-feed-resizer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 6px;
+    margin-bottom: -6px;
+    position: relative;
+    z-index: 2;
+    flex: 0 0 auto;
+  }
+  .sm-feed-resizer-handle {
+    flex: 1 1 auto;
+    height: 6px;
+    border: none;
+    background: transparent;
+    cursor: row-resize;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .sm-feed-resizer-handle:hover .sm-feed-resizer-grip,
+  .sm-feed-resizer-handle:active .sm-feed-resizer-grip {
+    background: var(--accent);
+    opacity: 1;
+  }
+  .sm-feed-resizer-grip {
+    display: block;
+    width: 60px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--line-3);
+    opacity: 0.6;
+    transition: background 120ms, opacity 120ms;
+  }
+  .sm-feed-collapse-btn {
+    flex: 0 0 auto;
+    width: 28px;
+    height: 22px;
+    border: none;
+    background: var(--bg-2);
+    color: var(--ink-3);
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    border-radius: 3px 3px 0 0;
+    margin-right: 8px;
+  }
+  .sm-feed-collapse-btn:hover { color: var(--ink-1); background: var(--bg-3); }
+
+  .sm-feed-expand-btn {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border: 1px solid var(--line-2);
+    border-radius: 999px;
+    background: var(--bg-2);
+    color: var(--ink-1);
+    cursor: pointer;
+    font-size: 12px;
+    font-family: var(--sm-font-mono);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    animation: sm-feed-expand-pulse 1.8s ease-in-out infinite;
+  }
+  .sm-feed-expand-btn:hover {
+    background: var(--bg-3);
+    border-color: var(--accent);
+    animation-play-state: paused;
+  }
+  .sm-feed-expand-arrow {
+    font-size: 14px;
+    color: var(--accent);
+  }
+  .sm-feed-expand-label {
+    font-size: 11px;
+    color: var(--ink-2);
+  }
+  @keyframes sm-feed-expand-pulse {
+    0%, 100% { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 0 0 var(--accent); }
+    50%      { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 0 8px transparent; }
+  }
+
+  /* Watchpoints panel inside Inspector */
+  .sm-watchpoints {
+    border-top: 1px solid var(--line-1);
+    padding: 12px 14px;
+    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+  .sm-watchpoints-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .sm-watchpoint-item { margin: 0; padding: 0; }
+  .sm-watchpoint-row {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border: 1px solid var(--line-1);
+    border-radius: 4px;
+    background: var(--bg-2);
+    color: var(--ink-2);
+    cursor: pointer;
+    text-align: left;
+    transition: background 100ms, border-color 100ms;
+  }
+  .sm-watchpoint-row:hover { background: var(--bg-3); border-color: var(--line-2); }
+  .sm-watchpoint-row.has-events { color: var(--ink-1); }
+  .sm-watchpoint-row.has-events .sm-watchpoint-count { background: var(--accent); color: var(--bg-1); }
+  .sm-watchpoint-row.expanded { border-color: var(--accent); }
+  .sm-watchpoint-label { flex: 1 1 auto; font-size: 13px; }
+  .sm-watchpoint-count {
+    flex: 0 0 auto;
+    min-width: 22px;
+    height: 18px;
+    padding: 0 6px;
+    border-radius: 9px;
+    background: var(--bg-3);
+    color: var(--ink-3);
+    font-size: 11px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .sm-watchpoint-chevron { color: var(--ink-3); font-size: 11px; }
+
+  .sm-watchpoint-events {
+    list-style: none;
+    margin: 4px 0 8px 12px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .sm-watchpoint-event {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    background: transparent;
+    color: var(--ink-2);
+    cursor: pointer;
+    text-align: left;
+    font-size: 12px;
+  }
+  .sm-watchpoint-event:hover { border-color: var(--line-2); background: var(--bg-2); color: var(--ink-1); }
+  .sm-watchpoint-event-title {
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .sm-watchpoint-event-sev {
+    flex: 0 0 auto;
+    font-size: 9.5px;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    letter-spacing: 0.05em;
+  }
+  .sm-watchpoint-empty {
+    padding: 6px 12px;
+    font-size: 11.5px;
+    color: var(--ink-3);
+    font-style: italic;
+  }
+
+  /* Options dialog */
+  .sm-watchpoint-options-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .sm-watchpoint-options {
+    width: min(440px, 100%);
+    max-height: min(600px, 90vh);
+    background: var(--bg-1);
+    border: 1px solid var(--line-2);
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow: hidden;
+  }
+  .sm-watchpoint-options-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--line-1);
+    padding-bottom: 8px;
+  }
+  .sm-watchpoint-options-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    max-height: 220px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .sm-watchpoint-options-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 8px;
+    align-items: center;
+    padding: 6px 10px;
+    background: var(--bg-2);
+    border: 1px solid var(--line-1);
+    border-radius: 4px;
+    font-size: 12px;
+  }
+  .sm-watchpoint-options-label { color: var(--ink-1); font-weight: 500; }
+  .sm-watchpoint-options-match { color: var(--ink-3); font-size: 11px; }
+  .sm-watchpoint-options-match code {
+    background: var(--bg-3);
+    padding: 1px 4px;
+    border-radius: 2px;
+    font-family: var(--sm-font-mono);
+  }
+  .sm-watchpoint-options-remove {
+    border: 1px solid var(--line-2);
+    background: transparent;
+    color: var(--ink-3);
+    padding: 2px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+  }
+  .sm-watchpoint-options-remove:hover { color: var(--sev-major); border-color: var(--sev-major); }
+  .sm-watchpoint-options-empty {
+    padding: 12px;
+    color: var(--ink-3);
+    font-size: 12px;
+    text-align: center;
+    font-style: italic;
+  }
+  .sm-watchpoint-options-add {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-top: 1px solid var(--line-1);
+    padding-top: 12px;
+  }
+  .sm-watchpoint-options-field {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-size: 11px;
+    color: var(--ink-3);
+  }
+  .sm-watchpoint-options-field input {
+    background: var(--bg-2);
+    border: 1px solid var(--line-1);
+    border-radius: 3px;
+    padding: 5px 8px;
+    color: var(--ink-1);
+    font-size: 12px;
+    font-family: inherit;
+  }
+  .sm-watchpoint-options-field input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .sm-watchpoint-options-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
   }
 
   .sm-feed-row {

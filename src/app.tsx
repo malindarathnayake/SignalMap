@@ -6,11 +6,20 @@ import { ProviderStrip } from './components/chrome/ProviderStrip.tsx';
 import { LeftRail } from './components/rail/LeftRail.tsx';
 import { BriefStrip } from './components/chrome/BriefStrip.tsx';
 import { LiveFeed } from './components/feed/LiveFeed.tsx';
+import { FeedExpandButton } from './components/feed/FeedResizer.tsx';
 import { Inspector } from './components/inspector/Inspector.tsx';
 import { WorldMap } from './components/map/WorldMap.tsx';
 import { MapOverlays } from './components/map/MapOverlays.tsx';
+import { feedHeight, feedCollapsed } from './state/watchlist.ts';
 
 export function App() {
+  const collapsed = feedCollapsed.value;
+  const h = feedHeight.value;
+  const centerStyle = {
+    // CSS variable consumed by .sm-center grid-template-rows
+    '--sm-feed-height': collapsed ? '0px' : `${h}px`,
+  } as Record<string, string>;
+
   return (
     <div className="sm-app">
       {/* Row 1: CommandBar (Phase 4a) */}
@@ -28,12 +37,16 @@ export function App() {
       {/* Rows 3-4: workspace (rail | center | inspector) */}
       <div className="sm-main">
         <LeftRail />
-        <div className="sm-center">
+        <div
+          className={`sm-center${collapsed ? ' feed-collapsed' : ''}`}
+          style={centerStyle}
+        >
           <div className="sm-map-wrap" aria-label="World map">
             <WorldMap />
             <MapOverlays />
+            {collapsed && <FeedExpandButton />}
           </div>
-          <LiveFeed />
+          {!collapsed && <LiveFeed />}
         </div>
         <Inspector />
       </div>

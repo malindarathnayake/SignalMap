@@ -7,6 +7,7 @@ import {
   type FeedSeverity,
 } from '../../state/filters.ts';
 import { FeedCard } from './FeedCard.tsx';
+import { FeedResizer } from './FeedResizer.tsx';
 
 const SEVERITY_LABELS: Record<FeedSeverity, string> = {
   critical: 'Critical',
@@ -43,6 +44,7 @@ export function LiveFeed() {
 
   return (
     <section className="sm-feed" data-testid="signalmap-feed" aria-label="Live feed">
+      <FeedResizer />
       <div className="sm-feed-head">
         <span className="eyebrow">Live feed</span>
         <span className="sm-feed-count mono tnum" data-testid="signalmap-feed-count">{visible.length}</span>

@@ -1,5 +1,6 @@
 import { signals, selectedEventId } from '../../state/signals.ts';
 import { WhyItMattersTab } from './WhyItMattersTab.tsx';
+import { WatchpointsView } from './WatchpointsView.tsx';
 
 export function Inspector() {
   const id = selectedEventId.value;
@@ -14,6 +15,7 @@ export function Inspector() {
             Click any row in the live feed to inspect the source stack, severity, and location.
           </div>
         </div>
+        <WatchpointsView />
       </aside>
     );
   }

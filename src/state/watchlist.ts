@@ -29,3 +29,30 @@ export const mapControls = persist(
   }),
   'signalmap-watchlist-map-controls',
 );
+
+// LiveFeed resize/collapse state — Feature: drag handle to resize, collapse to hide
+export const feedHeight = persist(signal(158), 'signalmap-feed-height');
+export const feedCollapsed = persist(signal(false), 'signalmap-feed-collapsed');
+
+export type Watchpoint = {
+  id: string;
+  label: string;
+  match: string; // substring matched against event location.name (case-insensitive)
+};
+
+export const DEFAULT_WATCHPOINTS: Watchpoint[] = [
+  { id: 'tel-aviv', label: 'Tel Aviv', match: 'tel aviv' },
+  { id: 'tehran', label: 'Tehran', match: 'tehran' },
+  { id: 'kyiv', label: 'Kyiv', match: 'kyiv' },
+  { id: 'moscow', label: 'Moscow', match: 'moscow' },
+  { id: 'london', label: 'London', match: 'london' },
+  { id: 'nyc', label: 'New York', match: 'new york' },
+  { id: 'dc', label: 'Washington DC', match: 'washington' },
+  { id: 'paris', label: 'Paris', match: 'paris' },
+  { id: 'tokyo', label: 'Tokyo', match: 'tokyo' },
+];
+
+export const watchpoints = persist(
+  signal<Watchpoint[]>(DEFAULT_WATCHPOINTS),
+  'signalmap-watchpoints',
+);
