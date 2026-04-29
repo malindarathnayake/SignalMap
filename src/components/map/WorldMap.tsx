@@ -11,6 +11,7 @@ import {
   mapControls,
   readOverlayLevel,
 } from '../../state/watchlist.ts';
+import { REGION_BBOX, eventInRegions } from '../../state/regions.ts';
 import { UNDERSEA_CABLES, FLAGSHIP_CABLE_IDS } from '../../data/undersea-cables.ts';
 import { DATA_CENTERS, FLAGSHIP_DATACENTER_IDS } from '../../data/datacenters.ts';
 import { MapMarker } from './MapMarker.tsx';
@@ -43,17 +44,6 @@ function densifyCablePoints(id: string, pts: [number, number][]): [number, numbe
   densifyCache.set(id, out);
   return out;
 }
-
-const REGION_BBOX: Record<string, [number, number, number, number]> = {
-  na:    [-170, 5,  -50, 75],
-  eu:    [-25,  35,  45, 72],
-  mena:  [-20,  10,  65, 40],
-  apac:  [60,  -45, 180, 55],
-  sa:    [60,    5,  95, 38],
-  af:    [-20, -38,  55, 38],
-  latam: [-95, -57, -30, 15],
-  // global has no bbox (full world); skip rendering when watched
-};
 
 export function WorldMap() {
   const [topo, setTopo] = useState<Topology | null>(null);
@@ -366,16 +356,17 @@ export function WorldMap() {
               });
             })()}
           </g>
-          {/* Event markers */}
+          {/* Event markers — region-filtered the same way the LiveFeed is */}
           <g data-testid="signalmap-worldmap-markers">
-            {projection && mappableEvents.value.map((ev) => {
-              const loc = ev.locations[0];
-              // Type guard already passed in mappableEvents — but re-narrow for TS:
-              if (typeof loc?.lon !== 'number' || typeof loc?.lat !== 'number') return null;
-              const xy = projection([loc.lon, loc.lat]);
-              if (!xy) return null;
-              return <MapMarker key={ev.id} event={ev} cx={xy[0]} cy={xy[1]} />;
-            })}
+            {projection && mappableEvents.value
+              .filter((ev) => eventInRegions(ev, watchedRegions.value))
+              .map((ev) => {
+                const loc = ev.locations[0];
+                if (typeof loc?.lon !== 'number' || typeof loc?.lat !== 'number') return null;
+                const xy = projection([loc.lon, loc.lat]);
+                if (!xy) return null;
+                return <MapMarker key={ev.id} event={ev} cx={xy[0]} cy={xy[1]} />;
+              })}
           </g>
         </g>
       )}

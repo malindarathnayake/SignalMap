@@ -6,6 +6,8 @@ import {
   ALL_SEVERITIES,
   type FeedSeverity,
 } from '../../state/filters.ts';
+import { regions as watchedRegions } from '../../state/watchlist.ts';
+import { eventInRegions } from '../../state/regions.ts';
 import { FeedCard } from './FeedCard.tsx';
 import { FeedResizer } from './FeedResizer.tsx';
 
@@ -34,8 +36,10 @@ export function LiveFeed({ embedded = false }: Props = {}) {
   const sevFilter = feedSeverityFilter.value;
   const mainSet = mainSeverities.value;
 
+  const watchedRegionIds = watchedRegions.value;
   const all = [...signals.value.values()]
     .filter(ev => active.includes(ev.category))
+    .filter(ev => eventInRegions(ev, watchedRegionIds))
     .sort((a, b) => b.startedAt - a.startedAt);
 
   const visible = sevFilter === 'main'
