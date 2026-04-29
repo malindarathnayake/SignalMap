@@ -19,12 +19,17 @@ const TYPE_HINT: Record<NewsChannelType, string> = {
   unknown: "Empty or invalid — paste an https:// URL",
 };
 
+type ForceType = 'auto' | 'youtube' | 'hls' | 'video' | 'iframe';
+const FORCE_OPTIONS: ForceType[] = ['auto', 'youtube', 'hls', 'video', 'iframe'];
+
 export function NewsChannelsOptions({ onClose }: Props) {
   const [draftUrl, setDraftUrl] = useState('');
   const [draftName, setDraftName] = useState('');
+  const [forceType, setForceType] = useState<ForceType>('auto');
 
-  const draftType = useMemo<NewsChannelType>(() => detectType(draftUrl), [draftUrl]);
-  const canAdd = draftUrl.trim().length > 0 && draftType !== 'unknown' && draftType !== 'rtmp';
+  const detected = useMemo<NewsChannelType>(() => detectType(draftUrl), [draftUrl]);
+  const effective: NewsChannelType = forceType === 'auto' ? detected : forceType;
+  const canAdd = draftUrl.trim().length > 0 && effective !== 'unknown' && effective !== 'rtmp';
 
   function add(e: Event) {
     e.preventDefault();
@@ -35,11 +40,12 @@ export function NewsChannelsOptions({ onClose }: Props) {
       id: makeChannelId(),
       name,
       url: draftUrl.trim(),
-      type: draftType,
+      type: effective,
     };
     newsChannels.value = [...existing, next];
     setDraftUrl('');
     setDraftName('');
+    setForceType('auto');
   }
 
   function remove(id: string) {
@@ -133,12 +139,31 @@ export function NewsChannelsOptions({ onClose }: Props) {
             />
           </label>
 
+          <label className="sm-watchpoint-options-field">
+            <span>
+              Force type (override auto-detect — useful for HLS streams without
+              a <code>.m3u8</code> extension)
+            </span>
+            <select
+              className="sm-cameras-options-select"
+              value={forceType}
+              data-testid="signalmap-news-options-force-type"
+              onChange={e => setForceType((e.currentTarget as HTMLSelectElement).value as ForceType)}
+            >
+              {FORCE_OPTIONS.map(opt => (
+                <option key={opt} value={opt}>
+                  {opt === 'auto' ? `auto (detected: ${detected})` : opt}
+                </option>
+              ))}
+            </select>
+          </label>
+
           <div
-            className={`sm-news-options-detect type-${draftType}`}
+            className={`sm-news-options-detect type-${effective}`}
             data-testid="signalmap-news-options-detected-type"
           >
-            <strong>Detected:</strong> <code>{draftType}</code>
-            <span className="sm-news-options-detect-hint">— {TYPE_HINT[draftType]}</span>
+            <strong>Will play as:</strong> <code>{effective}</code>
+            <span className="sm-news-options-detect-hint">— {TYPE_HINT[effective]}</span>
           </div>
 
           <div className="sm-watchpoint-options-actions">
