@@ -30,8 +30,12 @@ test.describe('SignalMap Phase 4 acceptance (unit 4e gate)', () => {
     const res = await request.get('/api/signalmap/source-health');
     expect(res.status()).toBe(200);
     const body = await res.json() as { sources: Array<{ id: string }> };
-    expect(body.sources.length).toBe(7);
+    expect(body.sources.length).toBe(13);
     expect(body.sources.map((s) => s.id)).toContain('radar');
+    expect(body.sources.map((s) => s.id)).toContain('openai-status');
+    expect(body.sources.map((s) => s.id)).toContain('claude-status');
+    expect(body.sources.map((s) => s.id)).toContain('aws-lambda-use1');
+    expect(body.sources.map((s) => s.id)).toContain('aws-s3-use1');
   });
 
   test('fixture endpoint /api/bootstrap serves deterministic JSON', async ({ request }) => {

@@ -10,6 +10,12 @@ const MOCK_SOURCES: readonly SourceHealth[] = [
   { id: 'okta-status', label: 'Okta Status RSS', tier: 1, status: 'ok', latencyMs: 121 },
   { id: 'm365-health', label: 'Microsoft Service Health', tier: 1, status: 'degraded', latencyMs: 612 },
   { id: 'azure-status', label: 'Azure Status RSS', tier: 1, status: 'ok', latencyMs: 198 },
+  { id: 'openai-status', label: 'OpenAI Status', tier: 1, status: 'ok', latencyMs: 165 },
+  { id: 'claude-status', label: 'Anthropic Status', tier: 1, status: 'ok', latencyMs: 142 },
+  { id: 'aws-lambda-use1', label: 'AWS Lambda — us-east-1', tier: 1, status: 'ok', latencyMs: 178 },
+  { id: 'aws-lambda-use2', label: 'AWS Lambda — us-east-2', tier: 1, status: 'ok', latencyMs: 184 },
+  { id: 'aws-rds-use1', label: 'AWS RDS — us-east-1', tier: 1, status: 'ok', latencyMs: 192 },
+  { id: 'aws-s3-use1', label: 'AWS S3 — us-east-1', tier: 1, status: 'ok', latencyMs: 156 },
   { id: 'gdelt', label: 'GDELT', tier: 2, status: 'ok', latencyMs: 410 },
   { id: 'rss-tier2', label: 'RSS / Tier-2 News', tier: 2, status: 'stale', latencyMs: 2400 },
 ];

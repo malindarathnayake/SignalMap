@@ -43,8 +43,13 @@ test.describe('SignalMap CommandBar (unit 4a)', () => {
     await page.getByTestId('signalmap-source-pill').click();
     const pop = page.getByTestId('signalmap-source-popover');
     await expect(pop).toBeVisible();
-    await expect(pop.getByTestId('signalmap-source-row')).toHaveCount(7);
+    await expect(pop.getByTestId('signalmap-source-row')).toHaveCount(13);
     await expect(pop).toContainText('Cloudflare Radar');
     await expect(pop).toContainText('Microsoft Service Health');
+    await expect(pop).toContainText('OpenAI Status');
+    await expect(pop).toContainText('Anthropic Status');
+    await expect(pop).toContainText('AWS Lambda');
+    await expect(pop).toContainText('AWS RDS');
+    await expect(pop).toContainText('AWS S3');
   });
 });
