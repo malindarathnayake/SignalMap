@@ -386,9 +386,11 @@ function signalmapFixturePlugin(): Plugin {
         // ---- brief event endpoint (any eventId) ----
         if (url.startsWith('/api/signalmap/brief/event/')) {
           try {
-            const { EVENT_BRIEF_FIXTURE } = await getFixtures();
+            const { LIST_EVENTS_FIXTURE, buildEventBrief } = await getFixtures();
             perEventCount += 1;
-            const body = JSON.stringify(EVENT_BRIEF_FIXTURE);
+            const eventId = decodeURIComponent(url.slice('/api/signalmap/brief/event/'.length));
+            const event = LIST_EVENTS_FIXTURE.events.find(e => e.id === eventId);
+            const body = JSON.stringify(buildEventBrief(event, eventId));
             res.statusCode = 200;
             res.setHeader('Content-Type', 'application/json');
             res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');

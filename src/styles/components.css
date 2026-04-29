@@ -1183,6 +1183,33 @@
     50%      { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 0 8px transparent; }
   }
 
+  .sm-insp-sources {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--ink-3);
+    line-height: 1.6;
+  }
+  .sm-insp-sources-label {
+    color: var(--ink-3);
+    margin-right: 2px;
+  }
+  .sm-insp-source-link {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--accent);
+    padding-bottom: 1px;
+    transition: color 100ms, border-color 100ms;
+  }
+  .sm-insp-source-link:hover {
+    color: var(--ink-1);
+    border-bottom-color: var(--ink-1);
+  }
+  .sm-insp-source-ext {
+    font-size: 10px;
+    margin-left: 1px;
+    opacity: 0.7;
+  }
+
   /* Watchpoints panel inside Inspector */
   .sm-watchpoints {
     border-top: 1px solid var(--line-1);

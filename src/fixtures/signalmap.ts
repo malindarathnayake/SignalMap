@@ -72,3 +72,134 @@ export const EVENT_BRIEF_FIXTURE = {
   warnings: [] as string[],
   degraded: false,
 };
+
+// Cloudflare Radar slugs: ISO 3166 alpha-2 country codes (lowercase),
+// or kebab-case continent names. Empty string => no slug, link to the
+// Radar homepage instead.
+const RADAR_SLUG: Record<string, string> = {
+  'Basra, Iraq': 'iq',
+  'Sudan': 'sd',
+  'Pakistan': 'pk',
+  'United Kingdom': 'gb',
+  'Global (multi-colo)': '',
+  'Okta cells (multi-region)': 'us',
+  'Azure West Europe': 'europe',
+  'EMEA (subset)': 'europe',
+};
+
+// RIPEstat country page (replaces BGPlay which needs an ASN/prefix
+// resource, not a country name).
+const RIPESTAT_COUNTRY_BASE = 'https://stat.ripe.net/country/';
+
+function radarUrlFor(loc: string): string {
+  const slug = RADAR_SLUG[loc];
+  if (slug === undefined) {
+    // Unknown location: just send to the Radar homepage.
+    return 'https://radar.cloudflare.com/';
+  }
+  if (slug === '') return 'https://radar.cloudflare.com/';
+  return `https://radar.cloudflare.com/traffic/${slug}`;
+}
+
+function ripestatUrlFor(loc: string): string {
+  const slug = RADAR_SLUG[loc];
+  // RIPEstat country page only works for actual ISO codes (2 chars).
+  // Continents and unknowns fall back to the explorer landing page.
+  if (slug && slug.length === 2) return `${RIPESTAT_COUNTRY_BASE}${slug}`;
+  return 'https://stat.ripe.net/';
+}
+
+// Per-event brief synthesizer for the dev/E2E fixture middleware.
+// Each event gets bullets + sources derived from its category, location,
+// severity, provider, and radarKind so the inspector shows distinct
+// content per event instead of a single hardcoded string.
+const PROVIDER_LABEL: Record<string, string> = {
+  cloudflare: 'Cloudflare',
+  okta: 'Okta',
+  azure: 'Azure',
+  m365: 'Microsoft 365',
+  wasabi: 'Wasabi',
+};
+
+const PROVIDER_STATUS_URL: Record<string, string> = {
+  cloudflare: 'https://www.cloudflarestatus.com/',
+  okta: 'https://status.okta.com/',
+  azure: 'https://azure.status.microsoft/en-us/status',
+  m365: 'https://status.cloud.microsoft/',
+  wasabi: 'https://status.wasabi.com/',
+};
+
+function severityWord(sev: SignalEvent['severity']): string {
+  if (sev === 'critical') return 'critical';
+  if (sev === 'major') return 'major';
+  if (sev === 'minor') return 'minor';
+  return 'informational';
+}
+
+export function buildEventBrief(event: SignalEvent | undefined, eventId: string): typeof EVENT_BRIEF_FIXTURE {
+  const fallback: typeof EVENT_BRIEF_FIXTURE = {
+    bullets: [
+      `Brief unavailable for ${eventId} — event not found in current fixture set.`,
+    ],
+    sources: [{ label: 'Reuters', url: 'https://www.reuters.com/' }],
+    generatedAt: new Date().toISOString(),
+    model: 'anthropic/claude-sonnet-4.6 (fixture)',
+    warnings: ['event-not-found'],
+    degraded: true,
+  };
+  if (!event) return fallback;
+
+  const loc = event.locations[0]?.name ?? 'unknown location';
+  const sev = severityWord(event.severity);
+  const locSlug = encodeURIComponent(loc);
+
+  let bullets: string[];
+  let sources: { label: string; url: string }[];
+
+  if (event.category === 'internet') {
+    const isOutage = event.radarKind === 'outage';
+    const kind = isOutage ? 'connectivity outage' : 'routing anomaly';
+    bullets = [
+      `${kind.charAt(0).toUpperCase()}${kind.slice(1)} in ${loc} — Cloudflare Radar shows a ${sev} departure from the trailing 7-day baseline.`,
+      `No public attribution from local operators yet; cross-check BGP/ASN telemetry before correlating with the geopolitical layer.`,
+      `Watch follow-on signals (DNS resolution rate, IXP throughput, VPN demand) for the next 60–120 minutes.`,
+    ];
+    sources = [
+      { label: 'Cloudflare Radar', url: radarUrlFor(loc) },
+      { label: 'RIPEstat', url: ripestatUrlFor(loc) },
+      { label: 'NetBlocks', url: `https://netblocks.org/?s=${locSlug}` },
+    ];
+  } else if (event.category === 'provider') {
+    const provider = event.provider ?? 'unknown';
+    const providerName = PROVIDER_LABEL[provider] ?? provider;
+    const statusUrl = PROVIDER_STATUS_URL[provider] ?? 'https://status.example.com/';
+    bullets = [
+      `${providerName} acknowledges ${sev} service degradation affecting ${loc}.`,
+      `Watch the official status feed for an incident ID and a post-mortem timeline; user-impact reports on social typically lead the status page by 5–15 minutes.`,
+      `Re-validate failover paths if cross-cloud workloads route through ${loc}.`,
+    ];
+    sources = [
+      { label: `${providerName} Status`, url: statusUrl },
+      { label: 'Downdetector', url: `https://downdetector.com/status/${provider}/` },
+      { label: 'Reuters Tech', url: 'https://www.reuters.com/technology/' },
+    ];
+  } else {
+    bullets = [
+      `${event.title} — ${loc} (${sev}).`,
+      'No tier-1 wire corroboration yet; verify against AP / Reuters before treating as confirmed.',
+    ];
+    sources = [
+      { label: 'Reuters World', url: 'https://www.reuters.com/world/' },
+      { label: 'AP News', url: 'https://apnews.com/' },
+    ];
+  }
+
+  return {
+    bullets,
+    sources,
+    generatedAt: new Date().toISOString(),
+    model: 'anthropic/claude-sonnet-4.6 (fixture)',
+    warnings: [],
+    degraded: false,
+  };
+}
