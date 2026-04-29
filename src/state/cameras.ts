@@ -53,17 +53,17 @@ export const REGION_LABEL: Record<CameraRegion, string> = {
   'space': 'Space',
 };
 
-export type CameraLayout = 1 | 2 | 4;
+export type CameraLayout = 1 | 2 | 4 | 6;
 
 export interface CameraPrefs {
   layout: CameraLayout;
-  cells: (string | null)[]; // length 4; ids null => empty cell
+  cells: (string | null)[]; // ids; null => empty cell
   muted: boolean;
 }
 
 export const DEFAULT_CAMERA_PREFS: CameraPrefs = {
-  layout: 4,
-  cells: ['iran-tehran', 'iran-telaviv', 'kyiv', 'taipei'],
+  layout: 6,
+  cells: ['iran-tehran', 'iran-telaviv', 'kyiv', 'taipei', 'new-york', 'los-angeles'],
   muted: true,
 };
 

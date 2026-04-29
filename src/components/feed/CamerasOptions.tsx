@@ -13,7 +13,7 @@ type Props = {
   onClose: () => void;
 };
 
-const LAYOUT_OPTIONS: CameraLayout[] = [1, 2, 4];
+const LAYOUT_OPTIONS: CameraLayout[] = [1, 2, 4, 6];
 
 export function CamerasOptions({ onClose }: Props) {
   const prefs = cameraPrefs.value;
