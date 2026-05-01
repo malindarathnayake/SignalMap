@@ -39,27 +39,34 @@ SignalMap watches the public internet for **operational, security, geopolitical,
 
 ## Quick start (Docker Compose)
 
-The fastest way to run SignalMap is with the published images from GitHub Container Registry. No local build, no source checkout required for the deploy host.
+Pre-built images are published to GitHub Container Registry on every release. The deploy host needs Docker + Compose and ~2 GB RAM — no source checkout, no Node toolchain.
+
+The two images:
 
 ```bash
-# On the deploy host (any Docker-capable Linux box, ~2 GB RAM):
+docker pull ghcr.io/malindarathnayake/signalmap-node:latest
+docker pull ghcr.io/malindarathnayake/signalmap-ui:latest
+```
+
+Five-service stack (`redis`, `signalmap-api`, `signalmap-collector`, `signalmap-cron`, `signalmap-ui`) is wired up in [`deploy/docker-compose.yml`](./deploy/docker-compose.yml). To bring it up:
+
+```bash
+# Grab just the deploy folder (no full source clone needed):
 mkdir -p /opt/signalmap && cd /opt/signalmap
+curl -fsSL https://raw.githubusercontent.com/malindarathnayake/SignalMap/main/deploy/docker-compose.yml -o docker-compose.yml
+curl -fsSL https://raw.githubusercontent.com/malindarathnayake/SignalMap/main/deploy/.env.example   -o .env.example
 
-# Grab the deploy folder (replace with raw URLs or sparse-clone if you prefer)
-git clone --depth 1 https://github.com/malindarathnayake/SignalMap.git tmp \
-  && mv tmp/deploy/* . && rm -rf tmp
-
-# Configure
+# Configure (at minimum REDIS_PASSWORD; for live mode also OPENROUTER_API_KEY,
+# PERPLEXITY_API_KEY, and optionally NEWSAPI_API_KEY)
 cp .env.example .env
-# edit .env — at minimum set REDIS_PASSWORD; for live mode also set
-# OPENROUTER_API_KEY, PERPLEXITY_API_KEY, optionally NEWSAPI_API_KEY.
+$EDITOR .env
 
 # Generate the admin token Docker secret
 mkdir -p secrets
 openssl rand -hex 32 > secrets/SIGNALMAP_ADMIN_TOKEN
 chmod 600 secrets/SIGNALMAP_ADMIN_TOKEN
 
-# Pull and start
+# Pull images and start
 docker compose pull
 docker compose up -d
 
@@ -70,7 +77,9 @@ curl -fsS http://localhost:8080/api/signalmap/health
 
 Open `http://<host>:8080`. The collector takes ~30-90 seconds to do its first tick; the feed populates after that.
 
-Full deployment guide (TLS, reverse proxy, version pinning, ops runbook):
+To pin a specific version, set `SIGNALMAP_VERSION=4.0.0` in `.env`. Default is `latest`.
+
+Full deployment guide (TLS, reverse proxy, ops runbook, troubleshooting):
 **[`deploy/README.md`](./deploy/README.md)**
 
 ---
