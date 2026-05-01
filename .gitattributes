@@ -1,0 +1,8 @@
+* text=auto
+
+# Shell scripts MUST stay LF — Alpine sh and tini exec the kernel-level
+# shebang directly, and a trailing CR turns "/bin/sh" into "/bin/sh\r"
+# which kernel resolves to "No such file or directory". Force LF on
+# checkout regardless of platform autocrlf settings.
+*.sh text eol=lf
+docker/entrypoint*.sh text eol=lf

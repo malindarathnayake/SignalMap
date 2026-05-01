@@ -22,16 +22,17 @@ import {
   collectSignalMapNews,
   hashSignalMapNewsTitle,
   loadSignalMapNewsSources,
+  makeSignalMapStoryEventId,
   parseSignalMapRssItems,
   resolveSignalMapNewsCollectorConfig,
   shouldFullExtractSignalMapUrl,
 } from '../scripts/signalmap-news-collector.mjs';
 
 const baseInput = {
-  url: 'https://risky.biz/news/test-story',
+  url: 'https://thehackernews.com/news/test-story',
   title: 'RSS title',
   snippet: 'RSS snippet body',
-  sourceName: 'Risky Business News',
+  sourceName: 'The Hacker News',
 };
 
 test('Distill timeout defaults and invalid env values resolve to 15000ms', (t) => {
@@ -114,8 +115,8 @@ test('missing root returns RSS fallback with missing_root reason', async () => {
     article: {
       title: 'RSS title',
       articleBody: 'RSS snippet body',
-      canonicalUrl: 'https://risky.biz/news/test-story',
-      sourceName: 'Risky Business News',
+      canonicalUrl: 'https://thehackernews.com/news/test-story',
+      sourceName: 'The Hacker News',
     },
     fallbackReason: 'missing_root',
   });
@@ -138,7 +139,11 @@ test('existing root without dist/index.js returns missing_build and does not imp
 test('missing descriptor returns missing_descriptor fallback', async (t) => {
   const root = await makeDistillRoot();
   t.after(() => rm(root, { recursive: true, force: true }));
-  await writeDescriptors(root, ['the-hacker-news.json']);
+  // Write a descriptor file that doesn't match this source. The bridge
+  // looks for the source-specific file (the-hacker-news.json for
+  // sourceName 'The Hacker News'); finding only an unrelated placeholder
+  // should still return missing_descriptor — the point of the test.
+  await writeDescriptors(root, ['unrelated-placeholder.json']);
   await writeFakeDistill(
     root,
     'throw new Error("fake distill should not be imported when descriptors are missing");\n',
@@ -157,7 +162,7 @@ test('missing descriptor returns missing_descriptor fallback', async (t) => {
 test('missing unrelated descriptor does not block source-specific extraction', async (t) => {
   const root = await makeDistillRoot();
   t.after(() => rm(root, { recursive: true, force: true }));
-  await writeDescriptors(root, ['risky-business-news.json']);
+  await writeDescriptors(root, ['the-hacker-news.json']);
   await writeFakeDistill(
     root,
     `
@@ -171,8 +176,8 @@ export class Distill {
     return {
       title: 'Distilled title',
       articleBody: 'Distilled article body',
-      canonicalUrl: 'https://risky.biz/news/canonical-story',
-      sourceName: 'Risky Business News'
+      canonicalUrl: 'https://thehackernews.com/news/canonical-story',
+      sourceName: 'The Hacker News'
     };
   }
 }
@@ -186,7 +191,7 @@ export class Distill {
 
   assert.equal(result.status, 'distilled');
   assert.deepEqual(globalThis.signalmapDistillUnrelatedDescriptor.constructedWith, {
-    descriptors: [resolve(root, 'descriptors', 'risky-business-news.json')],
+    descriptors: [resolve(root, 'descriptors', 'the-hacker-news.json')],
   });
 });
 
@@ -213,8 +218,8 @@ export class Distill {
       updatedAt: '2026-04-25T13:00:00Z',
       articleBody: 'Distilled article body',
       tags: ['cyber', '', 'risk'],
-      canonicalUrl: 'https://risky.biz/news/canonical-story',
-      sourceName: 'Risky Business News'
+      canonicalUrl: 'https://thehackernews.com/news/canonical-story',
+      sourceName: 'The Hacker News'
     };
   }
 }
@@ -235,11 +240,11 @@ export class Distill {
     updatedAt: '2026-04-25T13:00:00Z',
     articleBody: 'Distilled article body',
     tags: ['cyber', 'risk'],
-    canonicalUrl: 'https://risky.biz/news/canonical-story',
-    sourceName: 'Risky Business News',
+    canonicalUrl: 'https://thehackernews.com/news/canonical-story',
+    sourceName: 'The Hacker News',
   });
   assert.deepEqual(globalThis.signalmapDistillSuccess.constructedWith, {
-    descriptors: [resolve(root, 'descriptors', 'risky-business-news.json')],
+    descriptors: [resolve(root, 'descriptors', 'the-hacker-news.json')],
   });
   assert.equal(globalThis.signalmapDistillSuccess.extractedUrl, baseInput.url);
 });
@@ -339,8 +344,8 @@ export class Distill {
   async extract() {
     return {
       title: 'No body',
-      canonicalUrl: 'https://risky.biz/news/no-body',
-      sourceName: 'Risky Business News'
+      canonicalUrl: 'https://thehackernews.com/news/no-body',
+      sourceName: 'The Hacker News'
     };
   }
 }
@@ -357,8 +362,8 @@ export class Distill {
     article: {
       title: 'RSS title',
       articleBody: 'RSS snippet body',
-      canonicalUrl: 'https://risky.biz/news/test-story',
-      sourceName: 'Risky Business News',
+      canonicalUrl: 'https://thehackernews.com/news/test-story',
+      sourceName: 'The Hacker News',
     },
     fallbackReason: 'invalid_distill_output',
   });
@@ -376,7 +381,7 @@ export class Distill {
     return {
       title: 'Distilled title',
       articleBody: 'Distilled article body',
-      canonicalUrl: 'https://risky.biz/news/canonical-story',
+      canonicalUrl: 'https://thehackernews.com/news/canonical-story',
       sourceName: 'Example Security Blog'
     };
   }
@@ -394,8 +399,8 @@ export class Distill {
     article: {
       title: 'RSS title',
       articleBody: 'RSS snippet body',
-      canonicalUrl: 'https://risky.biz/news/test-story',
-      sourceName: 'Risky Business News',
+      canonicalUrl: 'https://thehackernews.com/news/test-story',
+      sourceName: 'The Hacker News',
     },
     fallbackReason: 'invalid_distill_output',
   });
@@ -572,7 +577,7 @@ test('SignalMap health domains are registered for api health and collector publi
 });
 
 test('full extraction gate only allows Risky Biz and The Hacker News domains', () => {
-  assert.equal(shouldFullExtractSignalMapUrl('https://risky.biz/news/story'), true);
+  assert.equal(shouldFullExtractSignalMapUrl('https://thehackernews.com/news/story'), true);
   assert.equal(shouldFullExtractSignalMapUrl('https://www.thehackernews.com/2026/04/story.html'), true);
   assert.equal(shouldFullExtractSignalMapUrl('https://example.com/security/story'), false);
 });
@@ -649,13 +654,13 @@ test('collector degrades source health when full extraction falls back and still
   const result = await collectSignalMapNews({
     now: '2026-04-25T13:00:00Z',
     env: { SIGNALMAP_VECTOR_ENABLED: 'false' },
-    feeds: [{ name: 'Risky Business News', url: 'https://feeds.example.test/rss.xml' }],
+    feeds: [{ name: 'The Hacker News', url: 'https://feeds.example.test/rss.xml' }],
     fetchImpl: async () =>
       okXml(
         rss([
           {
             title: 'Risky fallback story',
-            link: 'https://risky.biz/news/fallback-story',
+            link: 'https://thehackernews.com/news/fallback-story',
             description: 'RSS snippet fallback',
           },
         ]),
@@ -838,7 +843,13 @@ test('marker-eligible and feed-only accepted events are both upserted when vecto
 
   const result = await collectSignalMapNews({
     now: '2026-04-25T13:00:00Z',
-    env: { SIGNALMAP_VECTOR_ENABLED: 'true' },
+    // The 'Feed only story' fixture below uses confidence 0.5 to exercise
+    // the markerEligible=false path. The production default for
+    // eventConfidenceMin is 0.7 (drops sports/entertainment fluff), which
+    // would also drop the 0.5 fixture and break the assertion that both
+    // events make it through. Lower the threshold for this test so the
+    // behaviour under test (vector upsert of both kinds) is what's checked.
+    env: { SIGNALMAP_VECTOR_ENABLED: 'true', SIGNALMAP_EVENT_CONFIDENCE_MIN: '0.4' },
     feeds: [{ name: 'Example Security Blog', url: 'https://feeds.example.test/rss.xml' }],
     fetchImpl: async () =>
       okXml(
@@ -918,9 +929,9 @@ test('collector exposes independent health domains without leaking paths or secr
       SIGNALMAP_LANCEDB_URI: 'C:\\secret\\signalmap\\lancedb',
       OPENROUTER_API_KEY: 'sk-test-secret',
     },
-    feeds: [{ name: 'Risky Business News', url: 'https://feeds.example.test/rss.xml' }],
+    feeds: [{ name: 'The Hacker News', url: 'https://feeds.example.test/rss.xml' }],
     fetchImpl: async () =>
-      okXml(rss([{ title: 'Health domain story', link: 'https://risky.biz/news/health-domain' }])),
+      okXml(rss([{ title: 'Health domain story', link: 'https://thehackernews.com/news/health-domain' }])),
     extractArticleImpl: async (item) => ({
       status: 'fallback',
       fallbackReason: 'missing_root',
@@ -1040,16 +1051,16 @@ test('published payload and vector upsert event do not contain full article body
   const result = await collectSignalMapNews({
     now: '2026-04-25T13:00:00Z',
     env: { SIGNALMAP_VECTOR_ENABLED: 'true' },
-    feeds: [{ name: 'Risky Business News', url: 'https://feeds.example.test/rss.xml' }],
+    feeds: [{ name: 'The Hacker News', url: 'https://feeds.example.test/rss.xml' }],
     fetchImpl: async () =>
-      okXml(rss([{ title: 'Risky story', link: 'https://risky.biz/news/body-story' }])),
+      okXml(rss([{ title: 'Risky story', link: 'https://thehackernews.com/news/body-story' }])),
     extractArticleImpl: async () => ({
       status: 'distilled',
       article: {
         title: 'Risky story',
         articleBody: 'Full article body that must not be stored',
-        canonicalUrl: 'https://risky.biz/news/body-story',
-        sourceName: 'Risky Business News',
+        canonicalUrl: 'https://thehackernews.com/news/body-story',
+        sourceName: 'The Hacker News',
       },
     }),
     parseArticleImpl: async () => parsedEvent({ canonicalTitle: 'Risky story' }),
@@ -1169,4 +1180,216 @@ test('collector publishes cache and seed-meta commands via custom publishImpl', 
   assert.equal(lancedbMeta.status, 'ok');
   assert.equal(lancedbMeta.recordCount, 0);
   assert.doesNotMatch(JSON.stringify(commands), /redis-secret-token/i);
+});
+
+// ─── Sliding-window merge ────────────────────────────────────────────────────
+// The cache blob is rewritten each tick. Without merging the prior payload,
+// a barren tick (0 LLM-accepted articles) wipes the visible feed. These
+// tests pin three properties of the merge: (1) prior events survive a barren
+// tick; (2) anything past the window is pruned; (3) the function return
+// stays delta-only so worker eventCount + SSE fanout aren't skewed.
+
+function priorStoryEvent(overrides = {}) {
+  const id = overrides.id ?? 'signalmap-story-prev-001';
+  return {
+    id,
+    eventId: id,
+    category: 'cyber',
+    severity: 'medium',
+    title: overrides.title ?? 'Prior tick story',
+    canonicalTitle: overrides.title ?? 'Prior tick story',
+    summary: 'Prior summary',
+    tags: ['cyber'],
+    startedAt: overrides.startedAt ?? '2026-04-25T11:00:00Z',
+    lastObservedAt: overrides.lastObservedAt ?? '2026-04-25T11:00:00Z',
+    publishedAt: overrides.publishedAt ?? '2026-04-25T11:00:00Z',
+    locations: [],
+    sources: [
+      {
+        id: 'source-prev-001',
+        label: 'Prior',
+        name: 'Prior',
+        url: overrides.canonicalUrl ?? 'https://example.com/prev',
+        feedUrl: 'https://example.com/feed',
+        tier: 1,
+        fetchedAt: overrides.lastObservedAt ?? '2026-04-25T11:00:00Z',
+        publishedAt: overrides.publishedAt ?? '2026-04-25T11:00:00Z',
+      },
+    ],
+    confidence: 0.85,
+    kind: 'story',
+    watchlistMatch: false,
+    markerEligible: false,
+    canonicalUrl: overrides.canonicalUrl ?? 'https://example.com/prev',
+    sourceName: 'Prior',
+    contentHash: 'prevhash',
+    sourceTextHash: 'prevsource',
+  };
+}
+
+test('sliding-window merge: barren tick preserves prior events', async () => {
+  // No new RSS items + so the per-item loop accepts 0 articles. Prior
+  // events from 30 minutes ago should still be in the published payload.
+  let publishedPayload;
+  const result = await collectSignalMapNews({
+    now: '2026-04-25T13:00:00Z',
+    env: { SIGNALMAP_VECTOR_ENABLED: 'false' },
+    feeds: [{ name: 'Empty Feed', url: 'https://feeds.example.test/empty.xml' }],
+    fetchImpl: async () => okXml(rss([])),
+    parseArticleImpl: async () => ({ status: 'failed', reason: 'unused' }),
+    resolveLocationsImpl: async () => [],
+    readPreviousImpl: async () => [
+      priorStoryEvent({
+        id: 'signalmap-story-prev-fresh',
+        lastObservedAt: '2026-04-25T12:30:00Z', // 30 min before now
+      }),
+    ],
+    publishImpl: async (payload) => {
+      publishedPayload = payload;
+      return { status: 'published' };
+    },
+  });
+
+  assert.equal(result.events.length, 0, 'this-tick events stay delta-only');
+  assert.equal(publishedPayload.data.events.length, 1, 'prior event survives in published cache');
+  assert.equal(publishedPayload.data.events[0].id, 'signalmap-story-prev-fresh');
+  assert.equal(publishedPayload.meta.recordCount, 1, 'meta.recordCount reflects merged total');
+  assert.equal(publishedPayload.data.health.acceptedThisTick, 0);
+  assert.equal(publishedPayload.data.health.mergedEventCount, 1);
+});
+
+test('sliding-window merge: events older than window get pruned', async () => {
+  // Default window is 24h. Prior event from 30h ago should fall out;
+  // prior event from 23h ago should survive.
+  let publishedPayload;
+  await collectSignalMapNews({
+    now: '2026-04-25T13:00:00Z',
+    env: { SIGNALMAP_VECTOR_ENABLED: 'false' },
+    feeds: [{ name: 'Empty Feed', url: 'https://feeds.example.test/empty.xml' }],
+    fetchImpl: async () => okXml(rss([])),
+    parseArticleImpl: async () => ({ status: 'failed', reason: 'unused' }),
+    resolveLocationsImpl: async () => [],
+    readPreviousImpl: async () => [
+      priorStoryEvent({
+        id: 'signalmap-story-fresh',
+        lastObservedAt: '2026-04-24T14:00:00Z', // 23h ago — keep
+      }),
+      priorStoryEvent({
+        id: 'signalmap-story-stale',
+        lastObservedAt: '2026-04-24T07:00:00Z', // 30h ago — prune
+      }),
+    ],
+    publishImpl: async (payload) => {
+      publishedPayload = payload;
+      return { status: 'published' };
+    },
+  });
+
+  const ids = publishedPayload.data.events.map((event) => event.id);
+  assert.ok(ids.includes('signalmap-story-fresh'), 'event within window survives');
+  assert.ok(!ids.includes('signalmap-story-stale'), 'event past window pruned');
+});
+
+test('sliding-window merge: same-id refresh wins on collision', async () => {
+  // If this tick re-accepts an article that's already in the prior cache,
+  // the new copy (with refreshed lastObservedAt) should overwrite the
+  // older one. Without this, the sliding window would never advance for
+  // long-lived stories.
+  let publishedPayload;
+  await collectSignalMapNews({
+    now: '2026-04-25T13:00:00Z',
+    env: { SIGNALMAP_VECTOR_ENABLED: 'false' },
+    feeds: [{ name: 'Example', url: 'https://feeds.example.test/rss.xml' }],
+    fetchImpl: async () =>
+      okXml(
+        rss([
+          {
+            title: 'Same story refreshed',
+            link: 'https://example.com/news/refresh',
+            description: 'Refreshed snippet',
+          },
+        ]),
+      ),
+    parseArticleImpl: async () =>
+      parsedEvent({ canonicalTitle: 'Same story refreshed' }),
+    resolveLocationsImpl: async () => resolvedLocations(true),
+    readPreviousImpl: async () => [
+      // canonicalUrl matches what this tick will accept; the id is derived
+      // from canonicalUrl + canonicalTitle so the merge collision happens
+      // on a real-world basis, not just synthetic ids.
+      {
+        ...priorStoryEvent({
+          canonicalUrl: 'https://example.com/news/refresh',
+          title: 'Same story refreshed',
+          lastObservedAt: '2026-04-25T11:00:00Z',
+        }),
+        // Override id with the deterministic id collectSignalMapNews will
+        // assign so the collision is unambiguous.
+        id: makeSignalMapStoryEventId(
+          'https://example.com/news/refresh',
+          'Same story refreshed',
+        ),
+        eventId: makeSignalMapStoryEventId(
+          'https://example.com/news/refresh',
+          'Same story refreshed',
+        ),
+      },
+    ],
+    publishImpl: async (payload) => {
+      publishedPayload = payload;
+      return { status: 'published' };
+    },
+  });
+
+  assert.equal(publishedPayload.data.events.length, 1, 'collision dedup');
+  assert.equal(
+    publishedPayload.data.events[0].lastObservedAt,
+    '2026-04-25T13:00:00.000Z',
+    'this tick wins, lastObservedAt refreshed',
+  );
+});
+
+test('sliding-window merge: previous-events read failure tolerated', async () => {
+  // If the readPreviousImpl throws (redis unreachable mid-tick), the
+  // collector should treat prior events as empty rather than failing the
+  // tick. This is the same posture as the dedupe-set read at the top of
+  // the function — informational, never fatal.
+  let publishedPayload;
+  const result = await collectSignalMapNews({
+    now: '2026-04-25T13:00:00Z',
+    env: { SIGNALMAP_VECTOR_ENABLED: 'false' },
+    feeds: [{ name: 'Example', url: 'https://feeds.example.test/rss.xml' }],
+    fetchImpl: async () =>
+      okXml(
+        rss([
+          {
+            title: 'Fresh story',
+            link: 'https://example.com/news/fresh',
+            description: 'Fresh snippet',
+          },
+        ]),
+      ),
+    parseArticleImpl: async () => parsedEvent({ canonicalTitle: 'Fresh story' }),
+    resolveLocationsImpl: async () => resolvedLocations(true),
+    readPreviousImpl: async () => {
+      throw new Error('redis unreachable');
+    },
+    publishImpl: async (payload) => {
+      publishedPayload = payload;
+      return { status: 'published' };
+    },
+  });
+
+  assert.equal(result.status, 'ok');
+  assert.equal(publishedPayload.data.events.length, 1, 'this tick still publishes');
+});
+
+test('sliding-window: ttl expands to cover the configured window', () => {
+  const cfg = resolveSignalMapNewsCollectorConfig({
+    env: { SIGNALMAP_NEWS_WINDOW_HOURS: '48' },
+  });
+  // 48h window + 1h buffer = 176400s
+  assert.equal(cfg.windowHours, 48);
+  assert.equal(cfg.windowMs, 48 * 3600 * 1000);
+  assert.ok(cfg.ttlSeconds >= 48 * 3600 + 3600, 'ttl outlives window + buffer');
 });

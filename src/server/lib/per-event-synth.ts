@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { chat } from './openrouter.ts';
 import { escapeForXmlContext, type BriefResult } from './brief-pipeline.ts';
+import { parseLlmJson } from './llm-json.ts';
 
 const PerEventBriefSchema = z.object({
   bullets: z.array(z.string().min(1).max(500)).min(1).max(3),
@@ -22,6 +23,9 @@ export interface PerEventInput {
   category?: string;
   severity?: string;
   locationName?: string;
+  provider?: string;
+  sourceLabel?: string;
+  sourceUrl?: string;
 }
 
 export interface PerEventResult extends BriefResult {}
@@ -33,6 +37,9 @@ export function wrapEventBlock(input: PerEventInput): string {
   if (input.category !== undefined) lines.push(`  category: ${escapeForXmlContext(input.category)}`);
   if (input.severity !== undefined) lines.push(`  severity: ${escapeForXmlContext(input.severity)}`);
   if (input.locationName !== undefined) lines.push(`  locationName: ${escapeForXmlContext(input.locationName)}`);
+  if (input.provider !== undefined) lines.push(`  provider: ${escapeForXmlContext(input.provider)}`);
+  if (input.sourceLabel !== undefined) lines.push(`  sourceLabel: ${escapeForXmlContext(input.sourceLabel)}`);
+  if (input.sourceUrl !== undefined) lines.push(`  sourceUrl: ${escapeForXmlContext(input.sourceUrl)}`);
   return `<event>\n${lines.join('\n')}\n</event>`;
 }
 
@@ -64,12 +71,9 @@ export async function synthesizePerEvent(
     throw new Error('OpenRouter response has no choices');
   }
 
-  let raw: unknown;
-  try {
-    raw = JSON.parse(responseChoice.message.content);
-  } catch {
-    throw new Error('Per-event synthesis failed schema validation: output is not valid JSON');
-  }
+  // parseLlmJson strips ```json fences and surfaces the raw model snippet
+  // in the error message; bare JSON.parse fails on fenced output.
+  const raw = parseLlmJson(responseChoice.message.content, 'Per-event synthesis');
 
   const parsed = PerEventBriefSchema.safeParse(raw);
   if (!parsed.success) {

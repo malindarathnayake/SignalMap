@@ -3,15 +3,17 @@ import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 export const SIGNALMAP_DISTILL_DESCRIPTOR_FILES = [
-  'risky-business-news.json',
   'the-hacker-news.json',
 ];
 
 export const DEFAULT_SIGNALMAP_DISTILL_TIMEOUT_MS = 15000;
 
-const SUPPORTED_SOURCE_NAMES = new Set(['Risky Business News', 'The Hacker News']);
+// Risky Business News dropped — descriptor was producing
+// invalid_distill_output as the site's HTML layout drifts faster than
+// the descriptor can be maintained. The Hacker News covers the same
+// cybersecurity news category adequately.
+const SUPPORTED_SOURCE_NAMES = new Set(['The Hacker News']);
 const SIGNALMAP_DISTILL_DESCRIPTOR_BY_SOURCE = new Map([
-  ['Risky Business News', 'risky-business-news.json'],
   ['The Hacker News', 'the-hacker-news.json'],
 ]);
 

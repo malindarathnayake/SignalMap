@@ -1,10 +1,10 @@
-import { loadSharedConfig } from './_seed-utils.mjs';
 import {
   createCountryResolvers,
   isIso2,
+  loadSharedConfig,
   normalizeCountryToken,
   resolveIso2,
-} from './_country-resolver.mjs';
+} from './_signalmap-shared.mjs';
 
 export const DEFAULT_SIGNALMAP_LOCATION_CONFIDENCE_MIN = 0.7;
 
@@ -65,6 +65,25 @@ export const SIGNALMAP_STATIC_PLACES = [
     lon: -82.9001,
   },
   { name: 'Georgia', countryIso2: 'GE', scope: 'country', lat: 42.325, lon: 43.21 },
+  // Misses surfaced during live ingestion runs — added so flood/security
+  // signals from these locales pin to the right map coords instead of
+  // dropping to country-bbox center or being filed feed-only.
+  {
+    name: 'Kerala',
+    aliases: ['Kerala, India', 'State of Kerala'],
+    countryIso2: 'IN',
+    scope: 'region',
+    lat: 10.8505,
+    lon: 76.2711,
+  },
+  {
+    name: 'Golders Green',
+    aliases: ['Golders Green, London', 'Golders Green, UK'],
+    countryIso2: 'GB',
+    scope: 'city',
+    lat: 51.5722,
+    lon: -0.1976,
+  },
 ];
 
 const AMBIGUOUS_LOCATION_NAMES = new Set([

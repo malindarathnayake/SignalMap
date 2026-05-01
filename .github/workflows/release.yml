@@ -1,0 +1,141 @@
+name: Release
+
+# Builds and publishes the two SignalMap container images to GitHub
+# Container Registry on a version tag push (e.g. `git tag v4.0.0 && git
+# push origin v4.0.0`). Each tag produces a versioned image and refreshes
+# the `latest` tag so the deploy compose file always pulls a known build.
+#
+# Images:
+#   ghcr.io/<owner>/signalmap-node:<version>   (api / collector / cron — role via CMD)
+#   ghcr.io/<owner>/signalmap-ui:<version>     (nginx + static bundle)
+#
+# Permissions: uses the auto-provisioned GITHUB_TOKEN with `packages: write`
+# so no PAT is required.
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to publish (e.g. v4.0.0). Required when running manually.'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  publish:
+    name: Build and push ${{ matrix.image.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          - name: signalmap-node
+            dockerfile: docker/Dockerfile.node
+            context: .
+          - name: signalmap-ui
+            dockerfile: docker/Dockerfile
+            context: .
+            build-args: |
+              VITE_VARIANT=signalmap
+              VITE_WS_API_URL=/api/ws
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve version tag
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            tag="${{ inputs.tag }}"
+          else
+            tag="${GITHUB_REF#refs/tags/}"
+          fi
+          if [[ ! "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            echo "::error::Tag '$tag' must match v<major>.<minor>.<patch>"
+            exit 1
+          fi
+          # Strip the leading 'v' for image tags (ghcr.io/...:4.0.0 not :v4.0.0).
+          version="${tag#v}"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compute image name (lowercase owner)
+        id: image
+        run: |
+          # Repository owner can be mixed-case (e.g. MyOrg); container registries
+          # require lowercase image names.
+          owner="$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')"
+          echo "ref=${{ env.REGISTRY }}/$owner/${{ matrix.image.name }}" >> "$GITHUB_OUTPUT"
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.image.outputs.ref }}
+          tags: |
+            type=raw,value=${{ steps.version.outputs.version }}
+            type=raw,value=latest
+          labels: |
+            org.opencontainers.image.title=${{ matrix.image.name }}
+            org.opencontainers.image.version=${{ steps.version.outputs.version }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.image.context }}
+          file: ${{ matrix.image.dockerfile }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: ${{ matrix.image.build-args }}
+          cache-from: type=gha,scope=${{ matrix.image.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.image.name }}
+
+  summary:
+    name: Release summary
+    needs: publish
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - name: Resolve tag
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            tag="${{ inputs.tag }}"
+          else
+            tag="${GITHUB_REF#refs/tags/}"
+          fi
+          version="${tag#v}"
+          owner="$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')"
+          {
+            echo "## SignalMap $tag published"
+            echo ""
+            echo "| Image | Tag |"
+            echo "| --- | --- |"
+            echo "| \`ghcr.io/$owner/signalmap-node\` | \`$version\`, \`latest\` |"
+            echo "| \`ghcr.io/$owner/signalmap-ui\` | \`$version\`, \`latest\` |"
+            echo ""
+            echo "Pull with the deploy compose file at \`deploy/docker-compose.yml\`."
+          } >> "$GITHUB_STEP_SUMMARY"

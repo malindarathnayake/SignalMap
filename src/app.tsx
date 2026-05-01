@@ -10,9 +10,18 @@ import { FeedExpandButton } from './components/feed/FeedResizer.tsx';
 import { Inspector } from './components/inspector/Inspector.tsx';
 import { WorldMap } from './components/map/WorldMap.tsx';
 import { MapOverlays } from './components/map/MapOverlays.tsx';
+import { SourceHealthDetails } from './components/pages/SourceHealthDetails.tsx';
 import { feedHeight, feedCollapsed } from './state/watchlist.ts';
 
 export function App() {
+  // Lightweight pathname route guard — no router dependency. New full-page
+  // routes added under /source-health-details (and any future /<page>) get
+  // dispatched here. The default app shell renders for everything else.
+  const path = typeof window !== 'undefined' ? window.location.pathname : '/';
+  if (path === '/source-health-details' || path.startsWith('/source-health-details/')) {
+    return <SourceHealthDetails />;
+  }
+
   const collapsed = feedCollapsed.value;
   const h = feedHeight.value;
   const centerStyle = {

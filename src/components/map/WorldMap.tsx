@@ -11,11 +11,12 @@ import {
   mapControls,
   readOverlayLevel,
 } from '../../state/watchlist.ts';
-import { categories as activeCategories } from '../../state/filters.ts';
+import { categories as activeCategories, mapKinds } from '../../state/filters.ts';
 import { REGION_BBOX, eventInRegions } from '../../state/regions.ts';
 import { UNDERSEA_CABLES, FLAGSHIP_CABLE_IDS } from '../../data/undersea-cables.ts';
 import { DATA_CENTERS, FLAGSHIP_DATACENTER_IDS } from '../../data/datacenters.ts';
 import { MapMarker } from './MapMarker.tsx';
+import { getMarkerKind } from '../../utils/marker-kind.ts';
 
 const WIDTH = 960;
 const HEIGHT = 480;
@@ -364,6 +365,7 @@ export function WorldMap() {
             {projection && mappableEvents.value
               .filter((ev) => activeCategories.value.includes(ev.category))
               .filter((ev) => eventInRegions(ev, watchedRegions.value))
+              .filter((ev) => mapKinds.value.includes(getMarkerKind(ev)))
               .map((ev) => {
                 const loc = ev.locations[0];
                 if (typeof loc?.lon !== 'number' || typeof loc?.lat !== 'number') return null;

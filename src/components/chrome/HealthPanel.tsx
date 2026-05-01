@@ -19,6 +19,21 @@ interface HealthResponse {
   generatedAt: string;
 }
 
+interface CollectorProgress {
+  stage: string;
+  currentSource: string;
+  articlesProcessed: number;
+  articlesTotal: number;
+  articlesAccepted: number;
+  updatedAt: string;
+}
+
+interface SourceHealthResponse {
+  sourceHealth: unknown[];
+  progress: CollectorProgress | null;
+  fetchedAt: number;
+}
+
 type Props = {
   onClose: () => void;
 };
@@ -32,6 +47,7 @@ function statusDot(status: HealthStatus): string {
 
 export function HealthPanel({ onClose }: Props) {
   const [data, setData] = useState<HealthResponse | null>(null);
+  const [progress, setProgress] = useState<CollectorProgress | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,6 +59,40 @@ export function HealthPanel({ onClose }: Props) {
       .then(j => { if (!cancelled) { setData(j as HealthResponse); setLoading(false); } })
       .catch(e => { if (!cancelled) { setError(e.message ?? String(e)); setLoading(false); } });
     return () => { cancelled = true; };
+  }, []);
+
+  // Poll /api/signalmap/source-health every 3s while the panel is open so
+  // the user gets live feedback during the 3-7 minute news collector tick
+  // ("Ingesting from Risky Business · 47/120 articles · 8 accepted") instead
+  // of staring at stale source-health rows that only update at end of tick.
+  useEffect(() => {
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
+    const pollOnce = async () => {
+      try {
+        const r = await fetch('/api/signalmap/source-health', { cache: 'no-store' });
+        if (!r.ok) {
+          if (!cancelled) setProgress(null);
+          return;
+        }
+        const j = (await r.json()) as SourceHealthResponse;
+        if (!cancelled) setProgress(j.progress ?? null);
+      } catch {
+        if (!cancelled) setProgress(null);
+      }
+    };
+
+    const tick = () => {
+      void pollOnce().finally(() => {
+        if (!cancelled) timer = setTimeout(tick, 3000);
+      });
+    };
+    tick();
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
   }, []);
 
   return (
@@ -105,6 +155,33 @@ export function HealthPanel({ onClose }: Props) {
                 );
               })}
             </div>
+
+            {progress && (
+              <div className="sm-health-progress" data-testid="signalmap-health-progress" role="status" aria-live="polite">
+                <div className="sm-health-progress-head">
+                  <span className="sm-health-progress-spinner" aria-hidden />
+                  <span className="sm-health-progress-label">
+                    Ingesting{progress.currentSource ? ` from ${progress.currentSource}` : ''}
+                  </span>
+                  <span className="sm-health-progress-stats mono">
+                    {progress.articlesProcessed}
+                    {progress.articlesTotal > 0 ? `/${progress.articlesTotal}` : ''}
+                    {' articles · '}
+                    {progress.articlesAccepted} accepted
+                  </span>
+                </div>
+                {progress.articlesTotal > 0 && (
+                  <div className="sm-health-progress-bar" aria-hidden>
+                    <span
+                      className="sm-health-progress-bar-fill"
+                      style={{
+                        width: `${Math.min(100, Math.round((progress.articlesProcessed / progress.articlesTotal) * 100))}%`,
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className="sm-health-sources">
               <div className="eyebrow">Source feeds ({data.sources.length})</div>

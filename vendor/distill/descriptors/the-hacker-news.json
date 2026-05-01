@@ -1,0 +1,78 @@
+{
+  "name": "the-hacker-news",
+  "version": "1.0.0",
+  "description": "The Hacker News article pages",
+  "url_pattern": "https://thehackernews.com/{year}/{month}/{slug}.html",
+  "base_url": "https://thehackernews.com/",
+  "root": "html",
+  "cleanup": {
+    "remove_selectors": [
+      "script",
+      "style",
+      "noscript",
+      "nav",
+      "header",
+      "footer",
+      "aside",
+      ".sidebar",
+      ".separator",
+      ".note-b",
+      ".float-share",
+      ".mobile-share",
+      ".tags",
+      "#popular-list",
+      ".latest-title",
+      ".latest",
+      ".email-outer",
+      ".article-sources"
+    ]
+  },
+  "fields": {
+    "title": {
+      "selector": "h1.story-title",
+      "extract": "text",
+      "required": true
+    },
+    "articleBody": {
+      "selector": "#articlebody",
+      "extract": "text",
+      "required": true
+    },
+    "canonicalUrl": {
+      "selector": "link[rel='canonical']",
+      "extract": "attr",
+      "attr": "href",
+      "required": true
+    },
+    "sourceName": {
+      "selector": "meta[property='og:site_name']",
+      "extract": "attr",
+      "attr": "content",
+      "required": true
+    },
+    "dek": {
+      "selector": "meta[name='description']",
+      "extract": "attr",
+      "attr": "content",
+      "required": false
+    },
+    "author": {
+      "selector": "div[itemprop='author'] meta[itemprop='name']",
+      "extract": "attr",
+      "attr": "content",
+      "required": false
+    },
+    "publishedAt": {
+      "selector": "meta[itemprop='datePublished']",
+      "extract": "attr",
+      "attr": "content",
+      "required": false
+    },
+    "updatedAt": {
+      "selector": "meta[itemprop='dateModified']",
+      "extract": "attr",
+      "attr": "content",
+      "required": false
+    }
+  }
+}

@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'preact/hooks';
+import { signal } from '@preact/signals';
 import { globalBrief, globalBriefLoading, globalBriefError, fetchGlobalBrief, subscribeBriefUpdates } from '../../state/brief.ts';
 import { regions as watchedRegions, providers as watchedProviders } from '../../state/watchlist.ts';
+import { persist } from '../../state/persist.ts';
+
+const briefCollapsed = persist(signal<boolean>(false), 'signalmap-brief-collapsed');
 
 function relativeTime(iso: string | null): string {
   if (!iso) return '';
@@ -9,6 +13,44 @@ function relativeTime(iso: string | null): string {
   if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
   if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
   return `${Math.floor(diff / 86400)}d ago`;
+}
+
+// Render brief sources as clickable chips. Show first 5 inline; collapse the
+// rest into a single "+N more" chip whose title attribute lists them all
+// (cheap progressive disclosure without an extra render-path/state machine).
+const SOURCE_CHIP_LIMIT = 5;
+function BriefSourceChips({ sources }: { sources: ReadonlyArray<{ label: string; url: string }> }) {
+  const visible = sources.slice(0, SOURCE_CHIP_LIMIT);
+  const overflow = sources.slice(SOURCE_CHIP_LIMIT);
+  return (
+    <span className="sm-brief-sources" data-testid="signalmap-brief-sources">
+      <span className="sm-brief-sources-label">Sources:</span>
+      <span className="sm-brief-sources-chips">
+        {visible.map((s, i) => (
+          <a
+            key={`${s.url}-${i}`}
+            href={s.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="sm-brief-source-chip"
+            data-testid={`signalmap-brief-source-${i}`}
+            title={s.url}
+          >
+            {s.label}
+          </a>
+        ))}
+        {overflow.length > 0 && (
+          <span
+            className="sm-brief-source-chip sm-brief-source-chip-more"
+            data-testid="signalmap-brief-source-more"
+            title={overflow.map((s) => `${s.label} ${s.url}`).join('\n')}
+          >
+            +{overflow.length} more
+          </span>
+        )}
+      </span>
+    </span>
+  );
 }
 
 function emphasizeBullet(text: string, watched: string[]): preact.ComponentChildren {
@@ -58,6 +100,7 @@ export function BriefStrip() {
   const brief = globalBrief.value;
   const loading = globalBriefLoading.value;
   const error = globalBriefError.value;
+  const collapsed = briefCollapsed.value;
 
   const watchedTerms = [
     ...(watchedRegions.value ?? []),
@@ -83,75 +126,105 @@ export function BriefStrip() {
     }
   }
 
+  function toggleCollapse() {
+    briefCollapsed.value = !briefCollapsed.value;
+  }
+
+  const bulletCount = brief?.bullets.length ?? 0;
+  const updatedLabel = brief?.generatedAt ? relativeTime(brief.generatedAt) : '';
+
   return (
-    <section className="sm-brief-strip" data-testid="signalmap-brief-strip" aria-label="Brief strip">
-      <span className="eyebrow">Briefing</span>
+    <section
+      className={`sm-brief-strip${collapsed ? ' collapsed' : ''}`}
+      data-testid="signalmap-brief-strip"
+      aria-label="Brief strip"
+    >
+      <div className="sm-brief-head">
+        <span className="eyebrow">Briefing</span>
+        {collapsed && bulletCount > 0 && (
+          <span className="sm-brief-summary mono">
+            {bulletCount} {bulletCount === 1 ? 'bullet' : 'bullets'}
+            {updatedLabel ? ` · updated ${updatedLabel}` : ''}
+          </span>
+        )}
+        <button
+          type="button"
+          className="sm-brief-toggle"
+          data-testid="signalmap-brief-toggle"
+          aria-expanded={!collapsed}
+          aria-controls="signalmap-brief-body"
+          onClick={toggleCollapse}
+          title={collapsed ? 'Expand briefing' : 'Collapse briefing'}
+        >
+          {collapsed ? '▾' : '▴'}
+        </button>
+      </div>
 
-      {loading && !brief && (
-        <span className="sm-brief-strip-loading mono" data-testid="signalmap-brief-strip-loading">
-          Loading…
-        </span>
-      )}
-
-      {error && !brief && (
-        <span data-testid="signalmap-brief-strip-error" className="mono">
-          Brief unavailable: {error}
-        </span>
-      )}
-
-      {brief && brief.bullets.length === 0 && (
-        <span data-testid="signalmap-brief-strip-empty" className="mono">
-          No brief yet — first cron run pending.
-        </span>
-      )}
-
-      {brief && brief.bullets.length > 0 && (
-        <ul className="sm-brief-bullets">
-          {brief.bullets.map((bullet, i) => (
-            <li key={i}>
-              <span data-testid="signalmap-brief-bullet">
-                {emphasizeBullet(bullet, watchedTerms)}
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {brief && (
-        <>
-          <div className="sm-brief-meta">
-            {brief.generatedAt && (
-              <span className="sm-brief-updated">Updated {relativeTime(brief.generatedAt)}</span>
-            )}
-            {brief.sources.length > 0 && (
-              <span className="sm-brief-sources">
-                Sources: {brief.sources.map((s) => s.label).join(', ')}
-              </span>
-            )}
-          </div>
-        </>
-      )}
-
-      {adminToken && (
-        <>
-          <button
-            type="button"
-            className="sm-btn"
-            data-testid="signalmap-brief-refresh"
-            onClick={() => void onRefresh()}
-          >
-            Refresh now
-          </button>
-          {refreshStatus && (
-            <span
-              data-testid="signalmap-brief-refresh-status"
-              aria-live="polite"
-              className="sm-brief-refresh-status"
-            >
-              {refreshStatus}
+      {!collapsed && (
+        <div id="signalmap-brief-body" className="sm-brief-body">
+          {loading && !brief && (
+            <span className="sm-brief-strip-loading mono" data-testid="signalmap-brief-strip-loading">
+              Loading…
             </span>
           )}
-        </>
+
+          {error && !brief && (
+            <span data-testid="signalmap-brief-strip-error" className="mono sm-brief-error">
+              Brief unavailable: {error}
+            </span>
+          )}
+
+          {brief && brief.bullets.length === 0 && (
+            <span data-testid="signalmap-brief-strip-empty" className="mono">
+              No brief yet — first cron run pending.
+            </span>
+          )}
+
+          {brief && brief.bullets.length > 0 && (
+            <ul className="sm-brief-bullets">
+              {brief.bullets.map((bullet, i) => (
+                <li key={i}>
+                  <span data-testid="signalmap-brief-bullet">
+                    {emphasizeBullet(bullet, watchedTerms)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {brief && (
+            <div className="sm-brief-meta">
+              {brief.generatedAt && (
+                <span className="sm-brief-updated">Updated {relativeTime(brief.generatedAt)}</span>
+              )}
+              {brief.sources.length > 0 && (
+                <BriefSourceChips sources={brief.sources} />
+              )}
+            </div>
+          )}
+
+          {adminToken && (
+            <div className="sm-brief-actions">
+              <button
+                type="button"
+                className="sm-btn"
+                data-testid="signalmap-brief-refresh"
+                onClick={() => void onRefresh()}
+              >
+                Refresh now
+              </button>
+              {refreshStatus && (
+                <span
+                  data-testid="signalmap-brief-refresh-status"
+                  aria-live="polite"
+                  className="sm-brief-refresh-status"
+                >
+                  {refreshStatus}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
       )}
     </section>
   );

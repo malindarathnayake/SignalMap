@@ -1,0 +1,35 @@
+# syntax=docker/dockerfile:1.7
+# SignalMap v2 Node runtime image — runs `api`, `collector`, or `cron`.
+# Role is passed as the container CMD (entrypoint dispatches via $1).
+# Workers run TS directly via tsx; no `tsc` build step.
+
+FROM node:22-alpine
+
+# redis-cli for collector + cron healthchecks (heartbeat-key existence probe).
+# wget is provided by busybox in the base image — used by the api healthcheck.
+RUN apk add --no-cache redis
+
+WORKDIR /app
+
+# Install deps from a locked manifest. --ignore-scripts skips lifecycle hooks
+# (no postinstall builds needed; lancedb ships musl prebuilt binaries).
+COPY package.json package-lock.json tsconfig.json ./
+RUN npm ci --legacy-peer-deps --ignore-scripts
+
+# Source — only what the workers need at runtime.
+COPY server/ ./server/
+COPY src/ ./src/
+COPY scripts/ ./scripts/
+COPY vendor/ ./vendor/
+
+# Entrypoint script
+COPY docker/entrypoint-node.sh /usr/local/bin/entrypoint-node.sh
+RUN chmod +x /usr/local/bin/entrypoint-node.sh
+
+# api default port (collector + cron don't listen)
+EXPOSE 3000
+
+# No HEALTHCHECK at image level — compose defines per-role healthchecks in 5b.
+
+ENTRYPOINT ["/usr/local/bin/entrypoint-node.sh"]
+CMD ["api"]

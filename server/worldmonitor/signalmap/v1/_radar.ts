@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type {
   SignalMapEvent,
   SignalMapLocation,
@@ -12,13 +15,49 @@ export const RADAR_SOURCE_ID = 'cloudflare-radar';
 const RADAR_SOURCE_LABEL = 'Cloudflare Radar';
 const PROVIDER = 'cloudflare';
 
-const COUNTRY_CENTROIDS: Record<string, readonly [number, number]> = {
-  FR: [46.23, 2.21],
-  US: [37.09, -95.71],
-  GB: [55.38, -3.44],
-  DE: [51.17, 10.45],
-  JP: [36.2, 138.25],
-};
+// Country centroids derived from scripts/shared/country-bboxes.json. The bbox
+// file ships ~250 countries as [minLat, minLon, maxLat, maxLon]; we compute
+// the geographic midpoint at module init for O(1) lookup. Previously this
+// table was hardcoded to 5 countries (FR/US/GB/DE/JP) which meant Cloudflare
+// Radar events for any other country (Malaysia, Iran, Sudan, etc.) ended up
+// without lat/lon and never rendered as map markers.
+function loadCountryCentroids(): Record<string, readonly [number, number]> {
+  // Walk up from this file (server/worldmonitor/signalmap/v1/_radar.ts) to
+  // the repo root, then into scripts/shared/country-bboxes.json. tsx runs
+  // this file directly so __dirname-equivalent works via import.meta.url.
+  const here = dirname(fileURLToPath(import.meta.url));
+  const candidates = [
+    resolve(here, '../../../../scripts/shared/country-bboxes.json'),
+    resolve(here, '../../../../../scripts/shared/country-bboxes.json'),
+  ];
+  for (const path of candidates) {
+    try {
+      const raw = readFileSync(path, 'utf8');
+      const parsed = JSON.parse(raw) as Record<string, [number, number, number, number]>;
+      const out: Record<string, readonly [number, number]> = {};
+      for (const [iso2, bbox] of Object.entries(parsed)) {
+        if (!Array.isArray(bbox) || bbox.length !== 4) continue;
+        const [minLat, minLon, maxLat, maxLon] = bbox;
+        if (![minLat, minLon, maxLat, maxLon].every((n) => typeof n === 'number' && Number.isFinite(n))) continue;
+        out[iso2] = [(minLat + maxLat) / 2, (minLon + maxLon) / 2] as const;
+      }
+      return out;
+    } catch {
+      // try next candidate
+    }
+  }
+  // Fallback: minimal seed list so something works even if the bbox file
+  // can't be located (e.g. running outside the docker image).
+  return {
+    FR: [46.23, 2.21],
+    US: [37.09, -95.71],
+    GB: [55.38, -3.44],
+    DE: [51.17, 10.45],
+    JP: [36.2, 138.25],
+  };
+}
+
+const COUNTRY_CENTROIDS: Record<string, readonly [number, number]> = loadCountryCentroids();
 
 const COUNTRY_NAME_TO_ISO2: Record<string, string> = {
   france: 'FR',

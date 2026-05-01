@@ -1,0 +1,5 @@
+# Local deploy state — never commit
+.env
+.env.local
+secrets/*
+!secrets/.gitkeep

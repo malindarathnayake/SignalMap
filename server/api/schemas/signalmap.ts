@@ -98,7 +98,7 @@ const HealthSourceRow = z.object({
   tier: z.number(),
 });
 
-const HealthResponse = z.object({
+export const HealthResponse = z.object({
   redis: ComponentHealth,
   lancedb: ComponentHealth,
   collector: ComponentHealth,

@@ -83,3 +83,36 @@ tmp/
 docs/plans/
 docs/brainstorms/
 playground-pricing.html
+
+# ─── SignalMap v2 backend artifacts ──────────────────────────────────────────
+# Editor / IDE settings
+.vscode/
+
+# Foreman session state (durable, but per-developer; not for shared history)
+docs/.foreman-journal.json
+docs/.foreman-ledger.json
+docs/.foreman-progress.json
+docs/.foreman-tmp/
+
+# Real secret material — only the .example file is tracked
+secrets/*
+!secrets/*.example
+!secrets/.gitkeep
+
+# Adjacent project workspace, not part of this repo
+blog-site/
+
+# v2 dev/debug screenshots captured during build-out (not part of source)
+signalmap-*.png
+v2-*.png
+
+# Backend runtime caches written into named volumes in production; only here
+# if someone bind-mounted them locally
+lancedb-data/
+models/
+
+# Live-mode e2e test artifacts (run via `npm run test:e2e:live`)
+test-results-live/
+
+# Generated OpenAPI bundles (rebuilt by `npm run build:openapi`)
+shared/openapi.bundled.yaml

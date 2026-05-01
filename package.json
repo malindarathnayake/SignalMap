@@ -1,7 +1,7 @@
 {
   "name": "signalmap",
   "private": true,
-  "version": "3.0.0",
+  "version": "4.0.0",
   "license": "AGPL-3.0-only",
   "type": "module",
   "scripts": {
@@ -19,7 +19,10 @@
     "typecheck:all": "tsc --noEmit && tsc --noEmit -p tsconfig.api.json",
     "preview": "vite preview",
     "test:data": "tsx --test tests/*.test.mjs tests/*.test.mts",
-    "test:feeds": "node scripts/validate-rss-feeds.mjs"
+    "test:feeds": "node scripts/validate-rss-feeds.mjs",
+    "start:api": "tsx server/api/index.ts",
+    "start:collector": "tsx server/workers/collector.ts",
+    "start:cron": "tsx server/workers/cron.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.7",
@@ -41,6 +44,8 @@
   "dependencies": {
     "@lancedb/lancedb": "^0.27.2",
     "@preact/signals": "^2.9.0",
+    "@toon-format/toon": "^2.1.0",
+    "cheerio": "^1.2.0",
     "d3": "^7.9.0",
     "d3-geo": "^3.1.1",
     "d3-zoom": "^3.0.0",

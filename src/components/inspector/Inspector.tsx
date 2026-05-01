@@ -46,6 +46,32 @@ export function Inspector() {
         <span data-testid="signalmap-inspector-location">{locName}</span>
       </div>
       {event.summary && <p className="sm-insp-summary">{event.summary}</p>}
+      {event.sources && event.sources.length > 0 && (
+        <div className="sm-insp-event-sources" data-testid="signalmap-inspector-event-sources">
+          <span className="eyebrow">Sources</span>
+          <ul className="sm-insp-event-sources-list">
+            {event.sources.map((s, i) => (
+              <li key={`${s.url ?? s.label}-${i}`}>
+                {s.url ? (
+                  <a
+                    href={s.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="sm-insp-source-link"
+                    data-testid={`signalmap-inspector-event-source-${i}`}
+                    title={s.url}
+                  >
+                    {s.label}
+                    <span className="sm-insp-source-ext" aria-hidden> ↗</span>
+                  </a>
+                ) : (
+                  <span>{s.label}</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       <WhyItMattersTab />
     </aside>
   );

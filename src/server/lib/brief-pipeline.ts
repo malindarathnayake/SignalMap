@@ -3,6 +3,7 @@ import { type PerplexityResponse } from './perplexity.ts';
 import { chat, type OpenRouterMessage } from './openrouter.ts';
 import { z } from 'zod';
 import { emitMetric, METRICS } from './metrics.ts';
+import { parseLlmJson } from './llm-json.ts';
 
 export const BriefSchema = z.object({
   bullets: z.array(z.string().min(1).max(500)).min(1).max(7),
@@ -123,12 +124,10 @@ export async function runBriefPipeline(args: {
   if (!responseChoice) {
     throw new Error('OpenRouter response has no choices');
   }
-  let raw: unknown;
-  try {
-    raw = JSON.parse(responseChoice.message.content);
-  } catch {
-    throw new Error('Brief synthesis failed schema validation: output is not valid JSON');
-  }
+  // parseLlmJson strips ```json...``` fences (the most common cause of
+  // "not valid JSON" failures) and includes a sanitized snippet of the
+  // raw output in the error message so ops can diagnose without re-running.
+  const raw = parseLlmJson(responseChoice.message.content, 'Brief synthesis');
 
   const parsed = BriefSchema.safeParse(raw);
   if (!parsed.success) {

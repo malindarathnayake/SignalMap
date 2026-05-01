@@ -28,3 +28,13 @@ export const mainSeverities = persist(
   signal<FeedSeverity[]>(['critical', 'major']),
   'signalmap-filters-main-severities',
 );
+
+// Map-only marker-kind filter (controlled by the legend in MapOverlays).
+// Hides specific marker shapes on the map without affecting the live feed.
+// `kind` is derived from category + radarKind by getMarkerKind in src/utils/marker-kind.ts.
+export const ALL_MAP_KINDS = ['outage', 'anomaly', 'provider', 'event'] as const;
+export type MapKind = (typeof ALL_MAP_KINDS)[number];
+export const mapKinds = persist(
+  signal<MapKind[]>([...ALL_MAP_KINDS]),
+  'signalmap-filters-map-kinds',
+);
