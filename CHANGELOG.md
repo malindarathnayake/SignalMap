@@ -165,4 +165,4 @@ a brief-generation cron worker, and an nginx-fronted UI behind one host port.
 - The collector embedding model first run downloads ~150 MB into the
   `signalmap-models` volume. Subsequent boots reuse the cached files.
 
-[4.0.0]: https://github.com/your-org/SignalMap/releases/tag/v4.0.0
+[4.0.0]: https://github.com/malindarathnayake/SignalMap/releases/tag/v4.0.0

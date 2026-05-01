@@ -21,7 +21,7 @@ name: signalmap
 # ─────────────────────────────────────────────────────────────────────────────
 
 x-node-base: &node-base
-  image: ghcr.io/${SIGNALMAP_REPO_OWNER:-your-org}/signalmap-node:${SIGNALMAP_VERSION:-latest}
+  image: ghcr.io/${SIGNALMAP_REPO_OWNER:-malindarathnayake}/signalmap-node:${SIGNALMAP_VERSION:-latest}
   restart: unless-stopped
   init: true
   pull_policy: always
@@ -148,7 +148,7 @@ services:
       - signalmap-net
 
   signalmap-ui:
-    image: ghcr.io/${SIGNALMAP_REPO_OWNER:-your-org}/signalmap-ui:${SIGNALMAP_VERSION:-latest}
+    image: ghcr.io/${SIGNALMAP_REPO_OWNER:-malindarathnayake}/signalmap-ui:${SIGNALMAP_VERSION:-latest}
     container_name: signalmap-ui
     pull_policy: always
     ports:

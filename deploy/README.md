@@ -16,7 +16,7 @@ GitHub Container Registry. No build step required on the host.
 
 ```bash
 # 1. Get the deploy folder onto the host (clone, scp, or download from a release).
-git clone https://github.com/your-org/SignalMap.git
+git clone https://github.com/malindarathnayake/SignalMap.git
 cd SignalMap/deploy
 
 # 2. Configure
