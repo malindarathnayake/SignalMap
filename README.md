@@ -1,144 +1,211 @@
-# SignalMap
-
-**Real-time signal intelligence dashboard** — provider outages, internet anomalies, and global signals in a unified situational awareness interface.
-
-[![GitHub stars](https://img.shields.io/github/stars/koala73/worldmonitor?style=social)](https://github.com/koala73/worldmonitor/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/koala73/worldmonitor?style=social)](https://github.com/koala73/worldmonitor/network/members)
-[![Discord](https://img.shields.io/badge/Discord-Join-5865F2?style=flat&logo=discord&logoColor=white)](https://discord.gg/re63kWKxaz)
-[![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
-[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Last commit](https://img.shields.io/github/last-commit/koala73/worldmonitor)](https://github.com/koala73/worldmonitor/commits/main)
-[![Latest release](https://img.shields.io/github/v/release/koala73/worldmonitor?style=flat)](https://github.com/koala73/worldmonitor/releases/latest)
-
-
 <p align="center">
-  <a href="https://worldmonitor.app/api/download?platform=windows-exe"><img src="https://img.shields.io/badge/Download-Windows_(.exe)-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="Download Windows"></a>&nbsp;
-  <a href="https://worldmonitor.app/api/download?platform=macos-arm64"><img src="https://img.shields.io/badge/Download-macOS_Apple_Silicon-000000?style=for-the-badge&logo=apple&logoColor=white" alt="Download macOS ARM"></a>&nbsp;
-  <a href="https://worldmonitor.app/api/download?platform=macos-x64"><img src="https://img.shields.io/badge/Download-macOS_Intel-555555?style=for-the-badge&logo=apple&logoColor=white" alt="Download macOS Intel"></a>&nbsp;
-  <a href="https://worldmonitor.app/api/download?platform=linux-appimage"><img src="https://img.shields.io/badge/Download-Linux_(.AppImage)-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Download Linux"></a>
+  <img src=".github/Banner.jpg" alt="SignalMap — operational signal intelligence" />
 </p>
 
 <p align="center">
-  <a href="https://www.worldmonitor.app/docs/documentation"><strong>Documentation</strong></a> &nbsp;·&nbsp;
-  <a href="https://github.com/koala73/worldmonitor/releases/latest"><strong>Releases</strong></a> &nbsp;·&nbsp;
-  <a href="https://www.worldmonitor.app/docs/contributing"><strong>Contributing</strong></a>
+  <a href="https://github.com/malindarathnayake/SignalMap/releases/latest"><img src="https://img.shields.io/github/v/release/malindarathnayake/SignalMap?display_name=tag&sort=semver" alt="Latest release"></a>
+  <a href="https://github.com/malindarathnayake/SignalMap/actions/workflows/release.yml"><img src="https://img.shields.io/github/actions/workflow/status/malindarathnayake/SignalMap/release.yml?label=release" alt="Release workflow"></a>
+  <a href="https://github.com/malindarathnayake/SignalMap/pkgs/container/signalmap-node"><img src="https://img.shields.io/badge/ghcr.io-signalmap--node-2496ED?logo=docker&logoColor=white" alt="GHCR signalmap-node"></a>
+  <a href="https://github.com/malindarathnayake/SignalMap/pkgs/container/signalmap-ui"><img src="https://img.shields.io/badge/ghcr.io-signalmap--ui-2496ED?logo=docker&logoColor=white" alt="GHCR signalmap-ui"></a>
+  <a href="https://www.gnu.org/licenses/agpl-3.0"><img src="https://img.shields.io/badge/license-AGPL--3.0-blue" alt="License: AGPL v3"></a>
+  <img src="https://img.shields.io/badge/node-22-339933?logo=node.js&logoColor=white" alt="Node 22">
+  <img src="https://img.shields.io/badge/typescript-5.7-3178C6?logo=typescript&logoColor=white" alt="TypeScript 5.7">
+  <a href="https://github.com/malindarathnayake/SignalMap/commits/main"><img src="https://img.shields.io/github/last-commit/malindarathnayake/SignalMap" alt="Last commit"></a>
 </p>
 
-![World Monitor Dashboard](docs/images/worldmonitor-7-mar-2026.jpg)
+<p align="center">
+  <a href="./CHANGELOG.md"><strong>Changelog</strong></a> &middot;
+  <a href="./deploy/README.md"><strong>Deploy guide</strong></a> &middot;
+  <a href="./docs/SignalMap"><strong>Architecture docs</strong></a> &middot;
+  <a href="https://github.com/malindarathnayake/SignalMap/issues"><strong>Issues</strong></a>
+</p>
 
 ---
 
-## What It Does
+## What it does
 
-- **Provider outage + internet anomaly tracking** with watchlist scoring and AI-synthesized situational briefs
-- **500+ curated news feeds** across 15 categories, AI-synthesized into briefs
-- **Cross-stream correlation** — military, economic, disaster, and escalation signal convergence
-- **Local AI** — run everything with Ollama, no API keys required
+SignalMap watches the public internet for **operational, security, geopolitical, and infrastructure events** — provider outages, network anomalies, cybersecurity incidents, supply-chain attacks — and surfaces them as a unified, geo-located, severity-ranked feed. It runs entirely on infrastructure you control.
 
-For the full feature list, architecture, data sources, and algorithms, see the **[documentation](https://www.worldmonitor.app/docs/documentation)**.
+- **Live map + feed** — every signal pinned to its geography, with category and severity colour-coding, server-sent updates as new events land.
+- **Source-health visibility** — `/source-health-details` shows per-source fetch / accept / reject counts, last-fetched age, and a "why articles were skipped" panel that aggregates LLM confidence stats and dedupe reasons.
+- **AI-classified news** — RSS items go through Distill (vendored) for clean article extraction, then through OpenRouter for structured event extraction with a confidence floor. Off-topic items (sports, lifestyle, marketing) are filtered out before the geocoder runs.
+- **Sliding-window cache** — accepted events stay visible for 24h (configurable) even if the next collector tick rejects everything; a barren tick can no longer wipe the feed.
+- **Vector dedupe** — LanceDB stores embeddings of accepted stories so semantically duplicate articles from different sources collapse into a single signal.
+- **Brief generation** — periodic AI brief over the last 30 minutes of activity, with per-event drill-down.
+- **Provider status** — Cloudflare, OpenAI, Anthropic, Azure, Okta, AWS Lambda / RDS / S3 surfaced from their public status feeds.
+- **Cloudflare Radar** — real-time outage incidents geocoded down to the datacenter (IATA-aware) instead of country centroid.
 
 ---
 
-## Quick Start
+## Quick start (Docker Compose)
+
+The fastest way to run SignalMap is with the published images from GitHub Container Registry. No local build, no source checkout required for the deploy host.
 
 ```bash
-git clone https://github.com/koala73/worldmonitor.git
-cd worldmonitor
-npm install
-npm run dev
+# On the deploy host (any Docker-capable Linux box, ~2 GB RAM):
+mkdir -p /opt/signalmap && cd /opt/signalmap
+
+# Grab the deploy folder (replace with raw URLs or sparse-clone if you prefer)
+git clone --depth 1 https://github.com/malindarathnayake/SignalMap.git tmp \
+  && mv tmp/deploy/* . && rm -rf tmp
+
+# Configure
+cp .env.example .env
+# edit .env — at minimum set REDIS_PASSWORD; for live mode also set
+# OPENROUTER_API_KEY, PERPLEXITY_API_KEY, optionally NEWSAPI_API_KEY.
+
+# Generate the admin token Docker secret
+mkdir -p secrets
+openssl rand -hex 32 > secrets/SIGNALMAP_ADMIN_TOKEN
+chmod 600 secrets/SIGNALMAP_ADMIN_TOKEN
+
+# Pull and start
+docker compose pull
+docker compose up -d
+
+# Verify
+docker compose ps
+curl -fsS http://localhost:8080/api/signalmap/health
 ```
 
-Open [localhost:5173](http://localhost:5173). No environment variables required for basic operation.
+Open `http://<host>:8080`. The collector takes ~30-90 seconds to do its first tick; the feed populates after that.
 
-See the **[self-hosting guide](https://www.worldmonitor.app/docs/getting-started)** for deployment options (Vercel, Docker, static).
-
----
-
-## Tech Stack
-
-| Category | Technologies |
-|----------|-------------|
-| **Frontend** | Preact + Vite, SVG + d3-geo + d3-zoom, @preact/signals state, Server-Sent Events |
-| **Desktop** | Tauri 2 (Rust) with Node.js sidecar |
-| **AI/ML** | Ollama / Groq / OpenRouter, Transformers.js (browser-side) |
-| **API Contracts** | Protocol Buffers (92 protos, 22 services), sebuf HTTP annotations |
-| **Deployment** | Vercel Edge Functions (60+), Railway relay, Tauri, PWA |
-| **Caching** | Redis (ioredis, TCP), 3-tier cache, CDN, service worker |
-
-Full stack details in the **[architecture docs](https://www.worldmonitor.app/docs/architecture)**.
+Full deployment guide (TLS, reverse proxy, version pinning, ops runbook):
+**[`deploy/README.md`](./deploy/README.md)**
 
 ---
 
-## Flight Data
+## Architecture
 
-Flight data provided gracefully by [Wingbits](https://wingbits.com?utm_source=worldmonitor&utm_medium=referral&utm_campaign=worldmonitor), the most advanced ADS-B flight data solution.
+```
+                    ┌─────────────────┐
+                    │  Browser / SPA  │
+                    └────────┬────────┘
+                             │ HTTP + SSE
+                    ┌────────▼────────┐
+                    │  signalmap-ui   │  nginx + Vite static bundle
+                    │   (port 8080)   │  proxies /api/* to api
+                    └────────┬────────┘
+                             │
+                    ┌────────▼────────┐
+                    │  signalmap-api  │  Node 22, TS 5.7
+                    │                 │  Routes: list, stream, brief, health
+                    └────────┬────────┘
+                             │
+        ┌────────────────────┼────────────────────┐
+        │                    │                    │
+┌───────▼───────┐    ┌───────▼───────┐    ┌──────▼──────┐
+│ signalmap-    │    │ signalmap-    │    │   redis     │
+│  collector    │    │    cron       │    │             │
+│               │    │               │    │  cache,     │
+│ RSS / Radar / │    │  Brief gen    │    │  pubsub,    │
+│ status / LLM  │    │  every 30m    │    │  leases     │
+│ classify      │    │               │    │             │
+└───────┬───────┘    └───────────────┘    └─────────────┘
+        │
+┌───────▼───────┐
+│   LanceDB     │  Vector store for semantic dedupe
+└───────────────┘
+```
+
+Five containers, one host port, durable Docker volumes for Redis state, LanceDB vectors, and the embedding model cache. Worker leases coordinate collector / cron tick ownership through Redis.
 
 ---
 
-## Data Sources
+## Tech stack
 
-WorldMonitor aggregates 65+ external data sources across geopolitics, finance, energy, climate, aviation, cyber, military, infrastructure, and news intelligence. See the full [data sources catalog](https://www.worldmonitor.app/docs/data-sources) for providers, feed tiers, and collection methods.
+| Layer | What's in it |
+| --- | --- |
+| **Frontend** | Preact 10 + Vite 6, d3-geo / d3-zoom for the map, `@preact/signals` for state, SSE for live updates |
+| **API** | Node 22, TypeScript 5.7, ioredis 5, Zod schemas with OpenAPI generation |
+| **Workers** | Lease-coordinated collector + cron loops, AbortSignal-aware tick bodies |
+| **AI / LLM** | OpenRouter for classification + brief generation, Perplexity for grounded news, configurable model fallback chain |
+| **Article extraction** | Vendored Distill (`vendor/distill/`) with per-source descriptors |
+| **Vector dedupe** | LanceDB with locally-cached embedding model |
+| **Cache / control plane** | Redis 7 (cache, lease, pubsub, lock store, daily spend window) |
+| **Edge** | nginx serving the static bundle + reverse-proxying `/api/*` to the api worker |
+| **Deploy** | Docker Compose, GHCR-published images, Docker secrets bridge for the admin token |
 
 ---
 
-## Contributing
+## Tunables worth knowing
 
-Contributions welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+| Env | Default | What it does |
+| --- | --- | --- |
+| `SIGNALMAP_BACKEND_MODE` | `fixture` | `fixture` (free, no LLM) or `live` (real LLM calls) |
+| `SIGNALMAP_NEWS_WINDOW_HOURS` | `24` | Sliding window for the news cache |
+| `SIGNALMAP_EVENT_CONFIDENCE_MIN` | `0.7` | LLM confidence floor; below this, articles are dropped as `low_signal_confidence` |
+| `SIGNALMAP_DAILY_LLM_BUDGET_USD` | `2.00` | Hard cap on combined provider spend per UTC day |
+| `SIGNALMAP_RSS_POLL_MINUTES` | `15` | Collector tick cadence |
+| `SIGNALMAP_BRIEF_REFRESH_MINUTES` | `30` | Cron tick cadence |
+| `SIGNALMAP_VECTOR_ENABLED` | `true` | Disable to skip LanceDB + embedding model (saves ~150 MB download, ~1 GB RAM) |
+
+Full list with comments: [`deploy/.env.example`](./deploy/.env.example).
+
+---
+
+## Releases
+
+Versioned releases publish two images to GitHub Container Registry:
+
+```
+ghcr.io/malindarathnayake/signalmap-node:<version>   # api / collector / cron (role via CMD)
+ghcr.io/malindarathnayake/signalmap-ui:<version>     # nginx + static bundle
+```
+
+Both also tagged `latest`. The release workflow runs on every `vX.Y.Z` git tag push — see [`.github/workflows/release.yml`](./.github/workflows/release.yml).
+
+To upgrade a deployment:
 
 ```bash
-npm run typecheck        # Type checking
-npm run build            # Production build
+# in deploy/.env, set SIGNALMAP_VERSION=4.0.1 (or leave as `latest`)
+docker compose pull
+docker compose up -d
+```
+
+---
+
+## Development
+
+For source builds (rather than running pre-built images):
+
+```bash
+git clone https://github.com/malindarathnayake/SignalMap.git
+cd SignalMap
+
+# Frontend dev server (Vite, port 5173)
+npm install
+npm run dev
+
+# Or run the full stack from source via the root compose file
+cp docker/signalmap-shared.env.example .env
+# edit .env
+docker compose up -d --build
+```
+
+Tests:
+
+```bash
+npm run test:data        # unit + integration tests
+npm run typecheck:all    # TS type-check (ui + api)
+npm run lint             # biome lint
 ```
 
 ---
 
 ## License
 
-**AGPL-3.0** for non-commercial use. **Commercial license** required for any commercial use.
+**AGPL-3.0**. See [LICENSE](./LICENSE).
 
-| Use Case | Allowed? |
-|----------|----------|
+| Use case | Allowed |
+| --- | --- |
 | Personal / research / educational | Yes |
 | Self-hosted (non-commercial) | Yes, with attribution |
 | Fork and modify (non-commercial) | Yes, share source under AGPL-3.0 |
-| Commercial use / SaaS / rebranding | Requires commercial license |
-
-See [LICENSE](LICENSE) for full terms. For commercial licensing, contact the maintainer.
-
-Copyright (C) 2024-2026 Elie Habib. All rights reserved.
-
----
-
-## Author
-
-**Elie Habib** — [GitHub](https://github.com/koala73)
-
-## Contributors
-
-<a href="https://github.com/koala73/worldmonitor/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=koala73/worldmonitor" />
-</a>
-
-## Security Acknowledgments
-
-We thank the following researchers for responsibly disclosing security issues:
-
-- **Cody Richard** — Disclosed three security findings covering IPC command exposure, renderer-to-sidecar trust boundary analysis, and fetch patch credential injection architecture (2026)
-
-See our [Security Policy](./SECURITY.md) for responsible disclosure guidelines.
+| Commercial use / SaaS / rebranding | Requires a commercial license — open an issue |
 
 ---
 
 <p align="center">
-  <a href="https://worldmonitor.app">worldmonitor.app</a> &nbsp;·&nbsp;
-  <a href="https://www.worldmonitor.app/docs/documentation">docs.worldmonitor.app</a>
+  <sub>Built by <a href="https://github.com/malindarathnayake">@malindarathnayake</a> · operational signal intelligence, open source.</sub>
 </p>
-
-## Star History
-
-<a href="https://api.star-history.com/svg?repos=koala73/worldmonitor&type=Date">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=koala73/worldmonitor&type=Date&type=Date&theme=dark" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=koala73/worldmonitor&type=Date&type=Date" />
- </picture>
-</a>
