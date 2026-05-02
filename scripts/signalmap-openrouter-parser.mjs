@@ -1,6 +1,13 @@
 export const DEFAULT_OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
 export const DEFAULT_SIGNALMAP_LLM_TIMEOUT_MS = 30000;
 export const DEFAULT_SIGNALMAP_LLM_MAX_INPUT_CHARS = 12000;
+// Max tokens cap on the LLM response. Event extraction emits structured JSON
+// with ~10 fields — ~500 tokens typical, 1500 worst case. Without this cap,
+// providers like OpenRouter reserve the model's full output window (e.g.
+// claude-sonnet-4.6 = 65k) which 402s for accounts with limited per-request
+// credit allowance, even though the actual response is tiny. 2048 is a safe
+// upper bound for the schema and fits every common provider tier.
+export const DEFAULT_SIGNALMAP_LLM_MAX_OUTPUT_TOKENS = 2048;
 
 export const SIGNALMAP_LLM_CATEGORIES = [
   'internet',
@@ -445,9 +452,14 @@ export async function parseSignalMapArticleWithOpenRouter(article, options = {})
   );
   const sourceText = sanitizeSignalMapArticleText(article, options);
   const prompt = makeOpenRouterPrompt(article, sourceText);
+  const maxTokens = parsePositiveInteger(
+    options.maxTokens ?? env?.SIGNALMAP_LLM_MAX_OUTPUT_TOKENS,
+    DEFAULT_SIGNALMAP_LLM_MAX_OUTPUT_TOKENS,
+  );
   const requestBody = {
     model: modelSelection.model,
     temperature: 0,
+    max_tokens: maxTokens,
     response_format: SIGNALMAP_OPENROUTER_RESPONSE_FORMAT,
     messages: [
       {
