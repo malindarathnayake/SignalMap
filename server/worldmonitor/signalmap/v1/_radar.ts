@@ -101,9 +101,12 @@ const AWS_REGIONS: Record<
 > = loadAwsRegions();
 
 // Matches AWS region codes embedded in free-text fields. Order alternation
-// covers gov/cn variants without false-positives on unrelated tokens. The
-// `\b` boundaries reject substrings like "uus-east-1" or "1us-east-1".
-const AWS_REGION_REGEX = /\b((?:us|eu|ap|ca|me|af|sa|il|mx|cn|us-gov)-[a-z]+-\d+)\b/gi;
+// covers gov/cn variants without false-positives on unrelated tokens. Using
+// alphanumeric-class lookarounds instead of `\b` because `_` counts as a
+// word character in JS regex — `\b` failed to match
+// "multipleservices-me-central-1_1777533954" since there's no word boundary
+// between `1` and `_`.
+const AWS_REGION_REGEX = /(?<![a-z0-9])((?:us-gov|us|eu|ap|ca|me|af|sa|il|mx|cn)-[a-z]+-\d+)(?![a-z0-9])/gi;
 
 // Extract the first AWS region code mentioned in any of the candidate text
 // blobs. Returns the lowercase region key or null. Lowercased so it joins
