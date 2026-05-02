@@ -38,6 +38,14 @@ SignalMap began as a fork of Worldmap / World Monitor. The application has since
 - **Cloudflare Radar** — real-time outage incidents geocoded down to the datacenter. Cloudflare's own POPs map by IATA code; AWS regions like `me-central-1` map to the canonical datacenter city; ungrounded incidents fall back to country centroid (~250 countries) so they still render on the map.
 - **Live health visibility** — `/api/signalmap/health` reports per-component status (Redis, LanceDB, collector, brief, OpenRouter, Perplexity) with last-call metrics and error classes. The UI's System Health panel reads it directly.
 
+<p align="center">
+  <a href=".github/Screenshot_4_1_1.png">
+    <img src=".github/Screenshot_4_1_1.png" alt="SignalMap dashboard — live signals on the world map with category-coded markers, source-health rail, live feed, and inspector panel" width="820" />
+  </a>
+  <br/>
+  <sub><i>Map + live feed + inspector. Click for full resolution.</i></sub>
+</p>
+
 ---
 
 ## Quick start (Docker Compose)
