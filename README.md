@@ -87,38 +87,68 @@ Full deployment guide (TLS, reverse proxy, ops runbook, troubleshooting):
 
 ## Architecture
 
-```
-                    ┌─────────────────┐
-                    │  Browser / SPA  │
-                    └────────┬────────┘
-                             │ HTTP + SSE
-                    ┌────────▼────────┐
-                    │  signalmap-ui   │  nginx + Vite static bundle
-                    │   (port 8080)   │  proxies /api/* to api
-                    └────────┬────────┘
-                             │
-                    ┌────────▼────────┐
-                    │  signalmap-api  │  Node 22, TS 5.7
-                    │                 │  Routes: list, stream, brief, health
-                    └────────┬────────┘
-                             │
-        ┌────────────────────┼────────────────────┐
-        │                    │                    │
-┌───────▼───────┐    ┌───────▼───────┐    ┌──────▼──────┐
-│ signalmap-    │    │ signalmap-    │    │   redis     │
-│  collector    │    │    cron       │    │             │
-│               │    │               │    │  cache,     │
-│ RSS / Radar / │    │  Brief gen    │    │  pubsub,    │
-│ status / LLM  │    │  every 30m    │    │  leases     │
-│ classify      │    │               │    │             │
-└───────┬───────┘    └───────────────┘    └─────────────┘
-        │
-┌───────▼───────┐
-│   LanceDB     │  Vector store for semantic dedupe
-└───────────────┘
+```mermaid
+flowchart TD
+    Browser["🌐 Browser / SPA"]
+
+    subgraph Stack["Docker Compose stack — single host"]
+        direction TB
+
+        UI["**signalmap-ui**<br/>nginx + Vite static bundle<br/>port 8080 · proxies /api/*"]
+
+        API["**signalmap-api**<br/>Node 22 · TS 5.7<br/>routes: list / stream / brief / health"]
+
+        subgraph Workers["Workers (lease-coordinated via Redis)"]
+            direction LR
+            Collector["**signalmap-collector**<br/>RSS · Radar · provider-status<br/>LLM classify · sliding-window merge"]
+            Cron["**signalmap-cron**<br/>brief generation<br/>every 30 min"]
+        end
+
+        subgraph Data["Data plane"]
+            direction LR
+            Redis[("**Redis**<br/>cache · pubsub<br/>leases · spend window")]
+            Lance[("**LanceDB**<br/>vector store<br/>semantic dedupe")]
+        end
+
+        UI -->|HTTP + SSE| API
+        API --> Redis
+        Collector --> Redis
+        Collector --> Lance
+        Cron --> Redis
+    end
+
+    Browser -->|HTTPS| UI
+
+    subgraph External["External sources"]
+        direction TB
+        RSS["RSS feeds<br/>Hacker News · Dark Reading"]
+        NewsAPI["NewsAPI<br/>top-headlines"]
+        Radar["Cloudflare Radar<br/>outages · anomalies"]
+        Status["Provider status feeds<br/>Cloudflare · OpenAI · Anthropic<br/>Azure · Okta · AWS"]
+        OR["OpenRouter<br/>event extraction<br/>+ brief synthesis"]
+        PPLX["Perplexity<br/>grounded retrieval"]
+    end
+
+    Collector -.->|poll| RSS
+    Collector -.->|poll| NewsAPI
+    Collector -.->|poll| Radar
+    Collector -.->|poll| Status
+    Collector -.->|classify| OR
+    Cron -.->|synthesize| OR
+    Cron -.->|retrieve| PPLX
+
+    classDef container fill:#0c1016,stroke:#4cc9f0,color:#e8eef7,stroke-width:1.5px
+    classDef store fill:#0c1016,stroke:#1e6680,color:#e8eef7,stroke-width:1.5px
+    classDef ext fill:transparent,stroke:#8895a8,color:#8895a8,stroke-dasharray:4 3
+    classDef edge fill:transparent,stroke:#ff6b35,color:#ff6b35,stroke-width:1.5px
+
+    class UI,API,Collector,Cron container
+    class Redis,Lance store
+    class RSS,NewsAPI,Radar,Status,OR,PPLX ext
+    class Browser edge
 ```
 
-Five containers, one host port, durable Docker volumes for Redis state, LanceDB vectors, and the embedding model cache. Worker leases coordinate collector / cron tick ownership through Redis.
+Five containers, one host port, durable Docker volumes for Redis state, LanceDB vectors, and the embedding model cache. Worker leases (held in Redis) coordinate collector / cron tick ownership so multi-replica deploys remain singleton-correct without external orchestration.
 
 ---
 
