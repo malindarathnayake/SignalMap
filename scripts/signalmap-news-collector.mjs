@@ -69,6 +69,14 @@ export const DEFAULT_SIGNALMAP_FULL_EXTRACTION_DOMAINS = ['thehackernews.com'];
 // union back to signalmap:news:v1. Prevents a barren tick (0 accepts) from
 // wiping out the visible feed. Window default is 24h; tunable via env.
 const DEFAULT_SIGNALMAP_NEWS_WINDOW_HOURS = 24;
+// Cold-boot publishedAt cutoff. When the persistent dedupe set is empty
+// (fresh container, volumes wiped, dedupe TTL expired), the collector would
+// otherwise classify EVERY article in every RSS feed — typically ~120
+// articles spanning days of history — at full LLM cost. On a cold start we
+// trust that articles older than this window aren't worth re-classifying;
+// the next warm tick (15 min later) will pick up anything freshly
+// published. Trades a one-time backfill for a much cheaper cold boot.
+const DEFAULT_SIGNALMAP_NEWS_COLD_BOOT_HOURS = 6;
 // Cache TTL must outlive the window or the blob expires mid-window and we
 // lose retention. Compute at publish time as windowHours*3600 + buffer.
 const DEFAULT_SIGNALMAP_NEWS_TTL_BUFFER_SECONDS = 60 * 60;
@@ -552,6 +560,15 @@ export function resolveSignalMapNewsCollectorConfig(options = {}) {
     ),
     windowHours,
     windowMs: windowHours * 3600 * 1000,
+    coldBootHours: parsePositiveInteger(
+      options.coldBootHours ?? env?.SIGNALMAP_NEWS_COLD_BOOT_HOURS,
+      DEFAULT_SIGNALMAP_NEWS_COLD_BOOT_HOURS,
+    ),
+    coldBootMs:
+      parsePositiveInteger(
+        options.coldBootHours ?? env?.SIGNALMAP_NEWS_COLD_BOOT_HOURS,
+        DEFAULT_SIGNALMAP_NEWS_COLD_BOOT_HOURS,
+      ) * 3600 * 1000,
     vectorEnabled: vectorEnabledFrom(options, vectorConfig),
     vectorConfig,
   };
@@ -1078,6 +1095,64 @@ export async function collectSignalMapNews(options = {}) {
         reason: 'fetch_error',
         errorClass: error?.name ?? 'SignalMapRssFetchError',
       });
+    }
+  }
+
+  // Cold-boot: when the persistent dedupe set is empty (fresh container,
+  // volumes just wiped, or 7-day TTL expired) the RSS feed will be 100+
+  // articles deep with days of history. Without a publishedAt cutoff we'd
+  // pay full LLM cost on every backfill article even though most won't
+  // produce a fresh signal. Apply a 6h cutoff (configurable) to bound the
+  // first tick's spend; subsequent warm ticks trust the dedupe set instead
+  // of the cutoff.
+  const isColdBoot = persistedSeenUrls.size === 0;
+  if (isColdBoot && config.coldBootMs > 0) {
+    const tickNowMs = Date.parse(now);
+    const coldCutoffMs = Number.isFinite(tickNowMs) ? tickNowMs - config.coldBootMs : 0;
+    const before = items.length;
+    const kept = [];
+    for (const item of items) {
+      const publishedMs = Date.parse(item.publishedAt ?? '');
+      if (Number.isFinite(publishedMs) && publishedMs >= coldCutoffMs) {
+        kept.push(item);
+      } else {
+        // Record so the source-health page can show why cold-boot accepted
+        // fewer than the feed total. Bump the persistent source-health
+        // 'skipped' counter to match the pattern used by in-loop rejections,
+        // but not the per-tick 'rejected' progress counter — those drops
+        // happen before the parse loop and aren't part of articlesTotal.
+        // Not added to dedupe — next tick re-evaluates if the article is
+        // still in the feed and the system is no longer cold-booting.
+        const sourceForRow = sources.find((candidate) => candidate.name === item.sourceName) ?? {
+          name: item.sourceName,
+          feedUrl: item.feedUrl,
+          sourceTier: item.sourceTier,
+        };
+        markSource(sourceForRow, (current) => ({ skipped: current.skipped + 1 }));
+        diagnostics.push({
+          sourceName: item.sourceName,
+          stage: 'cold_boot',
+          reason: 'cold_boot_publishedAt_cutoff',
+          publishedAt: item.publishedAt ?? null,
+          cutoffHours: config.coldBootHours,
+        });
+      }
+    }
+    items.length = 0;
+    items.push(...kept);
+    if (before !== items.length) {
+      // One log line tells the operator the cold-boot path actually ran.
+      // No need to spam per-article — the diagnostics array carries detail.
+      // eslint-disable-next-line no-console
+      console.log(JSON.stringify({
+        ts: new Date().toISOString(),
+        level: 'info',
+        service: 'collector',
+        event: 'cold-boot-cutoff-applied',
+        cutoffHours: config.coldBootHours,
+        kept: items.length,
+        dropped: before - items.length,
+      }));
     }
   }
 
