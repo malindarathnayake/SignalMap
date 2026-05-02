@@ -1,7 +1,21 @@
 import { createHash } from 'node:crypto';
 
-export const DEFAULT_SIGNALMAP_EMBEDDING_MODEL = 'Xenova/all-MiniLM-L6-v2';
-export const DEFAULT_SIGNALMAP_EMBEDDING_DIM = 384;
+// OpenRouter routes /embeddings to OpenAI's embedding endpoint. Three models
+// are available there (probed live 2026-05-02): text-embedding-3-small,
+// text-embedding-3-large, text-embedding-ada-002. We default to 3-small —
+// 1536 dim, ~$0.02 per million tokens, top-of-class quality for the cost.
+//
+// At SignalMap's volume (~140 articles/day × ~125 tokens) that's ~17.5K
+// tokens/day → roughly $0.01/month. Comfortably within the LLM budget.
+//
+// To run without an OPENROUTER_API_KEY (test/dev mode), set
+// SIGNALMAP_EMBEDDING_MODEL to a Xenova/* slug — the function returns
+// 'embedding_unavailable' in that case unless the caller injects an
+// embedImpl, which keeps the historical behaviour intact.
+export const DEFAULT_SIGNALMAP_EMBEDDING_MODEL = 'openai/text-embedding-3-small';
+export const DEFAULT_SIGNALMAP_EMBEDDING_DIM = 1536;
+export const DEFAULT_OPENROUTER_EMBEDDINGS_BASE_URL = 'https://openrouter.ai/api/v1';
+const DEFAULT_OPENROUTER_EMBEDDINGS_TIMEOUT_MS = 15000;
 
 const DEFAULT_MAX_EMBEDDING_INPUT_CHARS = 4000;
 
@@ -99,9 +113,71 @@ function vectorFromEmbeddingResult(result) {
   return null;
 }
 
+// Decide whether the configured model should route through OpenRouter's
+// /embeddings endpoint. `openai/*` prefixes are the only ones OpenRouter
+// proxies for embeddings — Cohere/Voyage/Mistral all 400 there. Any other
+// model slug (e.g. `Xenova/*`) falls back to embedding_unavailable unless
+// the caller injects a custom embedImpl.
+function isOpenRouterEmbeddingModel(model) {
+  return typeof model === 'string' && model.startsWith('openai/');
+}
+
+async function embedViaOpenRouter(input, config, env, fetchImpl, abortControllerImpl) {
+  const apiKey = cleanString(env?.OPENROUTER_API_KEY);
+  if (!apiKey) {
+    const error = new Error('OPENROUTER_API_KEY not set');
+    error.name = 'SignalMapEmbeddingMissingApiKey';
+    throw error;
+  }
+  const baseUrl = cleanString(env?.OPENROUTER_BASE_URL) ?? DEFAULT_OPENROUTER_EMBEDDINGS_BASE_URL;
+  const timeoutMs = parsePositiveInteger(
+    env?.SIGNALMAP_EMBEDDING_TIMEOUT_MS,
+    DEFAULT_OPENROUTER_EMBEDDINGS_TIMEOUT_MS,
+  );
+  const controller = abortControllerImpl ? new abortControllerImpl() : undefined;
+  const timer = controller ? setTimeout(() => controller.abort(), timeoutMs) : undefined;
+  try {
+    const response = await fetchImpl(`${baseUrl.replace(/\/+$/, '')}/embeddings`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ model: config.model, input }),
+      ...(controller ? { signal: controller.signal } : {}),
+    });
+    if (!response?.ok) {
+      const status = response?.status ?? 0;
+      let detail = '';
+      try {
+        const body = await response.json();
+        detail = body?.error?.message ?? '';
+      } catch {
+        try { detail = (await response.text()).slice(0, 200); } catch { /* ignore */ }
+      }
+      const error = new Error(`OpenRouter embeddings HTTP ${status}${detail ? ' — ' + detail : ''}`);
+      error.name = status === 402 || status === 403
+        ? 'SignalMapEmbeddingBudgetError'
+        : 'SignalMapEmbeddingHttpError';
+      throw error;
+    }
+    const payload = await response.json();
+    const vector = payload?.data?.[0]?.embedding;
+    if (!Array.isArray(vector) || vector.length === 0) {
+      const error = new Error('OpenRouter embeddings response had no vector');
+      error.name = 'SignalMapEmbeddingShapeError';
+      throw error;
+    }
+    return vector;
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
 export async function embedSignalMapStory(eventOrText, options = {}) {
+  const env = options.env ?? process.env;
   const config = {
-    ...resolveSignalMapEmbeddingConfig(options.env ?? process.env),
+    ...resolveSignalMapEmbeddingConfig(env),
     ...(options.model ? { model: options.model } : {}),
     ...(options.dim ? { dim: options.dim } : {}),
   };
@@ -135,6 +211,31 @@ export async function embedSignalMapStory(eventOrText, options = {}) {
         embeddingModel: config.model,
         embeddingDim: config.dim,
         mock: true,
+      };
+    }
+
+    // Live path: openai/* models route through OpenRouter's embeddings
+    // endpoint. Anything else (e.g. legacy Xenova/* slugs) falls through
+    // to embedding_unavailable, preserving the historical behaviour for
+    // configurations that haven't been migrated.
+    if (isOpenRouterEmbeddingModel(config.model)) {
+      const fetchImpl = options.fetchImpl ?? ((...args) => globalThis.fetch(...args));
+      const AbortControllerImpl = options.AbortControllerImpl ?? globalThis.AbortController;
+      const vector = await embedViaOpenRouter(input, config, env, fetchImpl, AbortControllerImpl);
+      if (!Array.isArray(vector) || vector.length !== config.dim || !vector.every(Number.isFinite)) {
+        return {
+          status: 'failed',
+          reason: 'invalid_embedding_vector',
+          errorClass: 'SignalMapInvalidEmbeddingVectorError',
+          embeddingModel: config.model,
+          embeddingDim: config.dim,
+        };
+      }
+      return {
+        status: 'embedded',
+        vector,
+        embeddingModel: config.model,
+        embeddingDim: config.dim,
       };
     }
 
