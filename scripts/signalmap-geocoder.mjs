@@ -327,6 +327,31 @@ export function resolveSignalMapLocation(location, options = {}) {
     };
   }
 
+  // Country-centroid LAST-RESORT fallback. If the LLM emitted a clear
+  // countryIso2 but the place name didn't resolve to a static city/region
+  // (common for "AWS data centers", "Iranian missile bases", "Russian
+  // disinformation networks"), pin to the country centroid so the event
+  // still surfaces on the map. Keeps the original scope so the inspector
+  // shows the LLM's actual classification, but flags this with a distinct
+  // geocodeStatus so downstream code can know it's a coarse approximation.
+  if (countryIso2) {
+    const fallbackCentroid = countryBboxCentroid(countryBboxes[countryIso2]);
+    if (fallbackCentroid) {
+      const resolved = {
+        ...location,
+        countryIso2,
+        scope: location?.scope ?? 'country',
+        lat: fallbackCentroid.lat,
+        lon: fallbackCentroid.lon,
+        geocodeStatus: 'resolved_country_fallback',
+      };
+      return {
+        ...resolved,
+        markerEligible: markerEligibleFor(resolved, confidenceMin),
+      };
+    }
+  }
+
   return unresolvedLocation(location, 'unresolved_location', countryIso2 ? { countryIso2 } : {});
 }
 
