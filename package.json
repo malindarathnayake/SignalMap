@@ -42,7 +42,7 @@
     "vite": "^6.0.7"
   },
   "dependencies": {
-    "@lancedb/lancedb": "^0.27.2",
+    "@lancedb/lancedb": "^0.21.0",
     "@preact/signals": "^2.9.0",
     "@toon-format/toon": "^2.1.0",
     "apache-arrow": "^17.0.0",
@@ -64,5 +64,9 @@
     "serialize-javascript": "^7.0.4",
     "node-forge": "^1.4.0",
     "srvx": "^0.11.13"
+  },
+  "optionalDependencies": {
+    "@lancedb/lancedb-linux-arm64-musl": "0.21.0",
+    "@lancedb/lancedb-linux-x64-musl": "0.21.0"
   }
 }

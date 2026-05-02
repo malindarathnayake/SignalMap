@@ -500,13 +500,13 @@ export async function openVectorStore(options = {}) {
 }
 
 async function ensureWritableTable(store, record) {
-  if (store?.table) return store.table;
-  if (!store?.db || typeof store.db.createTable !== 'function') return null;
+  if (store?.table) return { table: store.table, createdNow: false };
+  if (!store?.db || typeof store.db.createTable !== 'function') return { table: null, createdNow: false };
   const table = await store.db.createTable(store.tableName, [serializeVectorRecordForLanceDb(record)]);
   store.table = table;
   store.pendingCreate = false;
   store.createdWithFirstRecord = true;
-  return table;
+  return { table, createdNow: true };
 }
 
 export async function upsertStoryVector(store, recordOrEvent, vector, options = {}) {
@@ -534,8 +534,15 @@ export async function upsertStoryVector(store, recordOrEvent, vector, options = 
       });
 
   try {
-    const table = await ensureWritableTable(store, record);
-    if (store.createdWithFirstRecord) {
+    // ensureWritableTable returns { table, createdNow }: createdNow is true
+    // ONLY when this call is the one that just created the table — the
+    // initial record was already written by createTable(records:[record]),
+    // so we skip the redundant table.add(). Subsequent calls reuse the
+    // existing table and append via table.add(). Previously this branch
+    // used a sticky store.createdWithFirstRecord flag that was never
+    // cleared, so every upsert after the first silently dropped.
+    const { table, createdNow } = await ensureWritableTable(store, record);
+    if (createdNow) {
       return { status: 'upserted', count: 1, createdTable: true, record };
     }
     if (!table || typeof table.add !== 'function') {
