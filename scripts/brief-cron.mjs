@@ -16,6 +16,39 @@ import { emitMetric, METRICS } from '../src/server/lib/metrics.js';
 
 export const BRIEF_GLOBAL_KEY = 'signalmap:brief:global';
 export const BRIEF_UPDATED_CHANNEL = 'signalmap:brief:updated';
+const PERPLEXITY_LASTCALL_KEY = 'signalmap:llm:lastcall:perplexity';
+const PERPLEXITY_LASTCALL_TTL_SEC = 24 * 3600;
+
+/**
+ * Record the most recent Perplexity call for the api's health route to read.
+ * Fire-and-forget; never blocks the brief pipeline. Reuses an injected
+ * Redis adapter if the caller already opened one (avoids a second TCP
+ * handshake per tick). Falls back to opening a fresh adapter via
+ * getRedisAdapter() and quitting it after the SETEX, but tolerates
+ * REDIS_URL absent (test/fixture mode).
+ */
+async function recordPerplexityLastCall(redis, payload) {
+  const blob = JSON.stringify({ ...payload, calledAt: new Date().toISOString() });
+  if (redis && typeof redis.setJsonEx === 'function') {
+    try {
+      await redis.setJsonEx(PERPLEXITY_LASTCALL_KEY, JSON.parse(blob), PERPLEXITY_LASTCALL_TTL_SEC);
+    } catch {
+      // tolerate; observability shouldn't block briefs
+    }
+    return;
+  }
+  let adapter;
+  try {
+    adapter = getRedisAdapter();
+  } catch {
+    return; // no Redis (fixture/test mode)
+  }
+  try {
+    await adapter.setJsonEx(PERPLEXITY_LASTCALL_KEY, JSON.parse(blob), PERPLEXITY_LASTCALL_TTL_SEC);
+  } catch {
+    // tolerate
+  }
+}
 
 export const DEFAULT_DOMAIN_ALLOWLIST = [
   'reuters.com',
@@ -82,9 +115,21 @@ export async function runOnce(opts) {
         },
         opts?.signal ? { signal: opts.signal } : undefined,
       );
+      // Observability: record successful Perplexity call so /api/signalmap/health
+      // can surface live status. Best-effort, never blocks the brief pipeline.
+      void recordPerplexityLastCall(opts?._redis, {
+        outcome: 'success',
+        model: perplexityResp?.model ?? 'sonar-pro',
+      });
     } catch (err) {
       console.warn(`[brief-cron] Perplexity unavailable: ${err.message}. Falling back to local-signals-only.`);
       perplexityWarnings.push('External context unavailable');
+      void recordPerplexityLastCall(opts?._redis, {
+        outcome: 'fail',
+        model: 'sonar-pro',
+        errorClass: err?.name ?? 'PerplexityError',
+        error: (err?.message ?? String(err)).slice(0, 80),
+      });
       perplexityResp = {
         id: 'fallback-no-perplexity',
         model: 'sonar-pro',

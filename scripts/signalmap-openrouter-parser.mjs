@@ -1,6 +1,34 @@
+import Redis from 'ioredis';
+
 export const DEFAULT_OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
 export const DEFAULT_SIGNALMAP_LLM_TIMEOUT_MS = 30000;
 export const DEFAULT_SIGNALMAP_LLM_MAX_INPUT_CHARS = 12000;
+
+// Records the most recent OpenRouter call into Redis so the api's health
+// route can surface live status (success / fail / model / error class).
+// Fire-and-forget — never blocks or fails the parser. The 24h TTL means
+// /api/signalmap/health shows 'unknown' if the collector or brief cron
+// haven't run in over a day.
+async function recordOpenRouterLastCall(env, payload) {
+  const redisUrl = env?.REDIS_URL;
+  if (!redisUrl || typeof redisUrl !== 'string' || !redisUrl.trim()) return;
+  const client = new Redis(redisUrl, {
+    lazyConnect: false,
+    enableAutoPipelining: false,
+    commandTimeout: 2000,
+  });
+  try {
+    await client.setex(
+      'signalmap:llm:lastcall:openrouter',
+      24 * 3600,
+      JSON.stringify({ ...payload, calledAt: new Date().toISOString() }),
+    );
+  } catch {
+    // tolerate; this is observability, not load-bearing
+  } finally {
+    try { await client.quit(); } catch { /* ignore */ }
+  }
+}
 // Max tokens cap on the LLM response. Event extraction emits structured JSON
 // with ~10 fields — ~400 tokens typical, 700 worst case for the schema.
 // Without this cap, providers like OpenRouter reserve the model's full
@@ -482,6 +510,10 @@ export async function parseSignalMapArticleWithOpenRouter(article, options = {})
     }, timeoutMs);
   });
 
+  // Capture the result locally so the finally block can record the lastcall
+  // observability blob regardless of which return path fired. Each branch
+  // sets `result`; finally clears the timer + writes the blob fire-and-forget.
+  let result;
   try {
     const contentResult = await Promise.race([
       (async () => {
@@ -499,40 +531,53 @@ export async function parseSignalMapArticleWithOpenRouter(article, options = {})
       timeoutPromise,
     ]);
     if (!contentResult.ok) {
-      return {
+      result = {
         status: 'failed',
         reason: 'openrouter_error',
         error: contentResult.error,
       };
+    } else {
+      const parsedJson = parseSignalMapLlmJson(contentResult.content);
+      const event = validateSignalMapLlmEvent(parsedJson);
+      result = {
+        status: 'parsed',
+        model: modelSelection.model,
+        ...(modelSelection.modelWarning ? { modelWarning: modelSelection.modelWarning } : {}),
+        event,
+      };
     }
-
-    const parsedJson = parseSignalMapLlmJson(contentResult.content);
-    const event = validateSignalMapLlmEvent(parsedJson);
-    return {
-      status: 'parsed',
-      model: modelSelection.model,
-      ...(modelSelection.modelWarning ? { modelWarning: modelSelection.modelWarning } : {}),
-      event,
-    };
   } catch (error) {
     if (error?.name === 'SignalMapOpenRouterTimeoutError' || error?.name === 'AbortError') {
-      return { status: 'failed', reason: 'timeout', error: error?.message ?? String(error) };
+      result = { status: 'failed', reason: 'timeout', error: error?.message ?? String(error) };
+    } else if (error?.reason === 'invalid_json') {
+      result = { status: 'failed', reason: 'invalid_json', error: error.message };
+    } else if (error?.reason === 'invalid_schema') {
+      result = { status: 'failed', reason: 'invalid_schema', error: error.message };
+    } else {
+      result = {
+        status: 'failed',
+        reason: 'openrouter_error',
+        error: error?.message ?? String(error),
+      };
     }
-
-    if (error?.reason === 'invalid_json') {
-      return { status: 'failed', reason: 'invalid_json', error: error.message };
-    }
-
-    if (error?.reason === 'invalid_schema') {
-      return { status: 'failed', reason: 'invalid_schema', error: error.message };
-    }
-
-    return {
-      status: 'failed',
-      reason: 'openrouter_error',
-      error: error?.message ?? String(error),
-    };
   } finally {
     clearTimeout(timer);
   }
+
+  // Fire-and-forget observability write. Don't await — parser stays fast.
+  void recordOpenRouterLastCall(env, {
+    outcome: result.status === 'parsed' ? 'success' : 'fail',
+    model: modelSelection.model,
+    ...(result.reason ? { reason: result.reason } : {}),
+    ...(result.error ? { errorClass: errorClassName(result.error) } : {}),
+  });
+
+  return result;
+}
+
+// Strip leading 'Error: ' / 'TypeError: ' style prefixes so health-card details
+// stay terse. Caps the surfaced string at 80 chars.
+function errorClassName(error) {
+  const raw = typeof error === 'string' ? error : error?.message ?? String(error);
+  return raw.replace(/^([A-Z][a-zA-Z]*Error):\s*/, '$1: ').slice(0, 80);
 }

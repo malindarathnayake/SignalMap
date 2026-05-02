@@ -41,6 +41,7 @@ const KEY_BRIEF_STATUS = 'signalmap:brief:cron:status';
 const KEY_LLM_OPENROUTER = 'signalmap:llm:lastcall:openrouter';
 const KEY_LLM_PERPLEXITY = 'signalmap:llm:lastcall:perplexity';
 const KEY_LANCEDB_HEARTBEAT = 'signalmap:lancedb:heartbeat';
+const KEY_LANCEDB_HEALTH = 'signalmap:health:lancedb:v1';
 const KEY_META_NEWS = 'seed-meta:signalmap:news';
 const KEY_META_RADAR = 'seed-meta:signalmap:radar';
 const KEY_META_PROVIDERS = 'seed-meta:signalmap:providers';
@@ -98,21 +99,51 @@ async function probeRedis(redis: RedisAdapter): Promise<ComponentHealthT> {
 }
 
 /**
- * Probe LanceDB. Phase 3+ will write signalmap:lancedb:heartbeat.
- * For now, read the key if present; otherwise report 'unknown'.
+ * Probe LanceDB by reading the per-domain health blob the collector
+ * publishes every tick. Status semantics:
+ *   - blob absent             → 'unknown' (collector hasn't ticked yet)
+ *   - status 'disabled'       → 'unknown' detail 'vector store disabled'
+ *   - status 'ok' / 'ready'   → 'ok' with recordCount metric
+ *   - anything else (degraded, errors) → 'degraded' with the error class
  */
 async function probeLancedb(redis: RedisAdapter): Promise<ComponentHealthT> {
+  let payload: {
+    status?: string;
+    enabled?: boolean;
+    disabled?: boolean;
+    recordCount?: number | null;
+    errorClass?: string;
+    lastVectorErrorClass?: string | null;
+  } | null = null;
   try {
-    const hb = await redis.getJson<{ ts?: string | number }>(KEY_LANCEDB_HEARTBEAT);
-    if (hb !== null) {
-      return { status: 'ok' };
-    }
-    // Phase 3+ concern — no writers yet
-    return { status: 'unknown', detail: 'Heartbeat not yet written (Phase 3+)' };
+    payload = await redis.getJson(KEY_LANCEDB_HEALTH);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     return { status: 'down', detail: msg };
   }
+
+  if (payload === null) {
+    return { status: 'unknown', detail: 'Collector has not published vector store health yet' };
+  }
+
+  const status = typeof payload.status === 'string' ? payload.status.toLowerCase() : '';
+  const recordCount = typeof payload.recordCount === 'number' ? payload.recordCount : undefined;
+  const metrics = recordCount !== undefined ? { recordCount } : undefined;
+
+  if (payload.disabled || status === 'disabled' || payload.enabled === false) {
+    return { status: 'unknown', detail: 'Vector store disabled (SIGNALMAP_VECTOR_ENABLED=false)' };
+  }
+  if (status === 'ok' || status === 'ready') {
+    return { status: 'ok', metrics };
+  }
+  const errorClass = payload.errorClass ?? payload.lastVectorErrorClass ?? undefined;
+  return {
+    status: 'degraded',
+    detail: errorClass
+      ? `vector store ${status || 'degraded'} — ${errorClass}`
+      : `vector store ${status || 'degraded'}`,
+    metrics,
+  };
 }
 
 /**
@@ -291,21 +322,23 @@ export async function buildHealthResponse(
   mode: string | undefined,
   now: number,
 ): Promise<HealthResponseT> {
-  // TODO: Re-enable probes for lancedb, openrouter, and perplexity once Phase 3+ writers are in prod.
-  const [redisCard, collectorCard, briefCard, sources] = await Promise.all([
+  const [redisCard, collectorCard, briefCard, openrouterCard, perplexityCard, lancedbCard, sources] = await Promise.all([
     probeRedis(redis),
     probeWorker(redis, KEY_COLLECTOR_HEARTBEAT, KEY_COLLECTOR_STATUS),
     probeWorker(redis, KEY_BRIEF_HEARTBEAT, KEY_BRIEF_STATUS),
+    probeLlm(redis, KEY_LLM_OPENROUTER),
+    probeLlm(redis, KEY_LLM_PERPLEXITY),
+    probeLancedb(redis),
     readSources(redis, now),
   ]);
 
   const response: HealthResponseT = {
     redis: redisCard,
-    lancedb: { status: 'unknown', detail: 'Probing disabled until writers are implemented' },
+    lancedb: lancedbCard,
     collector: collectorCard,
     brief: briefCard,
-    openrouter: { status: 'unknown', detail: 'Probing disabled until writers are implemented' },
-    perplexity: { status: 'unknown', detail: 'Probing disabled until writers are implemented' },
+    openrouter: openrouterCard,
+    perplexity: perplexityCard,
     sources,
     generatedAt: new Date(now).toISOString(),
   };
