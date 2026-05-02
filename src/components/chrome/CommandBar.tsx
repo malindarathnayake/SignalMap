@@ -224,7 +224,7 @@ export function CommandBar() {
           <circle cx="19" cy="6" r="1.5" fill="var(--sev-major)" />
         </svg>
         <div className="sm-brand-name">SIGNALMAP</div>
-        <div className="sm-brand-build mono">v4.0 · LIVE</div>
+        <div className="sm-brand-build mono">v4.1.1 · LIVE</div>
       </div>
 
       {/* Search input */}

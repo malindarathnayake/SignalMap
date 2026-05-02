@@ -31,10 +31,12 @@ SignalMap began as a fork of Worldmap / World Monitor. The application has since
 - **Source-health visibility** — `/source-health-details` shows per-source fetch / accept / reject counts, last-fetched age, and a "why articles were skipped" panel that aggregates LLM confidence stats and dedupe reasons.
 - **AI-classified news** — RSS items go through Distill (vendored) for clean article extraction, then through OpenRouter for structured event extraction with a confidence floor. Off-topic items (sports, lifestyle, marketing) are filtered out before the geocoder runs.
 - **Sliding-window cache** — accepted events stay visible for 24h (configurable) even if the next collector tick rejects everything; a barren tick can no longer wipe the feed.
-- **Vector dedupe** — LanceDB stores embeddings of accepted stories so semantically duplicate articles from different sources collapse into a single signal.
-- **Brief generation** — periodic AI brief over the last 30 minutes of activity, with per-event drill-down.
+- **Cold-boot cost guard** — on a fresh container or wiped volumes the collector only classifies articles published in the last 6h (tunable), so backfill doesn't blow LLM budget.
+- **Semantic dedupe** — accepted stories are embedded via OpenAI `text-embedding-3-small` (routed through your OpenRouter key, ~$0.01/month at typical volume) and stored in LanceDB; near-duplicate articles from different sources collapse into a single signal.
+- **Brief generation** — periodic AI brief over the last 30 minutes of activity, with per-event drill-down. Perplexity for grounded retrieval, OpenRouter Sonnet for synthesis.
 - **Provider status** — Cloudflare, OpenAI, Anthropic, Azure, Okta, AWS Lambda / RDS / S3 surfaced from their public status feeds.
-- **Cloudflare Radar** — real-time outage incidents geocoded down to the datacenter (IATA-aware) instead of country centroid.
+- **Cloudflare Radar** — real-time outage incidents geocoded down to the datacenter. Cloudflare's own POPs map by IATA code; AWS regions like `me-central-1` map to the canonical datacenter city; ungrounded incidents fall back to country centroid (~250 countries) so they still render on the map.
+- **Live health visibility** — `/api/signalmap/health` reports per-component status (Redis, LanceDB, collector, brief, OpenRouter, Perplexity) with last-call metrics and error classes. The UI's System Health panel reads it directly.
 
 ---
 
@@ -159,9 +161,10 @@ Five containers, one host port, durable Docker volumes for Redis state, LanceDB 
 | **Frontend** | Preact 10 + Vite 6, d3-geo / d3-zoom for the map, `@preact/signals` for state, SSE for live updates |
 | **API** | Node 22, TypeScript 5.7, ioredis 5, Zod schemas with OpenAPI generation |
 | **Workers** | Lease-coordinated collector + cron loops, AbortSignal-aware tick bodies |
-| **AI / LLM** | OpenRouter for classification + brief generation, Perplexity for grounded news, configurable model fallback chain |
+| **AI / LLM** | OpenRouter for classification + brief synthesis, Perplexity for grounded news retrieval, configurable model fallback chain |
+| **Embeddings** | `openai/text-embedding-3-small` (1536 dim) routed via the same OpenRouter key — no separate API key needed |
 | **Article extraction** | Vendored Distill (`vendor/distill/`) with per-source descriptors |
-| **Vector dedupe** | LanceDB with locally-cached embedding model |
+| **Vector dedupe** | LanceDB 0.21.x (AVX2 build, runs on consumer CPUs) |
 | **Cache / control plane** | Redis 7 (cache, lease, pubsub, lock store, daily spend window) |
 | **Edge** | nginx serving the static bundle + reverse-proxying `/api/*` to the api worker |
 | **Deploy** | Docker Compose, GHCR-published images, Docker secrets bridge for the admin token |
@@ -174,11 +177,15 @@ Five containers, one host port, durable Docker volumes for Redis state, LanceDB 
 | --- | --- | --- |
 | `SIGNALMAP_BACKEND_MODE` | `fixture` | `fixture` (free, no LLM) or `live` (real LLM calls) |
 | `SIGNALMAP_NEWS_WINDOW_HOURS` | `24` | Sliding window for the news cache |
+| `SIGNALMAP_NEWS_COLD_BOOT_HOURS` | `6` | On a fresh container / wiped volumes, classify only articles published in the last N hours; later warm ticks use the dedupe set instead. Set `0` to disable. |
 | `SIGNALMAP_EVENT_CONFIDENCE_MIN` | `0.7` | LLM confidence floor; below this, articles are dropped as `low_signal_confidence` |
+| `SIGNALMAP_LLM_MAX_OUTPUT_TOKENS` | `768` | Cap on response tokens per OpenRouter call. Avoids 402 on tier-limited keys where the model's full output window (~65k for Sonnet) exceeds the per-request credit allowance. |
 | `SIGNALMAP_DAILY_LLM_BUDGET_USD` | `2.00` | Hard cap on combined provider spend per UTC day |
 | `SIGNALMAP_RSS_POLL_MINUTES` | `15` | Collector tick cadence |
 | `SIGNALMAP_BRIEF_REFRESH_MINUTES` | `30` | Cron tick cadence |
-| `SIGNALMAP_VECTOR_ENABLED` | `true` | Disable to skip LanceDB + embedding model (saves ~150 MB download, ~1 GB RAM) |
+| `SIGNALMAP_VECTOR_ENABLED` | `true` | Disable to skip embeddings + LanceDB. Saves a tiny per-tick OpenRouter embed call (~$0.01/month) and the LanceDB volume; disables semantic dedup. |
+| `SIGNALMAP_EMBEDDING_MODEL` | `openai/text-embedding-3-small` | OpenRouter-routed embedding model. Anything not prefixed `openai/` falls back to `embedding_unavailable`. |
+| `SIGNALMAP_VECTOR_MIN_SCORE` | `0.72` | Cosine-similarity threshold above which a story is treated as a semantic duplicate of an existing one and dropped. Lower (e.g. 0.65) for tighter dedup. |
 
 Full list with comments: [`deploy/.env.example`](./deploy/.env.example).
 

@@ -5,6 +5,113 @@ All notable changes to SignalMap are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.1.1] — 2026-05-02
+
+Live-tested release. Wires up real semantic-dedup (embeddings + LanceDB
+both produce signal end-to-end now) plus a half-dozen reliability /
+visibility fixes that surfaced during cold-boot validation.
+
+### Added
+
+- **OpenRouter `/embeddings` integration** — collector now embeds
+  accepted articles via `openai/text-embedding-3-small` (1536 dim)
+  routed through the OpenRouter key it already uses for chat
+  completions. Replaces the never-actually-wired `Xenova/*` local
+  path. Cost ≈ $0.01/month at typical volume; saves ~150 MB local
+  model download and ~1 GB RAM.
+- **AWS region resolver in radar pipeline** —
+  `scripts/shared/aws-regions.json` (~37 entries covering all current
+  standard, GovCloud, and China regions) plus a regex extractor in
+  `server/worldmonitor/signalmap/v1/_radar.ts` that pulls codes like
+  `me-central-1` from outage description / region / title / link /
+  linkedUrl text and pins the event to the right datacenter city at
+  confidence 0.85. Fixes "Platform outage in Unknown" cards that used
+  to drop off the map even when the upstream URL clearly identified
+  the affected region.
+- **Cold-boot publishedAt cutoff** — when the persistent dedupe set
+  is empty (fresh container, wiped volumes, 7-day TTL expired), the
+  collector now filters fetched articles to those published within
+  `SIGNALMAP_NEWS_COLD_BOOT_HOURS` (default 6h) BEFORE any LLM call.
+  Trades a one-time backfill for a much cheaper cold start. Verified
+  live: 119/120 articles dropped without an LLM call on a typical
+  cold boot.
+- **Three live health probes** — `/api/signalmap/health` no longer
+  ships `lancedb`, `openrouter`, `perplexity` as `unknown`
+  placeholders. Each card now reads from a real lastCall blob (LLM
+  paths) or the existing per-domain health blob (LanceDB) with
+  appropriate status / metrics / model / error-class fields.
+- **Country-centroid last-resort geocoder fallback** — when the LLM
+  emits a clear `countryIso2` but the place name doesn't resolve to
+  a static city/region (e.g. "AWS data centers", "Iranian missile
+  bases"), the geocoder pins to the country centroid instead of
+  returning `unresolved_location`. Keeps the original scope so the
+  inspector still shows the LLM's classification.
+
+### Changed
+
+- **LLM `max_tokens` cap** added to OpenRouter parser request
+  (`SIGNALMAP_LLM_MAX_OUTPUT_TOKENS`, default 768). Without this,
+  providers reserve the model's full output window (e.g. 65k for
+  Claude Sonnet 4.6) per request and 402 on tier-limited accounts
+  even though the actual structured-JSON event response is ~400
+  tokens.
+- **README architecture diagram** — replaced the ASCII box-drawing
+  diagram with a Mermaid `flowchart TD` that GitHub renders natively.
+  Adds explicit external services (RSS, Cloudflare Radar, OpenRouter,
+  Perplexity, NewsAPI, provider status) which the ASCII version
+  glossed over.
+- **Cron heartbeat key in compose healthcheck** — was looking for
+  `signalmap:cron:heartbeat`, the worker writes
+  `signalmap:brief:cron:heartbeat`. Fixed in both root and `deploy/`
+  compose files; cron container is now healthy out of the box.
+
+### Fixed
+
+- **`@lancedb/lancedb` peer dep + native binary missing in container**
+  — `apache-arrow` is a peerDependency that npm wasn't installing,
+  and the platform-specific binary (`@lancedb/lancedb-linux-x64-musl`
+  for Alpine) was missing from the lockfile due to the npm
+  optional-deps lockfile bug. Result: every `openVectorStore()` call
+  failed with a generic `Error` and the entire semantic-dedup path
+  was effectively off in production. Fixed by adding `apache-arrow`
+  as an explicit dep and pinning both linux-musl native packages in
+  `optionalDependencies`.
+- **LanceDB AVX-512 incompatibility** — `@lancedb/lancedb@0.27.x`
+  ships native bindings compiled with AVX-512 intrinsics that
+  consumer Intel CPUs (since 11th gen) don't have. Pinned to
+  `^0.21.0` whose native binary is AVX2-only.
+- **LanceDB multi-record upsert silently dropping** —
+  `ensureWritableTable()` set `store.createdWithFirstRecord = true`
+  after the first record, but `upsertStoryVector()` never cleared
+  the flag, so every subsequent upsert returned early as
+  `(createdTable)` without ever calling `table.add()`. Refactored
+  to return `{ table, createdNow }` so the early-return only fires
+  for the call that actually just created the table.
+
+### Test coverage
+
+- End-to-end probe (`embed → upsert → search`) verified live in the
+  collector container against real OpenRouter keys: 3 synthetic
+  events embedded at 1536 dim, all upserted, semantic search ranks
+  related-pair (probe-aws-1 ↔ probe-aws-2 = 0.669) above unrelated
+  (probe-aws-1 ↔ probe-cake-1 = 0.391) with clean separation.
+- One-shot 12h-window cold-boot demo: 2 real news articles
+  classified + embedded + upserted to LanceDB; all six health cards
+  flipped to `ok` after the tick.
+
+### Operational notes
+
+- `SIGNALMAP_VECTOR_MIN_SCORE` defaults to 0.72. The probe showed
+  the AWS-vs-AWS pair at 0.669, which is *just below* the threshold.
+  If same-event-different-source duplicates survive in production,
+  drop the threshold to 0.65. No code change required — env tunable.
+- The Apache-2.0 relicense (already in `package.json` since 4.0.0)
+  is unchanged. Source tree still carries `proto/worldmonitor/...`
+  and `server/worldmonitor/...` namespace paths inherited from the
+  upstream fork; that migration is a separate follow-up PR.
+
+[4.1.1]: https://github.com/malindarathnayake/SignalMap/releases/tag/v4.1.1
+
 ## [4.0.0] — 2026-05-01
 
 First release of the **v2 backend stack**. The Vercel-hosted, edge-function
