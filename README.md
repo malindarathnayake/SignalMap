@@ -64,8 +64,8 @@ Five-service stack (`redis`, `signalmap-api`, `signalmap-collector`, `signalmap-
 ```bash
 # Grab just the deploy folder (no full source clone needed):
 mkdir -p /opt/signalmap && cd /opt/signalmap
-curl -fsSL https://raw.githubusercontent.com/malindarathnayake/SignalMap/main/deploy/docker-compose.yml -o docker-compose.yml
-curl -fsSL https://raw.githubusercontent.com/malindarathnayake/SignalMap/main/deploy/.env.example   -o .env.example
+curl -s https://raw.githubusercontent.com/malindarathnayake/SignalMap/refs/heads/main/deploy/docker-compose.yml -o docker-compose.yml
+curl -s https://raw.githubusercontent.com/malindarathnayake/SignalMap/refs/heads/main/deploy/.env.example       -o .env.example
 
 # Configure (at minimum REDIS_PASSWORD; for live mode also OPENROUTER_API_KEY,
 # PERPLEXITY_API_KEY, and optionally NEWSAPI_API_KEY)
