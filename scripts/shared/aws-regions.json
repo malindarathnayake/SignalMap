@@ -1,0 +1,49 @@
+{
+  "_comment": "AWS region code -> [lat, lon, countryIso2, displayName]. Used by the Cloudflare Radar / provider-status resolvers in server/worldmonitor/signalmap/v1/_radar.ts as a deterministic fallback when an outage description references a region code (e.g. 'me-central-1') but no country/locationsDetails was attached. Coords approximate the canonical city for each region.",
+
+  "us-east-1":      [38.9, -77.45, "US", "AWS US East (N. Virginia)"],
+  "us-east-2":      [40.0, -82.99, "US", "AWS US East (Ohio)"],
+  "us-west-1":      [37.43, -122.14, "US", "AWS US West (N. California)"],
+  "us-west-2":      [45.84, -119.7, "US", "AWS US West (Oregon)"],
+
+  "ca-central-1":   [45.5, -73.6, "CA", "AWS Canada (Central)"],
+  "ca-west-1":      [51.05, -114.07, "CA", "AWS Canada West (Calgary)"],
+
+  "eu-west-1":      [53.35, -6.26, "IE", "AWS Europe (Ireland)"],
+  "eu-west-2":      [51.5, -0.13, "GB", "AWS Europe (London)"],
+  "eu-west-3":      [48.85, 2.35, "FR", "AWS Europe (Paris)"],
+  "eu-central-1":   [50.11, 8.68, "DE", "AWS Europe (Frankfurt)"],
+  "eu-central-2":   [47.37, 8.55, "CH", "AWS Europe (Zurich)"],
+  "eu-north-1":     [59.33, 18.07, "SE", "AWS Europe (Stockholm)"],
+  "eu-south-1":     [45.46, 9.19, "IT", "AWS Europe (Milan)"],
+  "eu-south-2":     [41.65, -0.89, "ES", "AWS Europe (Spain, Aragon)"],
+
+  "ap-northeast-1": [35.68, 139.69, "JP", "AWS Asia Pacific (Tokyo)"],
+  "ap-northeast-2": [37.57, 126.98, "KR", "AWS Asia Pacific (Seoul)"],
+  "ap-northeast-3": [34.69, 135.5, "JP", "AWS Asia Pacific (Osaka)"],
+  "ap-southeast-1": [1.35, 103.82, "SG", "AWS Asia Pacific (Singapore)"],
+  "ap-southeast-2": [-33.87, 151.21, "AU", "AWS Asia Pacific (Sydney)"],
+  "ap-southeast-3": [-6.21, 106.85, "ID", "AWS Asia Pacific (Jakarta)"],
+  "ap-southeast-4": [-37.81, 144.96, "AU", "AWS Asia Pacific (Melbourne)"],
+  "ap-southeast-5": [3.14, 101.69, "MY", "AWS Asia Pacific (Malaysia)"],
+  "ap-southeast-7": [13.75, 100.5, "TH", "AWS Asia Pacific (Thailand)"],
+  "ap-south-1":     [19.08, 72.88, "IN", "AWS Asia Pacific (Mumbai)"],
+  "ap-south-2":     [17.39, 78.49, "IN", "AWS Asia Pacific (Hyderabad)"],
+  "ap-east-1":      [22.32, 114.17, "HK", "AWS Asia Pacific (Hong Kong)"],
+
+  "me-south-1":     [26.07, 50.55, "BH", "AWS Middle East (Bahrain)"],
+  "me-central-1":   [25.2, 55.27, "AE", "AWS Middle East (UAE)"],
+
+  "af-south-1":     [-33.92, 18.42, "ZA", "AWS Africa (Cape Town)"],
+
+  "sa-east-1":      [-23.55, -46.63, "BR", "AWS South America (São Paulo)"],
+
+  "il-central-1":   [32.08, 34.78, "IL", "AWS Israel (Tel Aviv)"],
+  "mx-central-1":   [19.43, -99.13, "MX", "AWS Mexico (Central)"],
+
+  "cn-north-1":     [39.9, 116.4, "CN", "AWS China (Beijing)"],
+  "cn-northwest-1": [38.49, 106.19, "CN", "AWS China (Ningxia)"],
+
+  "us-gov-east-1":  [38.9, -77.45, "US", "AWS GovCloud (US-East)"],
+  "us-gov-west-1": [45.84, -119.7, "US", "AWS GovCloud (US-West)"]
+}

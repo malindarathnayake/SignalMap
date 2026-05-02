@@ -59,6 +59,85 @@ function loadCountryCentroids(): Record<string, readonly [number, number]> {
 
 const COUNTRY_CENTROIDS: Record<string, readonly [number, number]> = loadCountryCentroids();
 
+// AWS region code → datacenter coordinate. Cloudflare Radar / provider-status
+// outage entries that target a specific cloud region (e.g. "AWS me-central-1")
+// rarely come tagged with a country in the upstream API — only the region
+// code appears in the description. Without this lookup, the resolver returns
+// confidence 0.45 and the event drops off the map even though "me-central-1"
+// is unambiguously UAE/Dubai. Source table: scripts/shared/aws-regions.json.
+function loadAwsRegions(): Record<
+  string,
+  readonly [number, number, string, string]
+> {
+  const here = dirname(fileURLToPath(import.meta.url));
+  const candidates = [
+    resolve(here, '../../../../scripts/shared/aws-regions.json'),
+    resolve(here, '../../../../../scripts/shared/aws-regions.json'),
+  ];
+  for (const path of candidates) {
+    try {
+      const raw = readFileSync(path, 'utf8');
+      const parsed = JSON.parse(raw) as Record<string, unknown>;
+      const out: Record<string, readonly [number, number, string, string]> = {};
+      for (const [code, entry] of Object.entries(parsed)) {
+        if (code.startsWith('_')) continue;
+        if (!Array.isArray(entry) || entry.length < 4) continue;
+        const [lat, lon, iso2, label] = entry as unknown[];
+        if (typeof lat !== 'number' || typeof lon !== 'number') continue;
+        if (typeof iso2 !== 'string' || typeof label !== 'string') continue;
+        out[code.toLowerCase()] = [lat, lon, iso2.toUpperCase(), label] as const;
+      }
+      return out;
+    } catch {
+      // try next candidate
+    }
+  }
+  return {};
+}
+
+const AWS_REGIONS: Record<
+  string,
+  readonly [number, number, string, string]
+> = loadAwsRegions();
+
+// Matches AWS region codes embedded in free-text fields. Order alternation
+// covers gov/cn variants without false-positives on unrelated tokens. The
+// `\b` boundaries reject substrings like "uus-east-1" or "1us-east-1".
+const AWS_REGION_REGEX = /\b((?:us|eu|ap|ca|me|af|sa|il|mx|cn|us-gov)-[a-z]+-\d+)\b/gi;
+
+// Extract the first AWS region code mentioned in any of the candidate text
+// blobs. Returns the lowercase region key or null. Lowercased so it joins
+// to AWS_REGIONS without further normalization.
+function extractAwsRegionCode(...texts: Array<string | undefined>): string | null {
+  for (const text of texts) {
+    if (!text) continue;
+    AWS_REGION_REGEX.lastIndex = 0;
+    const match = AWS_REGION_REGEX.exec(text);
+    if (match) return match[1].toLowerCase();
+  }
+  return null;
+}
+
+// Build a SignalMapLocation from an AWS region tag. Returns null when the
+// code is unknown so callers can keep walking their fallback chain.
+function awsRegionLocation(
+  regionCode: string,
+  evidence: string | undefined,
+): SignalMapLocation | null {
+  const entry = AWS_REGIONS[regionCode];
+  if (!entry) return null;
+  const [lat, lon, iso2, label] = entry;
+  return {
+    name: label,
+    countryIso2: iso2,
+    lat,
+    lon,
+    scope: 'region',
+    confidence: 0.85,
+    evidence: evidence ?? `AWS region ${regionCode}`,
+  };
+}
+
 const COUNTRY_NAME_TO_ISO2: Record<string, string> = {
   france: 'FR',
   'united states': 'US',
@@ -255,6 +334,16 @@ function outageLocation(entry: OutageEntry): SignalMapLocation {
   const region = cleanString(entry.region);
   const locationName = country ?? countryIso2 ?? 'Unknown';
 
+  // AWS region fallback: when the upstream entry has no country/locations
+  // attached but the description references a cloud region tag (e.g.
+  // "me-central-1"), pin to that region's datacenter city. Confidence 0.85
+  // beats the 0.7 marker threshold so the event renders on the map.
+  if (!countryIso2 && (lat == null || lon == null)) {
+    const awsRegion = extractAwsRegionCode(entry.description, region);
+    const awsLoc = awsRegion ? awsRegionLocation(awsRegion, cleanString(entry.description)) : null;
+    if (awsLoc) return awsLoc;
+  }
+
   return {
     name: region || locationName,
     countryIso2,
@@ -274,6 +363,21 @@ function anomalyLocation(entry: AnomalyEntry): SignalMapLocation {
   const lat = toNumber(entry.latitude ?? entry.locationDetails?.latitude) ?? centroid?.[0];
   const lon = toNumber(entry.longitude ?? entry.locationDetails?.longitude) ?? centroid?.[1];
   const asn = entry.asn ?? entry.asnDetails?.asn;
+
+  // AWS region fallback: same rationale as outageLocation. Some traffic
+  // anomalies reference cloud regions in the asnName / type fields without
+  // a country code attached.
+  if (!countryIso2 && (lat == null || lon == null)) {
+    const awsRegion = extractAwsRegionCode(
+      entry.asnName ?? entry.asnDetails?.name,
+      entry.type,
+      locationName,
+    );
+    const awsLoc = awsRegion
+      ? awsRegionLocation(awsRegion, entry.asnName ?? entry.asnDetails?.name ?? entry.type)
+      : null;
+    if (awsLoc) return awsLoc;
+  }
 
   return {
     name,
