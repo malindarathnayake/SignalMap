@@ -502,8 +502,8 @@ test('news collector config defaults use canonical keys and extraction allowlist
   assert.equal(config.cacheKey, SIGNALMAP_NEWS_CACHE_KEY);
   assert.equal(config.metaKey, SIGNALMAP_NEWS_META_KEY);
   assert.equal(config.vectorEnabled, true);
-  assert.deepEqual(DEFAULT_SIGNALMAP_FULL_EXTRACTION_DOMAINS, ['risky.biz', 'thehackernews.com']);
-  assert.deepEqual(config.fullExtractionDomains, ['risky.biz', 'thehackernews.com']);
+  assert.deepEqual(DEFAULT_SIGNALMAP_FULL_EXTRACTION_DOMAINS, ['thehackernews.com']);
+  assert.deepEqual(config.fullExtractionDomains, ['thehackernews.com']);
 
   for (const disabled of ['false', '0', 'no', 'off', 'disabled']) {
     assert.equal(

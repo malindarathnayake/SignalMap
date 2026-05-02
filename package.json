@@ -2,7 +2,7 @@
   "name": "signalmap",
   "private": true,
   "version": "4.0.0",
-  "license": "AGPL-3.0-only",
+  "license": "Apache-2.0",
   "type": "module",
   "scripts": {
     "lint": "biome lint ./src ./server ./tests ./e2e ./scripts",

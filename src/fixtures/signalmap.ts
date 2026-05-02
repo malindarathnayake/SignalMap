@@ -114,16 +114,6 @@ HEALTH_FIXTURE.sources = SOURCE_HEALTH_FIXTURE.sources.map(s => ({
   id: s.id, label: s.label, status: s.status, latencyMs: s.latencyMs, tier: s.tier,
 }));
 
-export const BOOTSTRAP_FIXTURE = {
-  filters: {
-    timeRange: '24h' as const,
-    categories: ['internet', 'provider', 'geopolitics', 'conflict', 'finance', 'technology', 'cyber', 'climate', 'health', 'energy', 'supply', 'infra'],
-  },
-  signalCount24h: LIST_EVENTS_FIXTURE.events.length,
-  // Source health repeated here for the bootstrap snapshot (UI may consume from either endpoint)
-  sourceHealth: SOURCE_HEALTH_FIXTURE.sources,
-};
-
 export const GLOBAL_BRIEF_FIXTURE = {
   bullets: [
     'Major regional internet disruption observed in southern Iraq.',

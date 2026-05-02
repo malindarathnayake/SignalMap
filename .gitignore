@@ -22,6 +22,7 @@ CLAUDE.md
 skills/
 !api/skills/
 ideas/
+docs/
 docs/internal/
 docs/ideation/
 internal/
@@ -93,6 +94,8 @@ docs/.foreman-journal.json
 docs/.foreman-ledger.json
 docs/.foreman-progress.json
 docs/.foreman-tmp/
+docs/**/_review/
+docs/**/_discovery/
 
 # Real secret material — only the .example file is tracked
 secrets/*

@@ -62,7 +62,7 @@ export const SIGNALMAP_COLLECTOR_HEALTH_DOMAINS = Object.freeze([
   'embeddings',
 ]);
 export const DEFAULT_SIGNALMAP_RSS_POLL_MINUTES = 15;
-export const DEFAULT_SIGNALMAP_FULL_EXTRACTION_DOMAINS = ['risky.biz', 'thehackernews.com'];
+export const DEFAULT_SIGNALMAP_FULL_EXTRACTION_DOMAINS = ['thehackernews.com'];
 
 // Sliding-window retention. Each tick MERGES this run's accepts with the
 // previous publish, prunes anything older than the window, and writes the
@@ -87,8 +87,8 @@ const TRACKING_QUERY_PARAM_RE =
   /^(utm_|fbclid$|gclid$|dclid$|mc_cid$|mc_eid$|igshid$|ref$|ref_src$|cmpid$|ocid$)/i;
 
 const DEFAULT_SIGNALMAP_NEWS_SOURCES = [
-  // Risky Business News removed — Distill descriptor selectors can't keep
-  // up with the site's frequent layout changes; The Hacker News + Dark
+  // Removed the old second cyber source because its Distill descriptor could
+  // not keep up with frequent layout changes; The Hacker News + Dark
   // Reading provide adequate cybersecurity news coverage for the same purpose.
   {
     name: 'The Hacker News',

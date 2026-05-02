@@ -68,8 +68,7 @@ export function normalizeSignalMapEmbeddingInput(eventOrText: any): string {
     locationNames,
   ];
 
-  return compactWhitespace(parts.filter(Boolean).join('
-')).slice(
+  return compactWhitespace(parts.filter(Boolean).join('\n')).slice(
     0,
     DEFAULT_MAX_EMBEDDING_INPUT_CHARS,
   );

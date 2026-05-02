@@ -40,7 +40,7 @@ const ALLOWLIST = [
   'bloomberg.com', 'wsj.com', 'nytimes.com', 'washingtonpost.com',
   'axios.com', 'politico.com', 'foreignpolicy.com', 'economist.com',
   'cyberscoop.com', 'krebsonsecurity.com', 'therecord.media',
-  'risky.biz', 'thehackernews.com', 'bleepingcomputer.com', 'aljazeera.com',
+  'thehackernews.com', 'bleepingcomputer.com', 'aljazeera.com',
 ];
 
 // ────────────────────────────────────────────────────────────

@@ -170,7 +170,7 @@ test('news collector sub-sources are appended when present in the news payload',
           sources: [
             { name: 'NewsAPI Everything', fetched: 19, accepted: 3, skipped: 16, errors: 0 },
             {
-              name: 'Risky Business News',
+              name: 'The Hacker News',
               fetched: 1,
               accepted: 0,
               skipped: 1,
@@ -193,10 +193,10 @@ test('news collector sub-sources are appended when present in the news payload',
   assert.equal(newsApi.eventCount, 3);
   assert.match(newsApi.detail, /fetched 19/);
 
-  const risky = results.find((entry) => entry.label === 'Risky Business News');
-  assert.ok(risky !== undefined, 'RSS sub-source should be present');
-  assert.equal(risky.status, 'degraded');
-  assert.match(risky.detail, /llm missing_api_key/);
+  const hackerNews = results.find((entry) => entry.label === 'The Hacker News');
+  assert.ok(hackerNews !== undefined, 'RSS sub-source should be present');
+  assert.equal(hackerNews.status, 'degraded');
+  assert.match(hackerNews.detail, /llm missing_api_key/);
 });
 
 test('Radar cached source health overrides fresh aggregate metadata when upstream is unavailable', async () => {

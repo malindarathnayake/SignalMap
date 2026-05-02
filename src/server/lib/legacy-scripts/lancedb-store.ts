@@ -363,12 +363,10 @@ export function createSignalMapVectorRecord(event: any, vector: any, options: an
   const lastObservedAt = isoDate(event?.lastObservedAt ?? event?.observedAt, new Date(publishedAt));
   const contentHash =
     cleanString(event?.contentHash) ??
-    hashValue([title, summary, canonicalUrl, publishedAt].join('
-'));
+    hashValue([title, summary, canonicalUrl, publishedAt].join('\n'));
   const sourceTextHash =
     cleanString(event?.sourceTextHash) ??
-    hashValue([canonicalUrl, sourceName, title, summary].join('
-'));
+    hashValue([canonicalUrl, sourceName, title, summary].join('\n'));
   const eventId =
     cleanString(event?.eventId) ??
     cleanString(event?.id) ??

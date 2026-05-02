@@ -88,8 +88,8 @@ a brief-generation cron worker, and an nginx-fronted UI behind one host port.
   `maximum`) that caused Azure-routed Claude to silently 400 every
   article. Schema is now type + enum + required + `additionalProperties`
   only. Made `countryIso2` required+nullable for the same reason.
-- **News collector source list** — Risky Business News removed (HTML
-  layout drifted faster than the descriptor); The Hacker News + Dark
+- **News collector source list** — retired an unstable cyber source whose
+  HTML layout drifted faster than its descriptor; The Hacker News + Dark
   Reading + NewsAPI cover the same beat.
 - **Source-health command-bar popover** — wired to the live
   `/api/signalmap/source-health` endpoint instead of fixture mocks.

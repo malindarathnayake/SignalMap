@@ -26,9 +26,6 @@ const SIGNALMAP_SURFACE = [
   'src/fixtures',
   'src/types',
   'src/vite-env.d.ts',
-  'src/services/runtime.ts',
-  'src/utils/sync-keys.ts',
-  'src/utils/settings-persistence.ts',
 ];
 
 const SOURCE_EXT = /\.(ts|tsx|js|mjs|cjs|jsx)$/;

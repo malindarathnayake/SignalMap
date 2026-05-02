@@ -38,14 +38,6 @@ test.describe('SignalMap Phase 4 acceptance (unit 4e gate)', () => {
     expect(body.sources.map((s) => s.id)).toContain('aws-s3-use1');
   });
 
-  test('fixture endpoint /api/bootstrap serves deterministic JSON', async ({ request }) => {
-    const res = await request.get('/api/bootstrap');
-    expect(res.status()).toBe(200);
-    const body = await res.json() as { filters: { timeRange: string; categories: string[] }; signalCount24h: number };
-    expect(body.filters.timeRange).toBe('24h');
-    expect(body.signalCount24h).toBe(8);
-  });
-
   test('shell mounts: every top-level region renders', async ({ page }) => {
     await page.goto('/');
     await expect(page.getByTestId('signalmap-cmdbar')).toBeVisible();

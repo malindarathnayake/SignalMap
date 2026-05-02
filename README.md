@@ -3,20 +3,19 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/malindarathnayake/SignalMap/releases/latest"><img src="https://img.shields.io/github/v/release/malindarathnayake/SignalMap?display_name=tag&sort=semver" alt="Latest release"></a>
-  <a href="https://github.com/malindarathnayake/SignalMap/actions/workflows/release.yml"><img src="https://img.shields.io/github/actions/workflow/status/malindarathnayake/SignalMap/release.yml?label=release" alt="Release workflow"></a>
-  <a href="https://github.com/malindarathnayake/SignalMap/pkgs/container/signalmap-node"><img src="https://img.shields.io/badge/ghcr.io-signalmap--node-2496ED?logo=docker&logoColor=white" alt="GHCR signalmap-node"></a>
-  <a href="https://github.com/malindarathnayake/SignalMap/pkgs/container/signalmap-ui"><img src="https://img.shields.io/badge/ghcr.io-signalmap--ui-2496ED?logo=docker&logoColor=white" alt="GHCR signalmap-ui"></a>
-  <a href="https://www.gnu.org/licenses/agpl-3.0"><img src="https://img.shields.io/badge/license-AGPL--3.0-blue" alt="License: AGPL v3"></a>
-  <img src="https://img.shields.io/badge/node-22-339933?logo=node.js&logoColor=white" alt="Node 22">
+  <a href="https://github.com/malindarathnayake/SignalMap/releases/latest"><img src="https://img.shields.io/github/v/release/malindarathnayake/SignalMap?display_name=tag&sort=semver&label=release&logo=github&logoColor=white" alt="Latest GitHub release"></a>
+  <a href="https://github.com/malindarathnayake/SignalMap/actions/workflows/release.yml"><img src="https://img.shields.io/github/actions/workflow/status/malindarathnayake/SignalMap/release.yml?branch=main&label=release%20workflow&logo=githubactions&logoColor=white" alt="Release workflow status"></a>
+  <a href="https://github.com/malindarathnayake/SignalMap/pkgs/container/signalmap-node"><img src="https://img.shields.io/badge/ghcr.io-signalmap--node-2496ED?logo=github&logoColor=white" alt="GHCR signalmap-node image"></a>
+  <a href="https://github.com/malindarathnayake/SignalMap/pkgs/container/signalmap-ui"><img src="https://img.shields.io/badge/ghcr.io-signalmap--ui-2496ED?logo=github&logoColor=white" alt="GHCR signalmap-ui image"></a>
+  <a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/license-Apache--2.0-D22128?logo=apache&logoColor=white" alt="License: Apache-2.0"></a>
+  <img src="https://img.shields.io/badge/node-22-339933?logo=nodedotjs&logoColor=white" alt="Node.js 22">
   <img src="https://img.shields.io/badge/typescript-5.7-3178C6?logo=typescript&logoColor=white" alt="TypeScript 5.7">
-  <a href="https://github.com/malindarathnayake/SignalMap/commits/main"><img src="https://img.shields.io/github/last-commit/malindarathnayake/SignalMap" alt="Last commit"></a>
+  <a href="https://github.com/malindarathnayake/SignalMap/commits/main"><img src="https://img.shields.io/github/last-commit/malindarathnayake/SignalMap?logo=git&logoColor=white" alt="Last commit"></a>
 </p>
 
 <p align="center">
   <a href="./CHANGELOG.md"><strong>Changelog</strong></a> &middot;
   <a href="./deploy/README.md"><strong>Deploy guide</strong></a> &middot;
-  <a href="./docs/SignalMap"><strong>Architecture docs</strong></a> &middot;
   <a href="https://github.com/malindarathnayake/SignalMap/issues"><strong>Issues</strong></a>
 </p>
 
@@ -25,6 +24,8 @@
 ## What it does
 
 SignalMap watches the public internet for **operational, security, geopolitical, and infrastructure events** — provider outages, network anomalies, cybersecurity incidents, supply-chain attacks — and surfaces them as a unified, geo-located, severity-ranked feed. It runs entirely on infrastructure you control.
+
+SignalMap began as a fork of Worldmap / World Monitor. The application has since been substantially rewritten: the multi-variant desktop/map-layer product was replaced with a focused operational-signal workflow, a new Preact shell, server API/workers, and a redesigned SVG/D3 map experience.
 
 - **Live map + feed** — every signal pinned to its geography, with category and severity colour-coding, server-sent updates as new events land.
 - **Source-health visibility** — `/source-health-details` shows per-source fetch / accept / reject counts, last-fetched age, and a "why articles were skipped" panel that aggregates LLM confidence stats and dedupe reasons.
@@ -204,14 +205,14 @@ npm run lint             # biome lint
 
 ## License
 
-**AGPL-3.0**. See [LICENSE](./LICENSE).
+**Apache-2.0**. See [LICENSE](./LICENSE).
 
 | Use case | Allowed |
 | --- | --- |
 | Personal / research / educational | Yes |
-| Self-hosted (non-commercial) | Yes, with attribution |
-| Fork and modify (non-commercial) | Yes, share source under AGPL-3.0 |
-| Commercial use / SaaS / rebranding | Requires a commercial license — open an issue |
+| Self-hosted | Yes |
+| Fork and modify | Yes, preserve license and notices |
+| Commercial use / SaaS / rebranding | Yes, under Apache-2.0 terms |
 
 ---
 

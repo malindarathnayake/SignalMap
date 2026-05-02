@@ -1,6 +1,6 @@
 // Bake the dev fixture responses into dist/api/ at build time.
 // Lets a static-only Docker deployment serve a working demo (events,
-// briefs, source health, bootstrap, per-event "Why this matters") via
+// briefs, source health, per-event "Why this matters") via
 // nginx without a Node backend. Run AFTER `vite build`.
 //
 // Usage: npx tsx scripts/bake-fixtures.mjs
@@ -12,7 +12,6 @@ import { fileURLToPath } from 'node:url';
 import {
   LIST_EVENTS_FIXTURE,
   SOURCE_HEALTH_FIXTURE,
-  BOOTSTRAP_FIXTURE,
   GLOBAL_BRIEF_FIXTURE,
   HEALTH_FIXTURE,
   buildEventBrief,
@@ -37,7 +36,6 @@ function write(rel, body) {
 const baked = [];
 baked.push(write('signalmap/list.json', LIST_EVENTS_FIXTURE));
 baked.push(write('signalmap/source-health.json', SOURCE_HEALTH_FIXTURE));
-baked.push(write('bootstrap.json', BOOTSTRAP_FIXTURE));
 baked.push(write('signalmap/brief/global.json', GLOBAL_BRIEF_FIXTURE));
 baked.push(write('signalmap/health.json', HEALTH_FIXTURE));
 baked.push(write('signalmap/brief/refresh.json', { ok: true }));

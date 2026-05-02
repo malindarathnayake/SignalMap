@@ -35,7 +35,7 @@ const LOCAL_SIGNALS = JSON.stringify([
   { id: 'okta-001', source: 'okta_status', category: 'provider', title: 'Elevated sign-in error rates', severity: 'medium', startedMinutesAgo: 32, region: 'global' },
   { id: 'azure-001', source: 'azure_status', category: 'provider', title: 'Service management issues in West Europe', severity: 'medium', startedMinutesAgo: 45, region: 'eu', provider: 'azure' },
   { id: 'hn-cy-001', source: 'thehackernews', category: 'cyber', title: 'Ransomware campaign hits energy operators in Eastern Europe', severity: 'high', startedMinutesAgo: 120 },
-  { id: 'risky-cy-002', source: 'risky.biz', category: 'cyber', title: 'Citrix NetScaler zero-day exploited in the wild', severity: 'high', startedMinutesAgo: 180 },
+  { id: 'thn-cy-002', source: 'thehackernews.com', category: 'cyber', title: 'Citrix NetScaler zero-day exploited in the wild', severity: 'high', startedMinutesAgo: 180 },
 ], null, 2);
 
 const FILTERS = JSON.stringify({

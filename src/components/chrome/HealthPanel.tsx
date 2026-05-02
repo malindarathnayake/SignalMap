@@ -63,7 +63,7 @@ export function HealthPanel({ onClose }: Props) {
 
   // Poll /api/signalmap/source-health every 3s while the panel is open so
   // the user gets live feedback during the 3-7 minute news collector tick
-  // ("Ingesting from Risky Business · 47/120 articles · 8 accepted") instead
+  // ("Ingesting from The Hacker News · 47/120 articles · 8 accepted") instead
   // of staring at stale source-health rows that only update at end of tick.
   useEffect(() => {
     let cancelled = false;

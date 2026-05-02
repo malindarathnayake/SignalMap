@@ -436,21 +436,19 @@ function signalmapFixturePlugin(): Plugin {
           return;
         }
 
-        // ---- legacy Phase 4 endpoints (GET only) ----
+        // ---- SignalMap fixture endpoints (GET only) ----
         if (req.method !== 'GET') return next();
         if (
           url !== '/api/signalmap/list' &&
-          url !== '/api/signalmap/source-health' &&
-          url !== '/api/bootstrap'
+          url !== '/api/signalmap/source-health'
         ) {
           return next();
         }
         try {
-          const { LIST_EVENTS_FIXTURE, SOURCE_HEALTH_FIXTURE, BOOTSTRAP_FIXTURE } = await getFixtures();
+          const { LIST_EVENTS_FIXTURE, SOURCE_HEALTH_FIXTURE } = await getFixtures();
           const PATHS: Record<string, unknown> = {
             '/api/signalmap/list': LIST_EVENTS_FIXTURE,
             '/api/signalmap/source-health': SOURCE_HEALTH_FIXTURE,
-            '/api/bootstrap': BOOTSTRAP_FIXTURE,
           };
           const body = JSON.stringify(PATHS[url]);
           res.statusCode = 200;
@@ -585,11 +583,6 @@ export default defineConfig(({ mode }) => {
         ],
       },
       proxy: {
-        // Widget agent — forward to Railway relay for SSE streaming
-        '/widget-agent': {
-          target: 'https://proxy.worldmonitor.app',
-          changeOrigin: true,
-        },
         // Yahoo Finance API
         '/api/yahoo': {
           target: 'https://query1.finance.yahoo.com',

@@ -8,10 +8,9 @@ export const SIGNALMAP_DISTILL_DESCRIPTOR_FILES = [
 
 export const DEFAULT_SIGNALMAP_DISTILL_TIMEOUT_MS = 15000;
 
-// Risky Business News dropped — descriptor was producing
-// invalid_distill_output as the site's HTML layout drifts faster than
-// the descriptor can be maintained. The Hacker News covers the same
-// cybersecurity news category adequately.
+// A previous second cyber source was dropped because its descriptor produced
+// invalid_distill_output as the site's HTML layout drifted. The Hacker News
+// covers the same cybersecurity category adequately.
 const SUPPORTED_SOURCE_NAMES = new Set(['The Hacker News']);
 const SIGNALMAP_DISTILL_DESCRIPTOR_BY_SOURCE = new Map([
   ['The Hacker News', 'the-hacker-news.json'],

@@ -9,16 +9,14 @@ const BUNDLED_SIGNALMAP_DISTILL_ROOT = resolve(
 );
 
 export const SIGNALMAP_DISTILL_DESCRIPTOR_FILES = [
-  'risky-business-news.json',
   'the-hacker-news.json',
 ];
 
 export const DEFAULT_SIGNALMAP_DISTILL_TIMEOUT_MS = 15000;
 
-const SUPPORTED_SOURCE_NAMES = new Set(['Risky Business News', 'The Hacker News']);
-const SOURCE_NAME_ALIASES = new Map([['Risky Business', 'Risky Business News']]);
+const SUPPORTED_SOURCE_NAMES = new Set(['The Hacker News']);
+const SOURCE_NAME_ALIASES = new Map();
 const SIGNALMAP_DISTILL_DESCRIPTOR_BY_SOURCE = new Map([
-  ['Risky Business News', 'risky-business-news.json'],
   ['The Hacker News', 'the-hacker-news.json'],
 ]);
 

@@ -38,10 +38,7 @@
     "src/client/**/*.ts",
     "src/fixtures/**/*.ts",
     "src/types/**/*.ts",
-    "src/vite-env.d.ts",
-    "src/services/runtime.ts",
-    "src/utils/sync-keys.ts",
-    "src/utils/settings-persistence.ts"
+    "src/vite-env.d.ts"
   ],
   "exclude": ["src/workers/ml.worker.ts"]
 }

@@ -77,7 +77,7 @@ function makeSwSandbox() {
   let opened = null;
 
   const self = {
-    location: { origin: 'https://worldmonitor.app' },
+    location: { origin: 'https://signalmap.app' },
     addEventListener(name, fn) {
       if (!listeners.has(name)) listeners.set(name, []);
       listeners.get(name).push(fn);
@@ -145,7 +145,7 @@ describe('push-handler.js — push event', () => {
     box.emit('push', pushEvent({
       title: 'Your brief is ready',
       body: 'Iran threatens Strait of Hormuz closure · 11 more threads',
-      url: 'https://worldmonitor.app/api/brief/user_abc/2026-04-18?t=xxx',
+      url: 'https://signalmap.app/api/brief/user_abc/2026-04-18?t=xxx',
       tag: 'brief_ready:user_abc',
       eventType: 'brief_ready',
     }));
@@ -154,7 +154,7 @@ describe('push-handler.js — push event', () => {
     assert.equal(title, 'Your brief is ready');
     assert.equal(opts.body, 'Iran threatens Strait of Hormuz closure · 11 more threads');
     assert.equal(opts.tag, 'brief_ready:user_abc');
-    assert.equal(opts.data.url, 'https://worldmonitor.app/api/brief/user_abc/2026-04-18?t=xxx');
+    assert.equal(opts.data.url, 'https://signalmap.app/api/brief/user_abc/2026-04-18?t=xxx');
     // brief_ready should requireInteraction — don't let a lock-screen
     // swipe dismiss the CTA before the user reads the brief.
     assert.equal(opts.requireInteraction, true);
@@ -172,11 +172,11 @@ describe('push-handler.js — push event', () => {
     assert.equal(box.shown[0].opts.requireInteraction, false);
   });
 
-  it('falls back to "WorldMonitor" title when payload omits it', () => {
+  it('falls back to "SignalMap" title when payload omits it', () => {
     const box = makeSwSandbox();
     loadHandlerInto(box);
     box.emit('push', pushEvent({ body: 'body only, no title' }));
-    assert.equal(box.shown[0].title, 'WorldMonitor');
+    assert.equal(box.shown[0].title, 'SignalMap');
   });
 
   it('malformed JSON payload renders the raw text as the body', () => {
@@ -192,7 +192,7 @@ describe('push-handler.js — push event', () => {
     };
     box.emit('push', broken);
     assert.equal(box.shown.length, 1);
-    assert.equal(box.shown[0].title, 'WorldMonitor');
+    assert.equal(box.shown[0].title, 'SignalMap');
     assert.equal(box.shown[0].opts.body, 'plain raw text');
   });
 
@@ -201,7 +201,7 @@ describe('push-handler.js — push event', () => {
     loadHandlerInto(box);
     box.emit('push', { data: null, waitUntil() {} });
     assert.equal(box.shown.length, 1);
-    assert.equal(box.shown[0].title, 'WorldMonitor');
+    assert.equal(box.shown[0].title, 'SignalMap');
   });
 });
 
@@ -209,12 +209,12 @@ describe('push-handler.js — notificationclick', () => {
   it('opens the target url when no existing window matches', async () => {
     const box = makeSwSandbox();
     loadHandlerInto(box);
-    const ev = notifClickEvent({ url: 'https://worldmonitor.app/api/brief/user_a/2026-04-18?t=abc' });
+    const ev = notifClickEvent({ url: 'https://signalmap.app/api/brief/user_a/2026-04-18?t=abc' });
     box.emit('notificationclick', ev);
     assert.equal(ev.closed, true);
     // Wait for the waitUntil chain
     for (const p of ev.waits) await p;
-    assert.equal(box.opened, 'https://worldmonitor.app/api/brief/user_a/2026-04-18?t=abc');
+    assert.equal(box.opened, 'https://signalmap.app/api/brief/user_a/2026-04-18?t=abc');
   });
 
   it('focuses + navigates an existing same-origin window instead of opening', async () => {
@@ -222,16 +222,16 @@ describe('push-handler.js — notificationclick', () => {
     let focused = false;
     let navigated = null;
     box.windowClients.push({
-      url: 'https://worldmonitor.app/',
+      url: 'https://signalmap.app/',
       focus() { focused = true; return this; },
       navigate(url) { navigated = url; return Promise.resolve(); },
     });
     loadHandlerInto(box);
-    const ev = notifClickEvent({ url: 'https://worldmonitor.app/api/brief/u/d?t=t' });
+    const ev = notifClickEvent({ url: 'https://signalmap.app/api/brief/u/d?t=t' });
     box.emit('notificationclick', ev);
     for (const p of ev.waits) await p;
     assert.equal(focused, true);
-    assert.equal(navigated, 'https://worldmonitor.app/api/brief/u/d?t=t');
+    assert.equal(navigated, 'https://signalmap.app/api/brief/u/d?t=t');
     assert.equal(box.opened, null, 'openWindow must NOT fire when a window is focused');
   });
 

@@ -212,9 +212,7 @@ export function sanitizeSignalMapArticleText(
     article?.snippet,
   ];
   const text = stripHtml(
-    parts.filter((part) => typeof part === 'string' && part.trim()).join('
-
-'),
+    parts.filter((part) => typeof part === 'string' && part.trim()).join('\n\n'),
   );
 
   return text.length > maxInputChars ? text.slice(0, maxInputChars) : text;
@@ -381,8 +379,7 @@ function makeOpenRouterPrompt(article: any, sourceText: string): string {
     '<untrusted_article_data>',
     sourceText,
     '</untrusted_article_data>',
-  ].join('
-');
+  ].join('\n');
 }
 
 function openRouterEndpoint(baseUrl: string | undefined): string {
