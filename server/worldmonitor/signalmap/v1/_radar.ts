@@ -335,11 +335,21 @@ function outageLocation(entry: OutageEntry): SignalMapLocation {
   const locationName = country ?? countryIso2 ?? 'Unknown';
 
   // AWS region fallback: when the upstream entry has no country/locations
-  // attached but the description references a cloud region tag (e.g.
-  // "me-central-1"), pin to that region's datacenter city. Confidence 0.85
-  // beats the 0.7 marker threshold so the event renders on the map.
+  // attached but a cloud region tag appears in any of its text fields —
+  // including the source URL (e.g. health.aws.amazon.com/health/status
+  // #multipleservices-me-central-1_...) — pin to that region's datacenter
+  // city. Confidence 0.85 beats the 0.7 marker threshold so the event
+  // renders on the map. Order: description first (most specific), then
+  // region/title, then linked URLs (last because URLs may also embed
+  // unrelated tags).
   if (!countryIso2 && (lat == null || lon == null)) {
-    const awsRegion = extractAwsRegionCode(entry.description, region);
+    const awsRegion = extractAwsRegionCode(
+      entry.description,
+      region,
+      entry.title,
+      entry.link,
+      entry.linkedUrl,
+    );
     const awsLoc = awsRegion ? awsRegionLocation(awsRegion, cleanString(entry.description)) : null;
     if (awsLoc) return awsLoc;
   }
