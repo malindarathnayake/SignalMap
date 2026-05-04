@@ -1,5 +1,7 @@
 node_modules
 dist
+!vendor/distill/dist
+!vendor/distill/dist/**
 .git
 .github
 .windsurf

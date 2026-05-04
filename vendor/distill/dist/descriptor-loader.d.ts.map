@@ -1,0 +1,1 @@
+{"version":3,"file":"descriptor-loader.d.ts","sourceRoot":"","sources":["../src/descriptor-loader.ts"],"names":[],"mappings":"AAGA,OAAO,KAAK,EAAE,UAAU,EAAE,MAAM,YAAY,CAAC;AAE7C,wBAAgB,eAAe,CAAC,eAAe,CAAC,EAAE,KAAK,CAAC,MAAM,GAAG,UAAU,CAAC,GAAG,UAAU,EAAE,CAwB1F;AAED,wBAAgB,eAAe,CAAC,GAAG,EAAE,MAAM,EAAE,WAAW,EAAE,UAAU,EAAE,GAAG,UAAU,GAAG,IAAI,CAezF"}

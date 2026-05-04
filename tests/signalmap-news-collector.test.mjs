@@ -3,6 +3,7 @@ import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import test from 'node:test';
+import { pathToFileURL } from 'node:url';
 
 import {
   DEFAULT_SIGNALMAP_DISTILL_TIMEOUT_MS,
@@ -102,6 +103,21 @@ test('resolves bridge config from SIGNALMAP_DISTILL_ROOT and descriptor paths', 
   assert.deepEqual(
     config.descriptorPaths,
     SIGNALMAP_DISTILL_DESCRIPTOR_FILES.map((file) => resolve(root, 'descriptors', file)),
+  );
+});
+
+test('bundled Distill runtime is vendored with descriptors', async () => {
+  const distillRoot = resolve('vendor', 'distill');
+  const config = resolveSignalMapDistillBridgeConfig({ distillRoot });
+  const module = await import(pathToFileURL(config.modulePath).href);
+
+  assert.equal(config.enabled, true);
+  assert.equal(typeof module.Distill, 'function');
+  assert.match(config.distillRoot, /vendor[\\/]distill$/);
+  assert.match(config.modulePath, /vendor[\\/]distill[\\/]dist[\\/]index\.js$/);
+  assert.deepEqual(
+    config.descriptorPaths.map((path) => path.replace(/\\/g, '/').split('/').slice(-2).join('/')),
+    ['descriptors/the-hacker-news.json'],
   );
 });
 
@@ -1150,7 +1166,7 @@ test('collector publishes cache and seed-meta commands via custom publishImpl', 
     now: '2026-04-25T13:00:00Z',
     env: { SIGNALMAP_VECTOR_ENABLED: 'false' },
     feeds: [{ name: 'Example Security Blog', url: 'https://feeds.example.test/rss.xml' }],
-    fetchImpl: async (url) => okXml(rss([{ title: 'Redis health story', link: 'https://example.com/redis-health' }])),
+    fetchImpl: async (_url) => okXml(rss([{ title: 'Redis health story', link: 'https://example.com/redis-health' }])),
     parseArticleImpl: async (article) => parsedEvent({ canonicalTitle: article.title }),
     resolveLocationsImpl: async () => resolvedLocations(true),
     publishImpl: customPublishImpl,

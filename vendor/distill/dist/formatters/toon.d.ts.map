@@ -1,0 +1,1 @@
+{"version":3,"file":"toon.d.ts","sourceRoot":"","sources":["../../src/formatters/toon.ts"],"names":[],"mappings":"AACA,OAAO,KAAK,EAAE,WAAW,EAAE,MAAM,aAAa,CAAC;AAE/C,wBAAgB,UAAU,CAAC,IAAI,EAAE,WAAW,GAAG,MAAM,CAEpD;AAED,wBAAgB,eAAe,CAAC,IAAI,EAAE,WAAW,EAAE,GAAG,MAAM,CAE3D;AAED,wBAAgB,iBAAiB,CAAC,IAAI,EAAE,MAAM,CAAC,MAAM,EAAE,OAAO,CAAC,GAAG,MAAM,CAEvE"}

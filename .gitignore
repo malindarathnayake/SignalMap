@@ -1,6 +1,8 @@
 node_modules/
 .idea/
 dist/
+!vendor/distill/dist/
+!vendor/distill/dist/**
 public/blog/
 .DS_Store
 *.log
