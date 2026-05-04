@@ -40,6 +40,21 @@ export type SignalEvent = {
   markerEligible?: boolean;
 };
 
+export type RawSignalEvent = Omit<SignalEvent, 'startedAt'> & {
+  startedAt?: number | string;
+  lastObservedAt?: string;
+};
+
+export function normalizeSignalEvent(event: RawSignalEvent): SignalEvent | null {
+  const startedAt = typeof event.startedAt === 'number'
+    ? event.startedAt
+    : Date.parse(event.startedAt ?? event.lastObservedAt ?? '');
+
+  if (!Number.isFinite(startedAt)) return null;
+
+  return { ...event, startedAt };
+}
+
 const initial = new Map<string, SignalEvent>();
 for (const ev of LIST_EVENTS_FIXTURE.events) initial.set(ev.id, ev);
 

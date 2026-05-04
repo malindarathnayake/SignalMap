@@ -1,6 +1,6 @@
 import { render } from 'preact';
 import { App } from './app.tsx';
-import { signals, type SignalEvent } from './state/signals.ts';
+import { normalizeSignalEvent, signals, type RawSignalEvent, type SignalEvent } from './state/signals.ts';
 
 const root = document.getElementById('root');
 if (!root) {
@@ -14,10 +14,13 @@ void (async () => {
   try {
     const res = await fetch('/api/signalmap/list');
     if (!res.ok) return;
-    const json = await res.json() as { events: readonly SignalEvent[] };
+    const json = await res.json() as { events: readonly RawSignalEvent[] };
     if (!Array.isArray(json.events)) return;
     const next = new Map<string, SignalEvent>();
-    for (const ev of json.events) next.set(ev.id, ev);
+    for (const ev of json.events) {
+      const normalized = normalizeSignalEvent(ev);
+      if (normalized) next.set(normalized.id, normalized);
+    }
     signals.value = next;
   } catch {
     // network failure / shape mismatch → keep initial Map
